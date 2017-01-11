@@ -8,16 +8,19 @@ namespace DataCore
 {
     public class Query<T>
     {
+        private readonly ITranslator _translator;
+
         public string TableName { get; private set; }
 
-        public string SqlSelectFormat { get; private set; }
-        public string SqlColumns { get; private set; }
-        public string SqlFrom { get; private set; }
-        public string SqlWhere { get; private set; }
+        public string SqlSelectFormat { get; set; }
+        public string SqlColumns { get; set; }
+        public string SqlFrom { get; set; }
+        public string SqlWhere { get; set; }
         public StringBuilder SqlCommand { get; private set; }
 
-        public Query()
+        public Query(ITranslator translator)
         {
+            _translator = translator;
             SqlSelectFormat = "{0}";
             SqlWhere = string.Empty;
             SqlCommand = new StringBuilder();
@@ -53,7 +56,7 @@ namespace DataCore
 
         public Query<T> Top(int count)
         {
-            SqlSelectFormat = "TOP (" + count + ") {0}";
+            _translator.Top(this, count);
 
             return this;
         }
@@ -186,40 +189,10 @@ namespace DataCore
 
         private string BinaryExpressionString(IEnumerator<Expression> iterator, BinaryExpression binaryExpression)
         {
-            string format;
-            switch (binaryExpression.NodeType)
-            {
-                case ExpressionType.Equal:
-                    format = "({0} = {1})";
-                    break;
-                case ExpressionType.GreaterThan:
-                    format = "({0} > {1})";
-                    break;
-                case ExpressionType.GreaterThanOrEqual:
-                    format = "({0} >= {1})";
-                    break;
-                case ExpressionType.LessThan:
-                    format = "({0} < {1})";
-                    break;
-                case ExpressionType.LessThanOrEqual:
-                    format = "({0} <= {1})";
-                    break;
-                case ExpressionType.NotEqual:
-                    format = "({0} != {1})";
-                    break;
-                case ExpressionType.AndAlso:
-                    format = "({0} AND {1})";
-                    break;
-                case ExpressionType.OrElse:
-                    format = "({0} OR {1})";
-                    break;
-                default:
-                    format = "({0} {1})";
-                    break;
-            }
+            var format = _translator.GetFormatFor(binaryExpression.NodeType);
 
-            var left = "";
-            var right = "";
+            var left = string.Empty;
+            var right = string.Empty;
 
             if (iterator.MoveNext())
                 left = GetQueryFromExpression(iterator.Current);
@@ -230,16 +203,16 @@ namespace DataCore
             return string.Format(format, left, right);
         }
 
-        private static string ConstantExpressionString(ConstantExpression constantExpression)
+        private string ConstantExpressionString(ConstantExpression constantExpression)
         {
             switch (constantExpression.Type.Name)
             {
                 case "String":
-                    return string.Concat("'", constantExpression.Value, "'");
+                    return _translator.GetStringValue(constantExpression.Value);
                 case "DateTime":
                     {
                         var date = Convert.ToDateTime(constantExpression.Value);
-                        return string.Concat("'", date.ToString("yyyy-MM-dd HH:mm:ss.fff"), "'");
+                        return _translator.GetDateTimeValue(date);
                     }
                 default:
                     return Convert.ToString(constantExpression.Value);

@@ -8,7 +8,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateInnerJoin()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Join<TestClass2>((t, t2) => t.Id == t2.Id);
 
@@ -18,7 +18,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateLeftJoin()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.LeftJoin<TestClass2>((t, t2) => t.Id == t2.Id);
 
@@ -28,7 +28,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateRightJoin()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.RightJoin<TestClass2>((t, t2) => t.Id == t2.Id);
 
@@ -38,7 +38,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateInnerJoinAlso()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Join<TestClass2>((t, t2) => t.Id == t2.Id);
             data.Join<TestClass2, TestClass3>((t, t2) => t.Id == t2.Id);
@@ -49,7 +49,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateLeftJoinAlso()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.LeftJoin<TestClass2>((t, t2) => t.Id == t2.Id);
             data.LeftJoin<TestClass2, TestClass3>((t, t2) => t.Id == t2.Id);
@@ -60,7 +60,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateRightJoinAlso()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.RightJoin<TestClass2>((t, t2) => t.Id == t2.Id);
             data.RightJoin<TestClass2, TestClass3>((t, t2) => t.Id == t2.Id);

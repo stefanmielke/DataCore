@@ -8,7 +8,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseEquals()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id == 1);
 
@@ -18,7 +18,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseGreaterThan()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id > 1);
 
@@ -28,7 +28,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseGreaterThanOrEqual()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id >= 1);
 
@@ -38,7 +38,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseLessThan()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id < 1);
 
@@ -48,7 +48,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseLessThanOrEqual()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id <= 1);
 
@@ -58,7 +58,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseNotEqual()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id != 1);
 

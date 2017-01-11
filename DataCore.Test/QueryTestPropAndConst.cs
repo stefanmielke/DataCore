@@ -9,7 +9,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseEquals()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id == t.Id);
 
@@ -19,7 +19,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseGreaterThan()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id > t.Id);
 
@@ -29,7 +29,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseGreaterThanOrEqual()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id >= t.Id);
 
@@ -39,7 +39,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseLessThan()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id < t.Id);
 
@@ -49,7 +49,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseLessThanOrEqual()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id <= t.Id);
 
@@ -59,7 +59,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseNotEqual()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id != t.Id);
 
@@ -69,7 +69,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseString()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Name != "test");
 
@@ -79,7 +79,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseDateTimeInVariable()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             var date = new DateTime(2017, 1, 1, 17, 25, 47, 789);
 
@@ -91,7 +91,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanTransformWhereClauseDateTimeDirect()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.InsertDate > new DateTime(2017, 1, 1, 17, 25, 47, 789));
 
@@ -103,7 +103,7 @@ namespace DataCore.Test
         {
             var testClass = new TestClass { Name = "test" };
 
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Name == GetNameString(testClass));
 

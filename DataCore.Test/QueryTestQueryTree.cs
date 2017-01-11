@@ -8,7 +8,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateAndClause()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id == 0 && t.Number == 1);
 
@@ -18,7 +18,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateOrClause()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id == 0 || t.Number == 1);
 
@@ -28,7 +28,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateAndClauseCapsuled()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => (t.Id == 0 && t.Number == 1) && t.Id == 1);
 
@@ -38,7 +38,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateClauseDoubleCapsuled()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => (t.Id == 0 && t.Number == 1) || (t.Id == 1 && t.Number == 0));
 
@@ -48,7 +48,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateClauseDoubleWhere()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id == 1 && t.Number == 0);
             data.Where(t => t.Name == "test");
@@ -59,7 +59,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateClauseDoubleWhereWithOr()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id == 1 && t.Number == 0);
             data.Or(t => t.Name == "test");

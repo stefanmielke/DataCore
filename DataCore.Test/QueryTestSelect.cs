@@ -8,7 +8,7 @@ namespace DataCore.Test
         [TestMethod]
         public void DataTestSelectClauseNoWhere()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Select();
 
@@ -18,7 +18,7 @@ namespace DataCore.Test
         [TestMethod]
         public void DataTestSelectClauseWhere()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id == 0).Select();
 
@@ -28,7 +28,7 @@ namespace DataCore.Test
         [TestMethod]
         public void DataTestSelectClauseWithTop()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Top(10).Select();
 
@@ -38,7 +38,7 @@ namespace DataCore.Test
         [TestMethod]
         public void DataTestSelectClauseWithTopAndWhere()
         {
-            var data = new Query<TestClass>();
+            var data = new Query<TestClass>(new Translator());
 
             data.Where(t => t.Id == 0).Top(10).Select();
 
@@ -49,7 +49,7 @@ namespace DataCore.Test
         public void ComplexQueryTest()
         {
             var query =
-                new Query<TestClass>()
+                new Query<TestClass>(new Translator())
                     .Join<TestClass2>((t, t2) => t.Id == t2.Id)
                     .LeftJoin<TestClass2>((t, t2) => t.Id == t2.Id && t2.Id == 1)
                     .RightJoin<TestClass2, TestClass3>((t, t2) => t.Id == t2.Id && t2.Id > 1)
@@ -69,7 +69,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateSelectColumns()
         {
-            var query = new Query<TestClass>();
+            var query = new Query<TestClass>(new Translator());
             query.Select(t => new { t.Id, t.Name });
 
             Assert.AreEqual("SELECT TestClass.Id, TestClass.Name FROM TestClass", query.SqlCommand.ToString());
@@ -78,7 +78,7 @@ namespace DataCore.Test
         [TestMethod]
         public void CanGenerateSelectColumnsWithTop()
         {
-            var query = new Query<TestClass>();
+            var query = new Query<TestClass>(new Translator());
             query.Top(10).Select(t => new { t.Id, t.Name });
 
             Assert.AreEqual("SELECT TOP (10) TestClass.Id, TestClass.Name FROM TestClass", query.SqlCommand.ToString());
