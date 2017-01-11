@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DataCore
+namespace DataCore.Test
 {
-    public class Class1
+    class TestClass
     {
+        public int Id { get; set; }
     }
 }
