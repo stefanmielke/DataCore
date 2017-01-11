@@ -9,18 +9,23 @@ namespace DataCore
         protected override Expression VisitMember(MemberExpression memberExpression)
         {
             var expression = Visit(memberExpression.Expression);
-            if (expression is ConstantExpression)
+            var constantExpression = expression as ConstantExpression;
+            if (constantExpression != null)
             {
-                object container = ((ConstantExpression)expression).Value;
+                var container = constantExpression.Value;
                 var member = memberExpression.Member;
-                if (member is FieldInfo)
+
+                var fieldInfo = member as FieldInfo;
+                if (fieldInfo != null)
                 {
-                    object value = ((FieldInfo)member).GetValue(container);
+                    var value = fieldInfo.GetValue(container);
                     return Expression.Constant(value);
                 }
-                if (member is PropertyInfo)
+
+                var propertyInfo = member as PropertyInfo;
+                if (propertyInfo != null)
                 {
-                    object value = ((PropertyInfo)member).GetValue(container, null);
+                    var value = propertyInfo.GetValue(container, null);
                     return Expression.Constant(value);
                 }
             }

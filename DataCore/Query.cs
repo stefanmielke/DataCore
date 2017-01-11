@@ -35,7 +35,7 @@ namespace DataCore
             SqlCommand.Append(" FROM ");
             SqlCommand.Append(SqlFrom);
 
-            var where = SqlWhere.ToString();
+            var where = SqlWhere;
             if (!string.IsNullOrWhiteSpace(where))
                 SqlCommand.AppendFormat(" WHERE {0}", where);
 
@@ -62,12 +62,9 @@ namespace DataCore
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
 
-            string query = GetQueryFromExpression(newExpression.Body);
+            var query = GetQueryFromExpression(newExpression.Body);
 
-            if (string.IsNullOrEmpty(SqlWhere))
-                SqlWhere = query;
-            else
-                SqlWhere = string.Concat("(", SqlWhere, ") AND (", query, ")");
+            SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") AND (", query, ")");
 
             return this;
         }
@@ -76,12 +73,9 @@ namespace DataCore
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
 
-            string query = GetQueryFromExpression(newExpression.Body);
+            var query = GetQueryFromExpression(newExpression.Body);
 
-            if (string.IsNullOrEmpty(SqlWhere))
-                SqlWhere = query;
-            else
-                SqlWhere = string.Concat("(", SqlWhere, ") OR (", query, ")");
+            SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") OR (", query, ")");
 
             return this;
         }
@@ -89,7 +83,7 @@ namespace DataCore
         public Query<T> Join<TJoined>(Expression<Func<T, TJoined, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            string query = GetQueryFromExpression(newExpression.Body);
+            var query = GetQueryFromExpression(newExpression.Body);
 
             var joinedTableName = typeof(TJoined).Name;
             SqlFrom = string.Concat(SqlFrom, " INNER JOIN ", joinedTableName, " ON ", query);
@@ -100,7 +94,7 @@ namespace DataCore
         public Query<T> Join<TJoinedLeft, TJoinedRight>(Expression<Func<TJoinedLeft, TJoinedRight, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            string query = GetQueryFromExpression(newExpression.Body);
+            var query = GetQueryFromExpression(newExpression.Body);
 
             var joinedTableName = typeof(TJoinedRight).Name;
 
@@ -112,7 +106,7 @@ namespace DataCore
         public Query<T> LeftJoin<TJoined>(Expression<Func<T, TJoined, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            string query = GetQueryFromExpression(newExpression.Body);
+            var query = GetQueryFromExpression(newExpression.Body);
 
             var joinedTableName = typeof(TJoined).Name;
             SqlFrom = string.Concat(SqlFrom, " LEFT JOIN ", joinedTableName, " ON ", query);
@@ -123,7 +117,7 @@ namespace DataCore
         public Query<T> LeftJoin<TJoinedLeft, TJoinedRight>(Expression<Func<TJoinedLeft, TJoinedRight, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            string query = GetQueryFromExpression(newExpression.Body);
+            var query = GetQueryFromExpression(newExpression.Body);
 
             var joinedTableName = typeof(TJoinedRight).Name;
             SqlFrom = string.Concat(SqlFrom, " LEFT JOIN ", joinedTableName, " ON ", query);
@@ -134,7 +128,7 @@ namespace DataCore
         public Query<T> RightJoin<TJoined>(Expression<Func<T, TJoined, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            string query = GetQueryFromExpression(newExpression.Body);
+            var query = GetQueryFromExpression(newExpression.Body);
 
             var joinedTableName = typeof(TJoined).Name;
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
@@ -145,7 +139,7 @@ namespace DataCore
         public Query<T> RightJoin<TJoinedLeft, TJoinedRight>(Expression<Func<TJoinedLeft, TJoinedRight, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            string query = GetQueryFromExpression(newExpression.Body);
+            var query = GetQueryFromExpression(newExpression.Body);
 
             var joinedTableName = typeof(TJoinedRight).Name;
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
@@ -155,15 +149,12 @@ namespace DataCore
 
         private string GetQueryFromExpression(Expression clause)
         {
-            string query = string.Empty;
             var members = GetMemberExpressions(clause);
-            if (members.Any())
-            {
-                var enumerator = members.GetEnumerator();
-                query = GetString(enumerator);
-            }
+            if (!members.Any())
+                return string.Empty;
 
-            return query;
+            var enumerator = members.GetEnumerator();
+            return GetString(enumerator);
         }
 
         private string GetString(IEnumerator<Expression> iterator)
@@ -227,8 +218,8 @@ namespace DataCore
                     break;
             }
 
-            string left = "";
-            string right = "";
+            var left = "";
+            var right = "";
 
             if (iterator.MoveNext())
                 left = GetQueryFromExpression(iterator.Current);
@@ -252,22 +243,6 @@ namespace DataCore
                     }
                 default:
                     return Convert.ToString(constantExpression.Value);
-            }
-        }
-
-        private static string GetValue(object value)
-        {
-            switch (value.GetType().Name)
-            {
-                case "String":
-                    return string.Concat("'", value, "'");
-                case "DateTime":
-                    {
-                        var date = Convert.ToDateTime(value);
-                        return string.Concat("'", date.ToString("yyyy-MM-dd HH:mm:ss.fff"), "'");
-                    }
-                default:
-                    return Convert.ToString(value);
             }
         }
 
