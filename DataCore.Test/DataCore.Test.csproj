@@ -53,11 +53,15 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="DataTestPropAndProp.cs" />
-    <Compile Include="DataTestPropAndConst.cs" />
-    <Compile Include="DataTestSelect.cs" />
+    <Compile Include="QueryTestJoins.cs" />
+    <Compile Include="QueryTestQueryTree.cs" />
+    <Compile Include="QueryTestPropAndProp.cs" />
+    <Compile Include="QueryTestPropAndConst.cs" />
+    <Compile Include="QueryTestSelect.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestClass.cs" />
+    <Compile Include="TestClass2.cs" />
+    <Compile Include="TestClass3.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataCore\DataCore.csproj">
