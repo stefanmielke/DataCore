@@ -30,7 +30,7 @@ namespace DataCore
             SqlCommand = new StringBuilder();
             SqlColumns = "*";
             TableName = typeof(T).Name;
-            SqlFrom = TableName;
+            SqlFrom = _translator.GetTableName(TableName);
         }
 
         public Query<T> Build()
@@ -93,7 +93,7 @@ namespace DataCore
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
             var query = GetQueryFromExpression(newExpression.Body);
 
-            var joinedTableName = typeof(TJoined).Name;
+            var joinedTableName = _translator.GetTableName(typeof(TJoined).Name);
             SqlFrom = string.Concat(SqlFrom, " INNER JOIN ", joinedTableName, " ON ", query);
 
             return this;
@@ -104,8 +104,7 @@ namespace DataCore
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
             var query = GetQueryFromExpression(newExpression.Body);
 
-            var joinedTableName = typeof(TJoinedRight).Name;
-
+            var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " INNER JOIN ", joinedTableName, " ON ", query);
 
             return this;
@@ -116,7 +115,7 @@ namespace DataCore
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
             var query = GetQueryFromExpression(newExpression.Body);
 
-            var joinedTableName = typeof(TJoined).Name;
+            var joinedTableName = _translator.GetTableName(typeof(TJoined).Name);
             SqlFrom = string.Concat(SqlFrom, " LEFT JOIN ", joinedTableName, " ON ", query);
 
             return this;
@@ -127,7 +126,7 @@ namespace DataCore
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
             var query = GetQueryFromExpression(newExpression.Body);
 
-            var joinedTableName = typeof(TJoinedRight).Name;
+            var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " LEFT JOIN ", joinedTableName, " ON ", query);
 
             return this;
@@ -138,7 +137,7 @@ namespace DataCore
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
             var query = GetQueryFromExpression(newExpression.Body);
 
-            var joinedTableName = typeof(TJoined).Name;
+            var joinedTableName = _translator.GetTableName(typeof(TJoined).Name);
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
 
             return this;
@@ -149,7 +148,7 @@ namespace DataCore
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
             var query = GetQueryFromExpression(newExpression.Body);
 
-            var joinedTableName = typeof(TJoinedRight).Name;
+            var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
 
             return this;

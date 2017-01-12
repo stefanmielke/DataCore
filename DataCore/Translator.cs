@@ -151,5 +151,10 @@ namespace DataCore
                     return "INT";
             }
         }
+
+        public virtual string GetTableName(string tableName)
+        {
+            return string.Concat(tableName, " WITH(NOLOCK)");
+        }
     }
 }

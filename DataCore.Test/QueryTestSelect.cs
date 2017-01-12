@@ -13,7 +13,7 @@ namespace DataCore.Test
 
             data.Build();
 
-            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass");
+            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK)");
         }
 
         [TestMethod]
@@ -23,7 +23,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id == 0).Build();
 
-            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WHERE (TestClass.Id = 0)");
+            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK) WHERE (TestClass.Id = 0)");
         }
 
         [TestMethod]
@@ -33,7 +33,7 @@ namespace DataCore.Test
 
             data.Top(10).Build();
 
-            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT TOP (10) * FROM TestClass");
+            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT TOP (10) * FROM TestClass WITH(NOLOCK)");
         }
 
         [TestMethod]
@@ -43,7 +43,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id == 0).Top(10).Build();
 
-            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT TOP (10) * FROM TestClass WHERE (TestClass.Id = 0)");
+            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT TOP (10) * FROM TestClass WITH(NOLOCK) WHERE (TestClass.Id = 0)");
         }
 
         [TestMethod]
@@ -58,10 +58,10 @@ namespace DataCore.Test
                     .Top(103)
                     .Build();
 
-            var expected = "SELECT TOP (103) * FROM TestClass"
-                            + " INNER JOIN TestClass2 ON (TestClass.Id = TestClass2.Id)"
-                            + " LEFT JOIN TestClass2 ON ((TestClass.Id = TestClass2.Id) AND (TestClass2.Id = 1))"
-                            + " RIGHT JOIN TestClass3 ON ((TestClass2.Id = TestClass3.Id) AND (TestClass3.Id > 1))"
+            var expected = "SELECT TOP (103) * FROM TestClass WITH(NOLOCK)"
+                            + " INNER JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id)"
+                            + " LEFT JOIN TestClass2 WITH(NOLOCK) ON ((TestClass.Id = TestClass2.Id) AND (TestClass2.Id = 1))"
+                            + " RIGHT JOIN TestClass3 WITH(NOLOCK) ON ((TestClass2.Id = TestClass3.Id) AND (TestClass3.Id > 1))"
                             + " WHERE (TestClass.Number > 105)";
 
             Assert.AreEqual(expected, query.SqlCommand.ToString());
@@ -73,7 +73,7 @@ namespace DataCore.Test
             var query = new Query<TestClass>(new Translator());
             query.Select(t => new { t.Id, t.Name }).Build();
 
-            Assert.AreEqual("SELECT TestClass.Id, TestClass.Name FROM TestClass", query.SqlCommand.ToString());
+            Assert.AreEqual("SELECT TestClass.Id, TestClass.Name FROM TestClass WITH(NOLOCK)", query.SqlCommand.ToString());
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@ namespace DataCore.Test
             var query = new Query<TestClass>(new Translator());
             query.Top(10).Select(t => new { t.Id, t.Name }).Build();
 
-            Assert.AreEqual("SELECT TOP (10) TestClass.Id, TestClass.Name FROM TestClass", query.SqlCommand.ToString());
+            Assert.AreEqual("SELECT TOP (10) TestClass.Id, TestClass.Name FROM TestClass WITH(NOLOCK)", query.SqlCommand.ToString());
         }
     }
 }

@@ -13,6 +13,7 @@ namespace DataCore
         string GetStringValue(object value);
         string GetDateTimeValue(DateTime date);
 
+        string GetTableName(string tableName);
         string GetCreateTableQuery(string tableName, IEnumerable<FieldDefinition> fields);
     }
 }
