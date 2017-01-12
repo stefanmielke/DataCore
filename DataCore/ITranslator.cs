@@ -14,6 +14,6 @@ namespace DataCore
         string GetDateTimeValue(DateTime date);
 
         string GetTableName(string tableName);
-        string GetCreateTableQuery(string tableName, IEnumerable<FieldDefinition> fields);
+        string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields);
     }
 }

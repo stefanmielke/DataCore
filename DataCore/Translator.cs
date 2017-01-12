@@ -49,7 +49,7 @@ namespace DataCore
             return string.Concat("'", date.ToString("yyyy-MM-dd HH:mm:ss.fff"), "'");
         }
 
-        public string GetCreateTableQuery(string tableName, IEnumerable<FieldDefinition> fields)
+        public string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
         {
             var query = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
             query.Append(tableName)

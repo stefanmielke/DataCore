@@ -31,7 +31,7 @@ namespace DataCore.Database
                 type.GetProperties()
                     .Select(p => new FieldDefinition { Name = p.Name, Nullable = false, Size = 255, Type = GetTypeForProperty(p) });
 
-            var query = _translator.GetCreateTableQuery(tableName, fields);
+            var query = _translator.GetCreateTableIfNotExistsQuery(tableName, fields);
 
             return Execute(query);
         }
