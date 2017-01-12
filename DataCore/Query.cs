@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -18,6 +19,7 @@ namespace DataCore
         public string SqlColumns { get; set; }
         public string SqlFrom { get; set; }
         public string SqlWhere { get; set; }
+        public string SqlOrderBy { get; set; }
         public StringBuilder SqlCommand { get; private set; }
 
         public Query(ITranslator translator)
@@ -29,6 +31,7 @@ namespace DataCore
             SqlWhere = string.Empty;
             SqlCommand = new StringBuilder();
             SqlColumns = "*";
+            SqlOrderBy = "";
             TableName = typeof(T).Name;
             SqlFrom = _translator.GetTableName(TableName);
         }
@@ -41,9 +44,11 @@ namespace DataCore
             SqlCommand.Append(" FROM ");
             SqlCommand.Append(SqlFrom);
 
-            var where = SqlWhere;
-            if (!string.IsNullOrWhiteSpace(where))
-                SqlCommand.AppendFormat(" WHERE {0}", where);
+            if (!string.IsNullOrWhiteSpace(SqlWhere))
+                SqlCommand.AppendFormat(" WHERE {0}", SqlWhere);
+
+            if (!string.IsNullOrWhiteSpace(SqlOrderBy))
+                SqlCommand.AppendFormat(" ORDER BY {0}", SqlOrderBy);
 
             Built = true;
 
@@ -52,7 +57,7 @@ namespace DataCore
 
         public Query<T> Select(Expression<Func<T, dynamic>> clause)
         {
-            SqlColumns = string.Join(", ", 
+            SqlColumns = string.Join(", ",
                             ((NewExpression)clause.Body).Arguments
                                 .Select(f => string.Concat(((MemberExpression)f).Member.DeclaringType.Name, ".", ((MemberExpression)f).Member.Name)));
 
@@ -150,6 +155,31 @@ namespace DataCore
 
             var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
+
+            return this;
+        }
+
+        public Query<T> OrderBy(Expression<Func<T, dynamic>> clause)
+        {
+            Expression[] arguments = null;
+
+            var newBody = clause.Body as NewExpression;
+            if (newBody != null)
+                arguments = ((NewExpression)clause.Body).Arguments.ToArray();
+
+            var unaryBody = clause.Body as UnaryExpression;
+            if (unaryBody != null)
+                arguments = new[] { unaryBody.Operand };
+
+            if (arguments != null && arguments.Length > 0)
+            {
+                if (!string.IsNullOrEmpty(SqlOrderBy))
+                    SqlOrderBy += ", ";
+
+                SqlOrderBy += string.Join(", ",
+                    arguments.Select(f => string.Concat(((MemberExpression)f).Member.DeclaringType.Name, ".", ((MemberExpression)f).Member.Name))
+                );
+            }
 
             return this;
         }
