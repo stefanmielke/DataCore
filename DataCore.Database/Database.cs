@@ -54,22 +54,22 @@ namespace DataCore.Database
             return _connection.Execute(query);
         }
 
-        private static FieldType GetTypeForProperty(PropertyInfo propertyInfo)
+        private static DbType GetTypeForProperty(PropertyInfo propertyInfo)
         {
             switch (propertyInfo.PropertyType.Name)
             {
                 case "String":
-                    return FieldType.Varchar;
+                    return DbType.String;
                 case "Int":
-                    return FieldType.Int;
+                    return DbType.Int32;
                 case "Boolean":
-                    return FieldType.Bool;
+                    return DbType.Boolean;
                 case "Float":
-                    return FieldType.Float;
+                    return DbType.Single;
                 case "Decimal":
-                    return FieldType.Float;
+                    return DbType.Decimal;
                 default:
-                    return FieldType.Int;
+                    return DbType.Int32;
             }
         }
     }
