@@ -39,7 +39,7 @@ namespace DataCore.Database
         public IEnumerable<T> Select<T>(Query<T> query)
         {
             if (!query.Built)
-                query.Select();
+                query.Build();
 
             return Execute<T>(query.SqlCommand.ToString());
         }

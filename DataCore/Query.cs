@@ -34,7 +34,7 @@ namespace DataCore
             SqlFrom = TableName;
         }
 
-        public Query<T> Select()
+        public Query<T> Build()
         {
             // run the query
             SqlCommand.Append("SELECT ");
@@ -57,7 +57,7 @@ namespace DataCore
                             ((NewExpression)clause.Body).Arguments
                                 .Select(f => string.Concat(((MemberExpression)f).Member.DeclaringType.Name, ".", ((MemberExpression)f).Member.Name)));
 
-            return Select();
+            return this;
         }
 
         public Query<T> Top(int count)

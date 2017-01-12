@@ -11,7 +11,7 @@ namespace DataCore.Test
         {
             var data = new Query<TestClass>(new Translator());
 
-            data.Select();
+            data.Build();
 
             Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass");
         }
@@ -21,7 +21,7 @@ namespace DataCore.Test
         {
             var data = new Query<TestClass>(new Translator());
 
-            data.Where(t => t.Id == 0).Select();
+            data.Where(t => t.Id == 0).Build();
 
             Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WHERE (TestClass.Id = 0)");
         }
@@ -31,7 +31,7 @@ namespace DataCore.Test
         {
             var data = new Query<TestClass>(new Translator());
 
-            data.Top(10).Select();
+            data.Top(10).Build();
 
             Assert.AreEqual(data.SqlCommand.ToString(), "SELECT TOP (10) * FROM TestClass");
         }
@@ -41,7 +41,7 @@ namespace DataCore.Test
         {
             var data = new Query<TestClass>(new Translator());
 
-            data.Where(t => t.Id == 0).Top(10).Select();
+            data.Where(t => t.Id == 0).Top(10).Build();
 
             Assert.AreEqual(data.SqlCommand.ToString(), "SELECT TOP (10) * FROM TestClass WHERE (TestClass.Id = 0)");
         }
@@ -56,7 +56,7 @@ namespace DataCore.Test
                     .RightJoin<TestClass2, TestClass3>((t, t2) => t.Id == t2.Id && t2.Id > 1)
                     .Where(t => t.Number > 105)
                     .Top(103)
-                    .Select();
+                    .Build();
 
             var expected = "SELECT TOP (103) * FROM TestClass"
                             + " INNER JOIN TestClass2 ON (TestClass.Id = TestClass2.Id)"
@@ -71,7 +71,7 @@ namespace DataCore.Test
         public void CanGenerateSelectColumns()
         {
             var query = new Query<TestClass>(new Translator());
-            query.Select(t => new { t.Id, t.Name });
+            query.Select(t => new { t.Id, t.Name }).Build();
 
             Assert.AreEqual("SELECT TestClass.Id, TestClass.Name FROM TestClass", query.SqlCommand.ToString());
         }
@@ -80,7 +80,7 @@ namespace DataCore.Test
         public void CanGenerateSelectColumnsWithTop()
         {
             var query = new Query<TestClass>(new Translator());
-            query.Top(10).Select(t => new { t.Id, t.Name });
+            query.Top(10).Select(t => new { t.Id, t.Name }).Build();
 
             Assert.AreEqual("SELECT TOP (10) TestClass.Id, TestClass.Name FROM TestClass", query.SqlCommand.ToString());
         }
