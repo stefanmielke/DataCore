@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -56,13 +57,8 @@ namespace DataCore
 
             query.Append(string.Join(",", 
                 fields.Select(
-                    field =>
-                    {
-                        var format = field.Type == FieldType.Varchar ? "{0} {1}({2}) {3}" : "{0} {1} {3}";
-
-                        return string.Format(format, field.Name, GetTextFor(field.Type), field.Size,
-                            field.Nullable ? "NULL" : "NOT NULL");
-                    })
+                    field => string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size,
+                        field.Nullable ? "NULL" : "NOT NULL"))
                 ));
 
             query.Append(")");
@@ -70,22 +66,89 @@ namespace DataCore
             return query.ToString();
         }
 
-        private static string GetTextFor(FieldType type)
+        private string GetFormatFor(FieldDefinition field)
+        {
+            switch (field.Type)
+            {
+                case DbType.Boolean:
+                    return "{0} {1} {3}";
+                case DbType.Double:
+                case DbType.Decimal:
+                case DbType.Single:
+                    return "{0} {1} {3}";
+                case DbType.Time:
+                    return "{0} {1} {3}";
+                case DbType.Binary:
+                case DbType.Byte:
+                case DbType.SByte:
+                case DbType.Int16:
+                case DbType.Int32:
+                case DbType.Int64:
+                case DbType.UInt16:
+                case DbType.UInt32:
+                case DbType.UInt64:
+                    return "{0} {1} {3}";
+                case DbType.Currency:
+                case DbType.VarNumeric:
+                    return "{0} {1} {3}";
+                case DbType.Guid:
+                case DbType.AnsiString:
+                case DbType.AnsiStringFixedLength:
+                case DbType.String:
+                case DbType.StringFixedLength:
+                case DbType.Object:
+                case DbType.Xml:
+                    return "{0} {1}({2}) {3}";
+                case DbType.Date:
+                case DbType.DateTime:
+                case DbType.DateTime2:
+                case DbType.DateTimeOffset:
+                    return "{0} {1} {3}";
+                default:
+                    return "{0} {1} {3}";
+            }
+        }
+
+        private string GetTextFor(DbType type)
         {
             switch (type)
             {
-                case FieldType.Varchar:
-                    return "VARCHAR";
-                case FieldType.Int:
-                    return "INT";
-                case FieldType.Bool:
+                case DbType.Boolean:
                     return "BOOLEAN";
-                case FieldType.Float:
+                case DbType.Double:
+                case DbType.Decimal:
+                case DbType.Single:
                     return "REAL";
-                case FieldType.Decimal:
+                case DbType.Time:
+                    return "DATETIME";
+                case DbType.Binary:
+                case DbType.Byte:
+                case DbType.SByte:
+                case DbType.Int16:
+                case DbType.Int32:
+                case DbType.Int64:
+                case DbType.UInt16:
+                case DbType.UInt32:
+                case DbType.UInt64:
+                    return "INT";
+                case DbType.Currency:
+                case DbType.VarNumeric:
                     return "REAL";
+                case DbType.Guid:
+                case DbType.AnsiString:
+                case DbType.AnsiStringFixedLength:
+                case DbType.String:
+                case DbType.StringFixedLength:
+                case DbType.Object:
+                case DbType.Xml:
+                    return "VARCHAR";
+                case DbType.Date:
+                case DbType.DateTime:
+                case DbType.DateTime2:
+                case DbType.DateTimeOffset:
+                    return "DATETIME";
                 default:
-                    return "";
+                    return "INT";
             }
         }
     }
