@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DataCore.Test
+namespace DataCore.Test.Models
 {
     class TestClass
     {

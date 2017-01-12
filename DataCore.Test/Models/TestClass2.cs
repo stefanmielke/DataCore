@@ -1,4 +1,4 @@
-﻿namespace DataCore.Test
+﻿namespace DataCore.Test.Models
 {
     public class TestClass2
     {

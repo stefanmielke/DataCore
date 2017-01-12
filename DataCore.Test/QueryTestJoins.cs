@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using DataCore.Test.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DataCore.Test
 {

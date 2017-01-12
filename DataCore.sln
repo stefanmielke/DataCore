@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCore", "DataCore\DataCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCore.Test", "DataCore.Test\DataCore.Test.csproj", "{B1AA69A1-3848-47C6-8D1B-8810A28D4315}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCore.Database", "DataCore.Database\DataCore.Database.csproj", "{BB807B00-3B7D-4AAD-9B56-A73EC1458366}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCore.Database.Sqlite", "DataCore.Database.Sqlite\DataCore.Database.Sqlite.csproj", "{4656BB1D-D2E8-4E08-9C35-E5CEAEEB2FD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{B1AA69A1-3848-47C6-8D1B-8810A28D4315}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1AA69A1-3848-47C6-8D1B-8810A28D4315}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1AA69A1-3848-47C6-8D1B-8810A28D4315}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB807B00-3B7D-4AAD-9B56-A73EC1458366}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB807B00-3B7D-4AAD-9B56-A73EC1458366}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB807B00-3B7D-4AAD-9B56-A73EC1458366}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB807B00-3B7D-4AAD-9B56-A73EC1458366}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4656BB1D-D2E8-4E08-9C35-E5CEAEEB2FD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4656BB1D-D2E8-4E08-9C35-E5CEAEEB2FD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4656BB1D-D2E8-4E08-9C35-E5CEAEEB2FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4656BB1D-D2E8-4E08-9C35-E5CEAEEB2FD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using DataCore.Test.Models;
 
 namespace DataCore.Test
 {

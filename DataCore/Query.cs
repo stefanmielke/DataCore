@@ -12,6 +12,8 @@ namespace DataCore
 
         public string TableName { get; private set; }
 
+        public bool Built { get; private set; }
+
         public string SqlSelectFormat { get; set; }
         public string SqlColumns { get; set; }
         public string SqlFrom { get; set; }
@@ -20,6 +22,8 @@ namespace DataCore
 
         public Query(ITranslator translator)
         {
+            Built = false;
+
             _translator = translator;
             SqlSelectFormat = "{0}";
             SqlWhere = string.Empty;
@@ -41,6 +45,8 @@ namespace DataCore
             var where = SqlWhere;
             if (!string.IsNullOrWhiteSpace(where))
                 SqlCommand.AppendFormat(" WHERE {0}", where);
+
+            Built = true;
 
             return this;
         }
