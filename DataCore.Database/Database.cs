@@ -22,7 +22,7 @@ namespace DataCore.Database
             return new Query<T>(_translator);
         }
 
-        public int CreateTable<T>()
+        public int CreateTableIfNotExists<T>()
         {
             var type = typeof(T);
 

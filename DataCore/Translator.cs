@@ -50,7 +50,7 @@ namespace DataCore
 
         public string GetCreateTableQuery(string tableName, IEnumerable<FieldDefinition> fields)
         {
-            var query = new StringBuilder("CREATE TABLE ");
+            var query = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
             query.Append(tableName)
                 .Append(" (");
 

@@ -9,7 +9,7 @@ namespace DataCore.Test
     public class DatabaseTest
     {
         [TestMethod]
-        public void SelectTest()
+        public void CanSelect()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
             {
@@ -28,7 +28,7 @@ namespace DataCore.Test
         }
 
         [TestMethod]
-        public void CreateTableTest()
+        public void CanCreateTable()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
             {
@@ -36,7 +36,27 @@ namespace DataCore.Test
 
                 var database = new SqliteDatabase(connection);
 
-                database.CreateTable<TestClass>();
+                database.CreateTableIfNotExists<TestClass>();
+
+                var query = database.From<TestClass>().Where(t => t.Id == 1);
+
+                database.Select(query);
+
+                connection.Close();
+            }
+        }
+
+        [TestMethod]
+        public void DoNotErrorOnDoubleCreateTable()
+        {
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+                database.CreateTableIfNotExists<TestClass>();
 
                 var query = database.From<TestClass>().Where(t => t.Id == 1);
 
