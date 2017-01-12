@@ -20,6 +20,7 @@ namespace DataCore
         public string SqlFrom { get; set; }
         public string SqlWhere { get; set; }
         public string SqlOrderBy { get; set; }
+        public string SqlGroupBy { get; set; }
         public StringBuilder SqlCommand { get; private set; }
 
         public Query(ITranslator translator)
@@ -31,6 +32,7 @@ namespace DataCore
             SqlWhere = string.Empty;
             SqlCommand = new StringBuilder();
             SqlColumns = "*";
+            SqlGroupBy = "";
             SqlOrderBy = "";
             TableName = typeof(T).Name;
             SqlFrom = _translator.GetTableName(TableName);
@@ -47,6 +49,9 @@ namespace DataCore
             if (!string.IsNullOrWhiteSpace(SqlWhere))
                 SqlCommand.AppendFormat(" WHERE {0}", SqlWhere);
 
+            if (!string.IsNullOrWhiteSpace(SqlGroupBy))
+                SqlCommand.AppendFormat(" GROUP BY {0}", SqlGroupBy);
+
             if (!string.IsNullOrWhiteSpace(SqlOrderBy))
                 SqlCommand.AppendFormat(" ORDER BY {0}", SqlOrderBy);
 
@@ -57,9 +62,10 @@ namespace DataCore
 
         public Query<T> Select(Expression<Func<T, dynamic>> clause)
         {
-            SqlColumns = string.Join(", ",
-                            ((NewExpression)clause.Body).Arguments
-                                .Select(f => string.Concat(((MemberExpression)f).Member.DeclaringType.Name, ".", ((MemberExpression)f).Member.Name)));
+            if (SqlColumns == "*")
+                SqlColumns = string.Empty;
+
+            SqlColumns = FormatStringFromArguments(clause, SqlColumns);
 
             return this;
         }
@@ -161,27 +167,30 @@ namespace DataCore
 
         public Query<T> OrderBy(Expression<Func<T, dynamic>> clause)
         {
+            SqlOrderBy = FormatStringFromArguments(clause, SqlOrderBy);
+
+            return this;
+        }
+
+        public Query<T> GroupBy(Expression<Func<T, dynamic>> clause)
+        {
+            SqlGroupBy = FormatStringFromArguments(clause, SqlGroupBy);
+
+            return this;
+        }
+
+        private static Expression[] GetExpressionsFromDynamic(Expression<Func<T, dynamic>> clause)
+        {
             Expression[] arguments = null;
 
             var newBody = clause.Body as NewExpression;
             if (newBody != null)
-                arguments = ((NewExpression)clause.Body).Arguments.ToArray();
+                arguments = ((NewExpression) clause.Body).Arguments.ToArray();
 
             var unaryBody = clause.Body as UnaryExpression;
             if (unaryBody != null)
-                arguments = new[] { unaryBody.Operand };
-
-            if (arguments != null && arguments.Length > 0)
-            {
-                if (!string.IsNullOrEmpty(SqlOrderBy))
-                    SqlOrderBy += ", ";
-
-                SqlOrderBy += string.Join(", ",
-                    arguments.Select(f => string.Concat(((MemberExpression)f).Member.DeclaringType.Name, ".", ((MemberExpression)f).Member.Name))
-                );
-            }
-
-            return this;
+                arguments = new[] {unaryBody.Operand};
+            return arguments;
         }
 
         private string GetQueryFromExpression(Expression clause)
@@ -281,6 +290,28 @@ namespace DataCore
                     candidates.Enqueue(((LambdaExpression)expr).Body);
                 }
             }
+        }
+
+        private static string FormatStringFromArguments(Expression<Func<T, dynamic>> clause, string startString)
+        {
+            var returnString = startString;
+
+            var arguments = GetExpressionsFromDynamic(clause);
+
+            if (arguments != null && arguments.Length > 0)
+            {
+                if (!string.IsNullOrEmpty(returnString))
+                    returnString += ", ";
+
+                returnString += string.Join(", ",
+                    arguments.Select(
+                        f =>
+                            string.Concat(((MemberExpression)f).Member.DeclaringType.Name, ".",
+                                ((MemberExpression)f).Member.Name))
+                );
+            }
+
+            return returnString;
         }
     }
 }

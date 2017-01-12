@@ -55,14 +55,20 @@ namespace DataCore.Test
                     .LeftJoin<TestClass2>((t, t2) => t.Id == t2.Id && t2.Id == 1)
                     .RightJoin<TestClass2, TestClass3>((t, t2) => t.Id == t2.Id && t2.Id > 1)
                     .Where(t => t.Number > 105)
+                    .GroupBy(t => new { t.Id, t.Name })
+                    .OrderBy(t => t.Id)
+                    .Select(t => new { t.Id, t.Name })
                     .Top(103)
                     .Build();
 
-            var expected = "SELECT TOP (103) * FROM TestClass WITH(NOLOCK)"
+            var expected = "SELECT TOP (103) TestClass.Id, TestClass.Name"
+                            + " FROM TestClass WITH(NOLOCK)"
                             + " INNER JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id)"
                             + " LEFT JOIN TestClass2 WITH(NOLOCK) ON ((TestClass.Id = TestClass2.Id) AND (TestClass2.Id = 1))"
                             + " RIGHT JOIN TestClass3 WITH(NOLOCK) ON ((TestClass2.Id = TestClass3.Id) AND (TestClass3.Id > 1))"
-                            + " WHERE (TestClass.Number > 105)";
+                            + " WHERE (TestClass.Number > 105)"
+                            + " GROUP BY TestClass.Id, TestClass.Name"
+                            + " ORDER BY TestClass.Id";
 
             Assert.AreEqual(expected, query.SqlCommand.ToString());
         }
@@ -71,9 +77,27 @@ namespace DataCore.Test
         public void CanGenerateSelectColumns()
         {
             var query = new Query<TestClass>(new Translator());
-            query.Select(t => new { t.Id, t.Name }).Build();
+            query.Select(t => new { t.Id, t.Name });
 
-            Assert.AreEqual("SELECT TestClass.Id, TestClass.Name FROM TestClass WITH(NOLOCK)", query.SqlCommand.ToString());
+            Assert.AreEqual("TestClass.Id, TestClass.Name", query.SqlColumns);
+        }
+
+        [TestMethod]
+        public void CanGenerateSelectColumnsFromSingle()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Select(t => t.Id);
+
+            Assert.AreEqual("TestClass.Id", query.SqlColumns);
+        }
+
+        [TestMethod]
+        public void CanGenerateSelectColumnsFromMultipleSelects()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Select(t => t.Id).Select(t => new { t.Name, t.Number });
+
+            Assert.AreEqual("TestClass.Id, TestClass.Name, TestClass.Number", query.SqlColumns);
         }
 
         [TestMethod]
