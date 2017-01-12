@@ -29,7 +29,6 @@ namespace DataCore
             SqlWhere = string.Empty;
             SqlCommand = new StringBuilder();
             SqlColumns = "*";
-            SqlFrom = typeof(T).Name;
             TableName = typeof(T).Name;
             SqlFrom = TableName;
         }
