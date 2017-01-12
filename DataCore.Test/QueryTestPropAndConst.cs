@@ -14,7 +14,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id == t.Id);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id = TestClass.Id)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id = TestClass.Id)");
         }
 
         [TestMethod]
@@ -24,7 +24,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id > t.Id);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id > TestClass.Id)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id > TestClass.Id)");
         }
 
         [TestMethod]
@@ -34,7 +34,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id >= t.Id);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id >= TestClass.Id)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id >= TestClass.Id)");
         }
 
         [TestMethod]
@@ -44,7 +44,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id < t.Id);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id < TestClass.Id)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id < TestClass.Id)");
         }
 
         [TestMethod]
@@ -54,7 +54,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id <= t.Id);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id <= TestClass.Id)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id <= TestClass.Id)");
         }
 
         [TestMethod]
@@ -64,7 +64,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id != t.Id);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id != TestClass.Id)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id != TestClass.Id)");
         }
 
         [TestMethod]
@@ -74,7 +74,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Name != "test");
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Name != 'test')");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Name != 'test')");
         }
 
         [TestMethod]
@@ -86,7 +86,7 @@ namespace DataCore.Test
 
             data.Where(t => t.InsertDate > date);
 
-            Assert.AreEqual("(TestClass.InsertDate > '2017-01-01 17:25:47.789')", data.SqlWhere.ToString());
+            Assert.AreEqual("(TestClass.InsertDate > '2017-01-01 17:25:47.789')", data.SqlWhere);
         }
 
         [TestMethod]
@@ -96,7 +96,7 @@ namespace DataCore.Test
 
             data.Where(t => t.InsertDate > new DateTime(2017, 1, 1, 17, 25, 47, 789));
 
-            Assert.AreEqual("(TestClass.InsertDate > '2017-01-01 17:25:47.789')", data.SqlWhere.ToString());
+            Assert.AreEqual("(TestClass.InsertDate > '2017-01-01 17:25:47.789')", data.SqlWhere);
         }
 
         [TestMethod]
@@ -108,7 +108,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Name == GetNameString(testClass));
 
-            Assert.AreEqual("(TestClass.Name = 'test')", data.SqlWhere.ToString());
+            Assert.AreEqual("(TestClass.Name = 'test')", data.SqlWhere);
         }
 
         private static string GetNameString(TestClass test)
