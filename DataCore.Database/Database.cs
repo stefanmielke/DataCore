@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Reflection;
 using Dapper;
 
 namespace DataCore.Database
@@ -20,6 +22,20 @@ namespace DataCore.Database
             return new Query<T>(_translator);
         }
 
+        public int CreateTable<T>()
+        {
+            var type = typeof(T);
+
+            var tableName = type.Name;
+            var fields =
+                type.GetProperties()
+                    .Select(p => new FieldDefinition { Name = p.Name, Nullable = false, Size = 255, Type = GetTypeForProperty(p) });
+
+            var query = _translator.GetCreateTableQuery(tableName, fields);
+
+            return Execute(query);
+        }
+
         public IEnumerable<T> Select<T>(Query<T> query)
         {
             if (!query.Built)
@@ -36,6 +52,25 @@ namespace DataCore.Database
         public int Execute(string query)
         {
             return _connection.Execute(query);
+        }
+
+        private static FieldType GetTypeForProperty(PropertyInfo propertyInfo)
+        {
+            switch (propertyInfo.PropertyType.Name)
+            {
+                case "String":
+                    return FieldType.Varchar;
+                case "Int":
+                    return FieldType.Int;
+                case "Boolean":
+                    return FieldType.Bool;
+                case "Float":
+                    return FieldType.Float;
+                case "Decimal":
+                    return FieldType.Float;
+                default:
+                    return FieldType.Int;
+            }
         }
     }
 }

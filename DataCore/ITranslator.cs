@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace DataCore
@@ -11,5 +12,7 @@ namespace DataCore
 
         string GetStringValue(object value);
         string GetDateTimeValue(DateTime date);
+
+        string GetCreateTableQuery(string tableName, IEnumerable<FieldDefinition> fields);
     }
 }

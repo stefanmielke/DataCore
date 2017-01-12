@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace DataCore
 {
@@ -43,6 +46,47 @@ namespace DataCore
         public string GetDateTimeValue(DateTime date)
         {
             return string.Concat("'", date.ToString("yyyy-MM-dd HH:mm:ss.fff"), "'");
+        }
+
+        public string GetCreateTableQuery(string tableName, IEnumerable<FieldDefinition> fields)
+        {
+            var query = new StringBuilder("CREATE TABLE ");
+            query.Append(tableName)
+                .Append(" (");
+
+            query.Append(string.Join(",", 
+                fields.Select(
+                    field =>
+                    {
+                        var format = field.Type == FieldType.Varchar ? "{0} {1}({2}) {3}" : "{0} {1} {3}";
+
+                        return string.Format(format, field.Name, GetTextFor(field.Type), field.Size,
+                            field.Nullable ? "NULL" : "NOT NULL");
+                    })
+                ));
+
+            query.Append(")");
+
+            return query.ToString();
+        }
+
+        private static string GetTextFor(FieldType type)
+        {
+            switch (type)
+            {
+                case FieldType.Varchar:
+                    return "VARCHAR";
+                case FieldType.Int:
+                    return "INT";
+                case FieldType.Bool:
+                    return "BOOLEAN";
+                case FieldType.Float:
+                    return "REAL";
+                case FieldType.Decimal:
+                    return "REAL";
+                default:
+                    return "";
+            }
         }
     }
 }

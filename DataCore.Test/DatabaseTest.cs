@@ -21,7 +21,26 @@ namespace DataCore.Test
 
                 var query = database.From<TestClass>().Where(t => t.Id == 1);
 
-                var results = database.Select(query);
+                database.Select(query);
+
+                connection.Close();
+            }
+        }
+
+        [TestMethod]
+        public void CreateTableTest()
+        {
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.CreateTable<TestClass>();
+
+                var query = database.From<TestClass>().Where(t => t.Id == 1);
+
+                database.Select(query);
 
                 connection.Close();
             }
