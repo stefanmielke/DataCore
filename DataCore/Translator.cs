@@ -198,5 +198,17 @@ namespace DataCore
         {
             return string.Concat("DROP INDEX IF EXISTS ", indexName);
         }
+
+        public virtual string GetCreateForeignKeyIfNotExistsQuery(string indexName, string tableNameFrom, string columnNameFrom,
+            string tableNameTo, string columnNameTo)
+        {
+            return string.Concat("ALTER TABLE ", tableNameFrom, " ADD CONSTRAINT ", indexName, " FOREIGN KEY (",
+                columnNameFrom, ") REFERENCES ", tableNameTo, " (", columnNameTo, ")");
+        }
+
+        public virtual string GetDropForeignKeyIfExistsQuery(string tableName, string indexName)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " DROP CONSTRAINT ", indexName);
+        }
     }
 }

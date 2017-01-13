@@ -162,5 +162,43 @@ namespace DataCore.Test
                 connection.Close();
             }
         }
+
+        [TestMethod]
+        public void CanCreateForeignKey()
+        {
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+                database.CreateTableIfNotExists<TestClass2>();
+
+                database.CreateForeignKeyIfNotExists<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id);
+
+                connection.Close();
+            }
+        }
+
+        [TestMethod]
+        public void CanDropForeignKey()
+        {
+            const string indexName = "FK_TestClass";
+
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+
+                database.CreateForeignKeyIfNotExists<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id, indexName);
+                database.DropForeignKeyIfExists<TestClass>(indexName);
+
+                connection.Close();
+            }
+        }
     }
 }

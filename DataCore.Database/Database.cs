@@ -102,7 +102,7 @@ namespace DataCore.Database
                 var tableName = typeof(T).Name;
                 var columns = string.Join(", ", arguments.Select(f => ((MemberExpression)f).Member.Name));
                 if (string.IsNullOrEmpty(indexName))
-                    indexName = string.Concat(tableName, "_", columns.Replace(", ", "_"));
+                    indexName = string.Concat("IX_", tableName, "_", columns.Replace(", ", "_"));
 
                 var query = _translator.GetCreateIndexIfNotExistsQuery(indexName, tableName, columns, unique);
 
@@ -117,6 +117,40 @@ namespace DataCore.Database
             var tableName = typeof(T).Name;
 
             var query = _translator.GetDropIndexIfExistsQuery(tableName, indexName);
+
+            return Execute(query);
+        }
+
+        public int CreateForeignKeyIfNotExists<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo, string indexName = null)
+        {
+            var argumentsFrom = ExpressionHelper.GetExpressionsFromDynamic(columnFrom);
+            var argumentsTo = ExpressionHelper.GetExpressionsFromDynamic(columnTo);
+
+            if (argumentsFrom != null && argumentsFrom.Length > 0
+               && argumentsTo != null && argumentsTo.Length > 0)
+            {
+                var tableNameFrom = typeof(TFrom).Name;
+                var tableNameTo = typeof(TTo).Name;
+
+                var columnNameFrom = ((MemberExpression)argumentsFrom.First()).Member.Name;
+                var columnNameTo = ((MemberExpression)argumentsTo.First()).Member.Name;
+
+                if (string.IsNullOrEmpty(indexName))
+                    indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
+
+                var query = _translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
+
+                return Execute(query);
+            }
+
+            return 0;
+        }
+
+        public int DropForeignKeyIfExists<T>(string indexName)
+        {
+            var tableName = typeof(T).Name;
+
+            var query = _translator.GetDropForeignKeyIfExistsQuery(tableName, indexName);
 
             return Execute(query);
         }
