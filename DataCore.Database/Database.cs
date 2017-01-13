@@ -36,6 +36,13 @@ namespace DataCore.Database
             return Execute(query);
         }
 
+        public int DropTableIfExists<T>()
+        {
+            var query = _translator.GetDropTableIfExistsQuery(typeof(T).Name);
+
+            return Execute(query);
+        }
+
         public IEnumerable<T> Select<T>(Query<T> query)
         {
             if (!query.Built)

@@ -17,5 +17,6 @@ namespace DataCore
 
         string GetTableName(string tableName);
         string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields);
+        string GetDropTableIfExistsQuery(string tableName);
     }
 }

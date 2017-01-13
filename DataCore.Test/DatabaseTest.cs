@@ -65,5 +65,24 @@ namespace DataCore.Test
                 connection.Close();
             }
         }
+
+        [TestMethod]
+        public void CanDropTable()
+        {
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+
+                database.Select(database.From<TestClass>().Where(t => t.Id == 1));
+
+                database.DropTableIfExists<TestClass>();
+
+                connection.Close();
+            }
+        }
     }
 }

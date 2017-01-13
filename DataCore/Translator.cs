@@ -78,6 +78,11 @@ namespace DataCore
             return query.ToString();
         }
 
+        public string GetDropTableIfExistsQuery(string tableName)
+        {
+            return string.Concat("DROP TABLE IF EXISTS ", tableName);   
+        }
+
         private string GetFormatFor(FieldDefinition field)
         {
             switch (field.Type)
