@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace DataCore
@@ -185,11 +186,11 @@ namespace DataCore
 
             var newBody = clause.Body as NewExpression;
             if (newBody != null)
-                arguments = ((NewExpression) clause.Body).Arguments.ToArray();
+                arguments = ((NewExpression)clause.Body).Arguments.ToArray();
 
             var unaryBody = clause.Body as UnaryExpression;
             if (unaryBody != null)
-                arguments = new[] {unaryBody.Operand};
+                arguments = new[] { unaryBody.Operand };
             return arguments;
         }
 
@@ -250,6 +251,8 @@ namespace DataCore
         {
             switch (constantExpression.Type.Name)
             {
+                case "Boolean":
+                    return _translator.GetBooleanValue(constantExpression.Value);
                 case "String":
                     return _translator.GetStringValue(constantExpression.Value);
                 case "DateTime":
@@ -269,13 +272,40 @@ namespace DataCore
             while (candidates.Count > 0)
             {
                 var expr = candidates.Dequeue();
-                if (expr is MemberExpression || expr is ConstantExpression)
+                if (expr is MemberExpression)
+                {
+                    //var member = ((MemberExpression)expr).Member;
+                    //var property = member as PropertyInfo;
+                    //if (property != null && property.PropertyType.Name == "Boolean")
+                    //{
+                    //    candidates.Enqueue(Expression.MakeBinary(ExpressionType.Equal, expr, Expression.Constant(true)));
+                    //    continue;
+                    //}
+
+                    yield return expr;
+                }
+                else if (expr is ConstantExpression)
                 {
                     yield return expr;
                 }
                 else if (expr is UnaryExpression)
                 {
-                    candidates.Enqueue(((UnaryExpression)expr).Operand);
+                    var unary = (UnaryExpression)expr;
+                    if (unary.NodeType == ExpressionType.Not)
+                    {
+                        var binaryExpression = unary.Operand as BinaryExpression;
+                        if (binaryExpression != null)
+                        {
+                            if (unary.Operand.NodeType == ExpressionType.Equal)
+                                candidates.Enqueue(Expression.MakeBinary(ExpressionType.NotEqual, binaryExpression.Left, binaryExpression.Right));
+                            else
+                                candidates.Enqueue(Expression.MakeBinary(ExpressionType.Equal, binaryExpression.Left, binaryExpression.Right));
+
+                            continue;
+                        }
+                    }
+
+                    candidates.Enqueue(unary.Operand);
                 }
                 else if (expr is BinaryExpression)
                 {

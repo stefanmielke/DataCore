@@ -39,6 +39,13 @@ namespace DataCore
             }
         }
 
+        public string GetBooleanValue(object value)
+        {
+            var isTrue = (bool)value;
+
+            return isTrue ? "1" : "0";
+        }
+
         public string GetStringValue(object value)
         {
             return string.Concat("'", value, "'");

@@ -10,6 +10,7 @@ namespace DataCore
 
         string GetFormatFor(ExpressionType type);
 
+        string GetBooleanValue(object constantExpressionValue);
         string GetStringValue(object value);
         string GetDateTimeValue(DateTime date);
 

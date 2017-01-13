@@ -30,6 +30,12 @@ namespace DataCore
                 }
             }
 
+            var memberPropertyInfo = memberExpression.Member as PropertyInfo;
+            if (memberPropertyInfo != null && memberPropertyInfo.PropertyType.Name == "Boolean")
+            {
+                return Expression.MakeBinary(ExpressionType.Equal, memberExpression, Expression.Constant(true));
+            }
+
             return base.VisitMember(memberExpression);
         }
 

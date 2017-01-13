@@ -72,6 +72,7 @@
     <Compile Include="Models\TestClass.cs" />
     <Compile Include="Models\TestClass2.cs" />
     <Compile Include="Models\TestClass3.cs" />
+    <Compile Include="QueryTestTypes.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataCore.Database.Sqlite\DataCore.Database.Sqlite.csproj">
