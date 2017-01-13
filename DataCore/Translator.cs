@@ -14,6 +14,11 @@ namespace DataCore
             query.SqlSelectFormat = "TOP (" + count + ") {0}";
         }
 
+        public void Count<T>(Query<T> query)
+        {
+            query.SqlSelectFormat = "COUNT({0})";
+        }
+
         public string GetFormatFor(ExpressionType type)
         {
             switch (type)

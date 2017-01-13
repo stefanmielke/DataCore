@@ -78,6 +78,13 @@ namespace DataCore
             return this;
         }
 
+        public Query<T> Count()
+        {
+            _translator.Count(this);
+
+            return this;
+        }
+
         public Query<T> Where(Expression<Func<T, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));

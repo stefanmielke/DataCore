@@ -7,6 +7,7 @@ namespace DataCore
     public interface ITranslator
     {
         void Top<T>(Query<T> query, int count);
+        void Count<T>(Query<T> query);
 
         string GetFormatFor(ExpressionType type);
 

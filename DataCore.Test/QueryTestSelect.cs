@@ -37,6 +37,16 @@ namespace DataCore.Test
         }
 
         [TestMethod]
+        public void DataTestSelectClauseWithCount()
+        {
+            var data = new Query<TestClass>(new Translator());
+
+            data.Count().Build();
+
+            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT COUNT(*) FROM TestClass WITH(NOLOCK)");
+        }
+
+        [TestMethod]
         public void DataTestSelectClauseWithTopAndWhere()
         {
             var data = new Query<TestClass>(new Translator());
