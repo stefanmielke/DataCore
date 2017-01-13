@@ -94,6 +94,33 @@ namespace DataCore.Database
             return 0;
         }
 
+        public int CreateIndexIfNotExists<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null)
+        {
+            var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
+            if (arguments != null && arguments.Length > 0)
+            {
+                var tableName = typeof(T).Name;
+                var columns = string.Join(", ", arguments.Select(f => ((MemberExpression)f).Member.Name));
+                if (string.IsNullOrEmpty(indexName))
+                    indexName = string.Concat(tableName, "_", columns.Replace(", ", "_"));
+
+                var query = _translator.GetCreateIndexIfNotExistsQuery(indexName, tableName, columns, unique);
+
+                return Execute(query);
+            }
+
+            return 0;
+        }
+
+        public int DropIndexIfExists<T>(string indexName)
+        {
+            var tableName = typeof(T).Name;
+
+            var query = _translator.GetDropIndexIfExistsQuery(tableName, indexName);
+
+            return Execute(query);
+        }
+
         public IEnumerable<T> Select<T>(Query<T> query)
         {
             if (!query.Built)

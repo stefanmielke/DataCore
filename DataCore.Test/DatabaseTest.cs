@@ -125,5 +125,42 @@ namespace DataCore.Test
                 connection.Close();
             }
         }
+
+        [TestMethod]
+        public void CanCreateIndex()
+        {
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+
+                database.CreateIndexIfNotExists<TestClass>(t => new { t.Id, t.Name }, true);
+
+                connection.Close();
+            }
+        }
+
+        [TestMethod]
+        public void CanDropIndex()
+        {
+            const string indexName = "IX_TestClass";
+
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+
+                database.CreateIndexIfNotExists<TestClass>(t => new { t.Id, t.Name }, true, indexName);
+                database.DropIndexIfExists<TestClass>(indexName);
+
+                connection.Close();
+            }
+        }
     }
 }

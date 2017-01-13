@@ -20,5 +20,7 @@ namespace DataCore
         string GetDropTableIfExistsQuery(string tableName);
         string GetCreateColumnIfNoExistsQuery(string tableName, FieldDefinition field);
         string GetDropColumnIfExistsQuery(string tableName, string memberName);
+        string GetCreateIndexIfNotExistsQuery(string indexName, string tableName, string columns, bool unique);
+        string GetDropIndexIfExistsQuery(string tableName, string indexName);
     }
 }

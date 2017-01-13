@@ -188,5 +188,15 @@ namespace DataCore
         {
             return string.Concat("ALTER TABLE ", tableName, " DROP COLUMN ", memberName);
         }
+
+        public string GetCreateIndexIfNotExistsQuery(string indexName, string tableName, string columns, bool unique)
+        {
+            return string.Concat("CREATE", unique ? " UNIQUE" : "", " INDEX IF NOT EXISTS ", indexName, " ON ", tableName, "(", columns, ")");
+        }
+
+        public string GetDropIndexIfExistsQuery(string tableName, string indexName)
+        {
+            return string.Concat("DROP INDEX IF EXISTS ", indexName);
+        }
     }
 }
