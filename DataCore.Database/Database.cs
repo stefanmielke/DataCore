@@ -3,6 +3,8 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using Dapper;
+using System.Linq.Expressions;
+using System;
 
 namespace DataCore.Database
 {
@@ -41,6 +43,35 @@ namespace DataCore.Database
             var query = _translator.GetDropTableIfExistsQuery(typeof(T).Name);
 
             return Execute(query);
+        }
+
+        public int CreateColumnIfNotExists<T>(Expression<Func<T, dynamic>> clause)
+        {
+            var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
+            if (arguments != null && arguments.Length > 0)
+            {
+                var tableName = typeof(T).Name;
+
+                var query = string.Join(";",
+                    arguments.Select(
+                        f =>
+                            _translator.GetCreateColumnIfNoExistsQuery(
+                                tableName,
+                                new FieldDefinition
+                                {
+                                    Name = ((MemberExpression)f).Member.Name,
+                                    Nullable = true,
+                                    Size = 255,
+                                    Type = GetTypeForProperty(((MemberExpression)f).Member as PropertyInfo)
+                                }
+                            )
+                    )
+                );
+
+                return Execute(query);
+            }
+
+            return 0;
         }
 
         public IEnumerable<T> Select<T>(Query<T> query)

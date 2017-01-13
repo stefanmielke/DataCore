@@ -69,8 +69,7 @@ namespace DataCore
 
             query.Append(string.Join(",", 
                 fields.Select(
-                    field => string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size,
-                        field.Nullable ? "NULL" : "NOT NULL"))
+                    field => GetStringForColumn(field))
                 ));
 
             query.Append(")");
@@ -169,9 +168,20 @@ namespace DataCore
             }
         }
 
+        public string GetCreateColumnIfNoExistsQuery(string tableName, FieldDefinition field)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " ADD COLUMN ", GetStringForColumn(field));
+        }
+
         public virtual string GetTableName(string tableName)
         {
             return string.Concat(tableName, " WITH(NOLOCK)");
+        }
+
+        private string GetStringForColumn(FieldDefinition field)
+        {
+            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size,
+                           field.Nullable ? "NULL" : "NOT NULL");
         }
     }
 }

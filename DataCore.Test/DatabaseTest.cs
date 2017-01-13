@@ -2,6 +2,7 @@
 using DataCore.Database.Sqlite;
 using DataCore.Test.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace DataCore.Test
 {
@@ -80,6 +81,29 @@ namespace DataCore.Test
                 database.Select(database.From<TestClass>().Where(t => t.Id == 1));
 
                 database.DropTableIfExists<TestClass>();
+
+                connection.Close();
+            }
+        }
+
+        [TestMethod]
+        public void CanCreateColumn()
+        {
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.Execute("CREATE TABLE TestClass ( Id INT not null, Number INT not null, Name VARCHAR(250) not null );");
+
+                database.CreateColumnIfNotExists<TestClass>(t => t.InsertDate);
+
+                var date = DateTime.Now;
+
+                var query = database.From<TestClass>().Where(t => t.InsertDate == date);
+
+                database.Select(query);
 
                 connection.Close();
             }
