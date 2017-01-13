@@ -108,5 +108,22 @@ namespace DataCore.Test
                 connection.Close();
             }
         }
+
+        [TestMethod]
+        public void CanDropColumn()
+        {
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+
+                database.DropColumnIfExists<TestClass>(t => t.Id);
+
+                connection.Close();
+            }
+        }
     }
 }

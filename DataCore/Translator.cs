@@ -183,5 +183,10 @@ namespace DataCore
             return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size,
                            field.Nullable ? "NULL" : "NOT NULL");
         }
+
+        public virtual string GetDropColumnIfExistsQuery(string tableName, string memberName)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " DROP COLUMN ", memberName);
+        }
     }
 }

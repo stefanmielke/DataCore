@@ -74,6 +74,26 @@ namespace DataCore.Database
             return 0;
         }
 
+        public int DropColumnIfExists<T>(Expression<Func<T, dynamic>> clause)
+        {
+            var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
+            if (arguments != null && arguments.Length > 0)
+            {
+                var tableName = typeof(T).Name;
+
+                var query = string.Join(";",
+                    arguments.Select(
+                        f =>
+                            _translator.GetDropColumnIfExistsQuery(tableName, ((MemberExpression)f).Member.Name)
+                    )
+                );
+
+                return Execute(query);
+            }
+
+            return 0;
+        }
+
         public IEnumerable<T> Select<T>(Query<T> query)
         {
             if (!query.Built)
