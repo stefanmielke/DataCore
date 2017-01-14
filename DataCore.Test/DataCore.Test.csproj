@@ -64,6 +64,7 @@
     <Compile Include="QueryTestGroupBy.cs" />
     <Compile Include="QueryTestJoins.cs" />
     <Compile Include="QueryTestOrderBy.cs" />
+    <Compile Include="QueryTestPagination.cs" />
     <Compile Include="QueryTestQueryTree.cs" />
     <Compile Include="QueryTestPropAndProp.cs" />
     <Compile Include="QueryTestPropAndConst.cs" />

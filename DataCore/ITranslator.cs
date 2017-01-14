@@ -8,6 +8,7 @@ namespace DataCore
     {
         void Top<T>(Query<T> query, int count);
         void Count<T>(Query<T> query);
+        void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage);
 
         string GetFormatFor(ExpressionType type);
 

@@ -11,12 +11,17 @@ namespace DataCore
     {
         public void Top<T>(Query<T> query, int count)
         {
-            query.SqlSelectFormat = "TOP (" + count + ") {0}";
+            query.SqlEnd = string.Concat("LIMIT ", count);
         }
 
         public void Count<T>(Query<T> query)
         {
             query.SqlSelectFormat = "COUNT({0})";
+        }
+
+        public void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage)
+        {
+            query.SqlEnd = string.Concat("LIMIT ", recordsPerPage, ", ", (currentPage - 1) * recordsPerPage);
         }
 
         public string GetFormatFor(ExpressionType type)
@@ -67,7 +72,7 @@ namespace DataCore
             query.Append(tableName)
                 .Append(" (");
 
-            query.Append(string.Join(",", 
+            query.Append(string.Join(",",
                 fields.Select(
                     field => GetStringForColumn(field))
                 ));
@@ -79,7 +84,7 @@ namespace DataCore
 
         public string GetDropTableIfExistsQuery(string tableName)
         {
-            return string.Concat("DROP TABLE IF EXISTS ", tableName);   
+            return string.Concat("DROP TABLE IF EXISTS ", tableName);
         }
 
         private string GetFormatFor(FieldDefinition field)

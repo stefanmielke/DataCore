@@ -18,6 +18,7 @@ namespace DataCore
         public string SqlWhere { get; set; }
         public string SqlOrderBy { get; set; }
         public string SqlGroupBy { get; set; }
+        public string SqlEnd { get; set; }
         public StringBuilder SqlCommand { get; private set; }
 
         public Query(ITranslator translator)
@@ -31,6 +32,7 @@ namespace DataCore
             SqlColumns = "*";
             SqlGroupBy = "";
             SqlOrderBy = "";
+            SqlEnd = "";
             TableName = typeof(T).Name;
             SqlFrom = _translator.GetTableName(TableName);
         }
@@ -51,6 +53,9 @@ namespace DataCore
 
             if (!string.IsNullOrWhiteSpace(SqlOrderBy))
                 SqlCommand.AppendFormat(" ORDER BY {0}", SqlOrderBy);
+
+            if (!string.IsNullOrWhiteSpace(SqlEnd))
+                SqlCommand.Append(" ").Append(SqlEnd);
 
             Built = true;
 
@@ -179,6 +184,13 @@ namespace DataCore
         public Query<T> GroupBy(Expression<Func<T, dynamic>> clause)
         {
             SqlGroupBy = ExpressionHelper.FormatStringFromArguments(clause, SqlGroupBy);
+
+            return this;
+        }
+
+        public Query<T> Paginate(int recordsPerPage, int currentPage)
+        {
+            _translator.Paginate(this, recordsPerPage, currentPage);
 
             return this;
         }

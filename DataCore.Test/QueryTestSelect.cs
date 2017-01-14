@@ -33,7 +33,7 @@ namespace DataCore.Test
 
             data.Top(10).Build();
 
-            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT TOP (10) * FROM TestClass WITH(NOLOCK)");
+            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK) LIMIT 10");
         }
 
         [TestMethod]
@@ -53,7 +53,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id == 0).Top(10).Build();
 
-            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT TOP (10) * FROM TestClass WITH(NOLOCK) WHERE (TestClass.Id = 0)");
+            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK) WHERE (TestClass.Id = 0) LIMIT 10");
         }
 
         [TestMethod]
@@ -71,14 +71,15 @@ namespace DataCore.Test
                     .Top(103)
                     .Build();
 
-            var expected = "SELECT TOP (103) TestClass.Id, TestClass.Name"
+            var expected = "SELECT TestClass.Id, TestClass.Name"
                             + " FROM TestClass WITH(NOLOCK)"
                             + " INNER JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id)"
                             + " LEFT JOIN TestClass2 WITH(NOLOCK) ON ((TestClass.Id = TestClass2.Id) AND (TestClass2.Id = 1))"
                             + " RIGHT JOIN TestClass3 WITH(NOLOCK) ON ((TestClass2.Id = TestClass3.Id) AND (TestClass3.Id > 1))"
                             + " WHERE (TestClass.Number > 105)"
                             + " GROUP BY TestClass.Id, TestClass.Name"
-                            + " ORDER BY TestClass.Id";
+                            + " ORDER BY TestClass.Id"
+                            + " LIMIT 103";
 
             Assert.AreEqual(expected, query.SqlCommand.ToString());
         }
@@ -116,7 +117,7 @@ namespace DataCore.Test
             var query = new Query<TestClass>(new Translator());
             query.Top(10).Select(t => new { t.Id, t.Name }).Build();
 
-            Assert.AreEqual("SELECT TOP (10) TestClass.Id, TestClass.Name FROM TestClass WITH(NOLOCK)", query.SqlCommand.ToString());
+            Assert.AreEqual("SELECT TestClass.Id, TestClass.Name FROM TestClass WITH(NOLOCK) LIMIT 10", query.SqlCommand.ToString());
         }
     }
 }
