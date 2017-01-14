@@ -18,6 +18,11 @@ namespace DataCore
             var unaryBody = clause.Body as UnaryExpression;
             if (unaryBody != null)
                 arguments = new[] { unaryBody.Operand };
+
+            var memberExpression = clause.Body as MemberExpression;
+            if (memberExpression != null)
+                arguments = new Expression[] { memberExpression };
+
             return arguments;
         }
 
@@ -174,6 +179,17 @@ namespace DataCore
             }
 
             return returnString;
+        }
+
+        public static IEnumerable<string> GetStringsFromArguments<T>(Expression<Func<T, dynamic>> clause)
+        {
+            var arguments = GetExpressionsFromDynamic(clause);
+            if (arguments != null && arguments.Length > 0)
+            {
+                return arguments.Select(f => ((MemberExpression) f).Member.Name);
+            }
+
+            return new string[0];
         }
     }
 }

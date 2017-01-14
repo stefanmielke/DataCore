@@ -41,7 +41,7 @@ namespace DataCore.Database
             Execute(query);
         }
 
-        public void Update<T>(T obj, Expression<Func<T, dynamic>> where)
+        public void Update<T>(T obj, Expression<Func<T, dynamic>> whereClause)
         {
             var type = typeof(T);
 
@@ -57,7 +57,33 @@ namespace DataCore.Database
                     )
             );
 
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(where));
+            var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
+            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+
+            var query = _translator.GetUpdateQuery(tableName, nameValues, whereQuery);
+
+            Execute(query);
+        }
+
+        public void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields, Expression<Func<T, dynamic>> whereClause)
+        {
+            var type = typeof(T);
+
+            var tableName = type.Name;
+
+            var properties = GetPropertiesForType(type);
+
+            var fields = ExpressionHelper.GetStringsFromArguments(onlyFields);
+
+            var nameValues = properties.Where(p => fields.Contains(p.Name)).Select(
+                p =>
+                    new KeyValuePair<string, string>(
+                        p.Name,
+                        ExpressionHelper.GetValueFrom(_translator, p.PropertyType, p.GetValue(obj, null))
+                    )
+            );
+
+            var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
             var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
 
             var query = _translator.GetUpdateQuery(tableName, nameValues, whereQuery);
