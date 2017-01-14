@@ -60,6 +60,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DatabaseDeleteTest.cs" />
     <Compile Include="DatabaseInsertTest.cs" />
     <Compile Include="DatabaseTest.cs" />
     <Compile Include="DatabaseUpdateQuery.cs" />

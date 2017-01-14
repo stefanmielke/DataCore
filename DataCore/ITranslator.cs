@@ -12,6 +12,7 @@ namespace DataCore
 
         string GetInsertQuery(string tableName, string names, string values);
         string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where);
+        string GetDeleteQuery(string tableName, string whereQuery);
 
         string GetFormatFor(ExpressionType type);
 

@@ -40,6 +40,11 @@ namespace DataCore
             return query;
         }
 
+        public string GetDeleteQuery(string tableName, string whereQuery)
+        {
+            return string.Concat("DELETE FROM ", tableName, " WHERE ", whereQuery);
+        }
+
         public string GetFormatFor(ExpressionType type)
         {
             switch (type)

@@ -91,6 +91,20 @@ namespace DataCore.Database
             Execute(query);
         }
 
+        public void Delete<T>(Expression<Func<T, bool>> whereClause)
+        {
+            var type = typeof(T);
+
+            var tableName = type.Name;
+            
+            var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
+            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+
+            var query = _translator.GetDeleteQuery(tableName, whereQuery);
+
+            Execute(query);
+        }
+
         public int CreateTableIfNotExists<T>()
         {
             var type = typeof(T);
