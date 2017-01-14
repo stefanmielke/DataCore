@@ -26,11 +26,8 @@ namespace DataCore.Database
 
         public void Insert<T>(T obj)
         {
-            Insert(typeof(T), obj);
-        }
+            var type = typeof(T);
 
-        private void Insert<T>(Type type, T obj)
-        {
             var tableName = type.Name;
 
             var properties = GetPropertiesForType(type);
