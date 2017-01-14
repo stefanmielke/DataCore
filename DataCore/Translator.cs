@@ -220,5 +220,10 @@ namespace DataCore
         {
             return string.Concat("ALTER TABLE ", tableName, " DROP CONSTRAINT ", indexName);
         }
+
+        public string GetExistsQuery(string query)
+        {
+            return string.Concat("SELECT EXISTS (", query, ")");
+        }
     }
 }

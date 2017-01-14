@@ -191,6 +191,16 @@ namespace DataCore.Database
             return Execute<T>(query.SqlCommand.ToString()).FirstOrDefault();
         }
 
+        public bool Exists<T>(Query<T> query)
+        {
+            if (!query.Built)
+                query.Build();
+
+            var queryWithExists = _translator.GetExistsQuery(query.SqlCommand.ToString());
+
+            return Execute<int>(queryWithExists).FirstOrDefault() == 1;
+        }
+
         public IEnumerable<T> Execute<T>(string query)
         {
             return _connection.Query<T>(query);

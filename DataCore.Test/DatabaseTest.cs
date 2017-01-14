@@ -48,6 +48,44 @@ namespace DataCore.Test
         }
 
         [TestMethod]
+        public void ExistsReturnTrueWhenExists()
+        {
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.Execute("CREATE TABLE TestClass ( Id INT not null, Number INT not null);INSERT INTO TestClass (Id, Number) VALUES (1, 1)");
+
+                var query = database.From<TestClass>().Where(t => t.Id == 1);
+
+                Assert.IsTrue(database.Exists(query));
+
+                connection.Close();
+            }
+        }
+
+        [TestMethod]
+        public void ExistsReturnFalseWhenNotExists()
+        {
+            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            {
+                connection.Open();
+
+                var database = new SqliteDatabase(connection);
+
+                database.Execute("CREATE TABLE TestClass (Id INT not null, Number INT not null);");
+
+                var query = database.From<TestClass>().Where(t => t.Id == 1);
+
+                Assert.IsFalse(database.Exists(query));
+
+                connection.Close();
+            }
+        }
+
+        [TestMethod]
         public void CanCreateTable()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
