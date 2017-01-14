@@ -183,6 +183,14 @@ namespace DataCore.Database
             return Execute<T>(query.SqlCommand.ToString());
         }
 
+        public T SelectSingle<T>(Query<T> query)
+        {
+            if (!query.Built)
+                query.Build();
+
+            return Execute<T>(query.SqlCommand.ToString()).FirstOrDefault();
+        }
+
         public IEnumerable<T> Execute<T>(string query)
         {
             return _connection.Query<T>(query);
