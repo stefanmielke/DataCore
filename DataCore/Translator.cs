@@ -29,6 +29,17 @@ namespace DataCore
             return string.Concat("INSERT INTO ", tableName, "(", names, ") VALUES (", values, ")");
         }
 
+        public string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where)
+        {
+            var query = string.Concat("UPDATE ", tableName, " SET ");
+            query += string.Join(", ", nameValues.Select(nv => string.Concat(nv.Key, "=", nv.Value)));
+
+            if (!string.IsNullOrEmpty(where))
+                query += string.Concat(" WHERE ", where);
+
+            return query;
+        }
+
         public string GetFormatFor(ExpressionType type)
         {
             switch (type)

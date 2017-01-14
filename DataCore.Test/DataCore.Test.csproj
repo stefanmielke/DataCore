@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="DatabaseInsertTest.cs" />
     <Compile Include="DatabaseTest.cs" />
+    <Compile Include="DatabaseUpdateQuery.cs" />
     <Compile Include="QueryTestGroupBy.cs" />
     <Compile Include="QueryTestJoins.cs" />
     <Compile Include="QueryTestOrderBy.cs" />

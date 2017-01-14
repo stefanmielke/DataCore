@@ -41,6 +41,30 @@ namespace DataCore.Database
             Execute(query);
         }
 
+        public void Update<T>(T obj, Expression<Func<T, dynamic>> where)
+        {
+            var type = typeof(T);
+
+            var tableName = type.Name;
+
+            var properties = GetPropertiesForType(type);
+
+            var nameValues = properties.Select(
+                p =>
+                    new KeyValuePair<string, string>(
+                        p.Name,
+                        ExpressionHelper.GetValueFrom(_translator, p.PropertyType, p.GetValue(obj, null))
+                    )
+            );
+
+            var newExpression = Expression.Lambda(new QueryVisitor().Visit(where));
+            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+
+            var query = _translator.GetUpdateQuery(tableName, nameValues, whereQuery);
+
+            Execute(query);
+        }
+
         public int CreateTableIfNotExists<T>()
         {
             var type = typeof(T);

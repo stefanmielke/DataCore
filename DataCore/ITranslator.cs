@@ -11,6 +11,7 @@ namespace DataCore
         void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage);
 
         string GetInsertQuery(string tableName, string names, string values);
+        string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where);
 
         string GetFormatFor(ExpressionType type);
 
