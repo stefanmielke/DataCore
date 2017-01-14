@@ -24,6 +24,26 @@ namespace DataCore.Database
             return new Query<T>(_translator);
         }
 
+        public void Insert<T>(T obj)
+        {
+            Insert(typeof(T), obj);
+        }
+
+        private void Insert<T>(Type type, T obj)
+        {
+            var tableName = type.Name;
+
+            var properties = GetPropertiesForType(type);
+
+            var names = string.Join(", ", properties.Select(p => p.Name));
+            var values = string.Join(", ",
+                properties.Select(p => ExpressionHelper.GetValueFrom(_translator, p.PropertyType, p.GetValue(obj, null))));
+
+            var query = _translator.GetInsertQuery(tableName, names, values);
+
+            Execute(query);
+        }
+
         public int CreateTableIfNotExists<T>()
         {
             var type = typeof(T);
@@ -187,9 +207,16 @@ namespace DataCore.Database
                     return DbType.Single;
                 case "Decimal":
                     return DbType.Decimal;
+                case "DateTime":
+                    return DbType.DateTime;
                 default:
                     return DbType.Int32;
             }
+        }
+
+        private PropertyInfo[] GetPropertiesForType(Type type)
+        {
+            return type.GetProperties();
         }
     }
 }

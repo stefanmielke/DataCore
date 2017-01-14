@@ -10,6 +10,8 @@ namespace DataCore
         void Count<T>(Query<T> query);
         void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage);
 
+        string GetInsertQuery(string tableName, string names, string values);
+
         string GetFormatFor(ExpressionType type);
 
         string GetBooleanValue(object constantExpressionValue);

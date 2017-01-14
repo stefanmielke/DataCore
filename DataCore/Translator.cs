@@ -24,6 +24,11 @@ namespace DataCore
             query.SqlEnd = string.Concat("LIMIT ", recordsPerPage, ", ", (currentPage - 1) * recordsPerPage);
         }
 
+        public string GetInsertQuery(string tableName, string names, string values)
+        {
+            return string.Concat("INSERT INTO ", tableName, "(", names, ") VALUES (", values, ")");
+        }
+
         public string GetFormatFor(ExpressionType type)
         {
             switch (type)

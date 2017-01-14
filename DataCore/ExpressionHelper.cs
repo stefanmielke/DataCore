@@ -21,17 +21,17 @@ namespace DataCore
             return arguments;
         }
 
-        public static string GetQueryFromExpression(ITranslator _translator, Expression clause)
+        public static string GetQueryFromExpression(ITranslator translator, Expression clause)
         {
             var members = GetMemberExpressions(clause);
             if (!members.Any())
                 return string.Empty;
 
             var enumerator = members.GetEnumerator();
-            return GetString(_translator, enumerator);
+            return GetString(translator, enumerator);
         }
 
-        public static string GetString(ITranslator _translator, IEnumerator<Expression> iterator)
+        public static string GetString(ITranslator translator, IEnumerator<Expression> iterator)
         {
             if (!iterator.MoveNext())
                 return string.Empty;
@@ -40,7 +40,7 @@ namespace DataCore
 
             var binaryExpression = expression as BinaryExpression;
             if (binaryExpression != null)
-                return BinaryExpressionString(_translator, iterator, binaryExpression);
+                return BinaryExpressionString(translator, iterator, binaryExpression);
 
             var memberExpression = expression as MemberExpression;
             if (memberExpression != null)
@@ -48,7 +48,7 @@ namespace DataCore
 
             var constantExpression = expression as ConstantExpression;
             if (constantExpression != null)
-                return ConstantExpressionString(_translator, constantExpression);
+                return ConstantExpressionString(translator, constantExpression);
 
             return string.Empty;
         }
@@ -58,37 +58,42 @@ namespace DataCore
             return string.Concat(memberExpression.Member.DeclaringType.Name, ".", memberExpression.Member.Name);
         }
 
-        public static string BinaryExpressionString(ITranslator _translator, IEnumerator<Expression> iterator, BinaryExpression binaryExpression)
+        public static string BinaryExpressionString(ITranslator translator, IEnumerator<Expression> iterator, BinaryExpression binaryExpression)
         {
-            var format = _translator.GetFormatFor(binaryExpression.NodeType);
+            var format = translator.GetFormatFor(binaryExpression.NodeType);
 
             var left = string.Empty;
             var right = string.Empty;
 
             if (iterator.MoveNext())
-                left = GetQueryFromExpression(_translator, iterator.Current);
+                left = GetQueryFromExpression(translator, iterator.Current);
 
             if (iterator.MoveNext())
-                right = GetQueryFromExpression(_translator, iterator.Current);
+                right = GetQueryFromExpression(translator, iterator.Current);
 
             return string.Format(format, left, right);
         }
 
-        public static string ConstantExpressionString(ITranslator _translator, ConstantExpression constantExpression)
+        public static string ConstantExpressionString(ITranslator translator, ConstantExpression constantExpression)
         {
-            switch (constantExpression.Type.Name)
+            return GetValueFrom(translator, constantExpression.Type, constantExpression.Value);
+        }
+
+        public static string GetValueFrom(ITranslator translator, Type type, object value)
+        {
+            switch (type.Name)
             {
                 case "Boolean":
-                    return _translator.GetBooleanValue(constantExpression.Value);
+                    return translator.GetBooleanValue(value);
                 case "String":
-                    return _translator.GetStringValue(constantExpression.Value);
+                    return translator.GetStringValue(value);
                 case "DateTime":
                     {
-                        var date = Convert.ToDateTime(constantExpression.Value);
-                        return _translator.GetDateTimeValue(date);
+                        var date = Convert.ToDateTime(value);
+                        return translator.GetDateTimeValue(date);
                     }
                 default:
-                    return Convert.ToString(constantExpression.Value);
+                    return Convert.ToString(value);
             }
         }
 
