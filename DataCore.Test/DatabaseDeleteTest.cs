@@ -34,8 +34,6 @@ namespace DataCore.Test
                 var result = database.SelectSingle(query);
                 Assert.IsNull(result);
 
-                database.DropTableIfExists<TestClass>();
-
                 connection.Close();
             }
         }
@@ -70,8 +68,6 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.IsNull(result);
-
-                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }

@@ -37,8 +37,6 @@ namespace DataCore.Test
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
 
-                database.DropTableIfExists<TestClass>();
-
                 connection.Close();
             }
         }
@@ -77,8 +75,6 @@ namespace DataCore.Test
                 Assert.AreEqual(updatedName, result.Name);
                 Assert.AreNotEqual(updatedNumber, result.Number);
 
-                database.DropTableIfExists<TestClass>();
-
                 connection.Close();
             }
         }
@@ -116,8 +112,6 @@ namespace DataCore.Test
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
                 Assert.AreNotEqual(updatedNumber, result.Number);
-
-                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }

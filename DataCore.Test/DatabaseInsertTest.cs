@@ -32,8 +32,6 @@ namespace DataCore.Test
                 var results = database.Select(query);
                 Assert.IsTrue(results.Any());
 
-                database.DropTableIfExists<TestClass>();
-
                 connection.Close();
             }
         }
