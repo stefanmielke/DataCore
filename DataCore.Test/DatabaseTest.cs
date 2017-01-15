@@ -20,8 +20,6 @@ namespace DataCore.Test
 
                 database.Select(query);
 
-                database.DropTableIfExists<TestClass>();
-
                 connection.Close();
             }
         }
@@ -39,8 +37,6 @@ namespace DataCore.Test
                 var query = database.From<TestClass>().Where(t => t.Id == 1);
 
                 Assert.IsNotNull(database.SelectSingle(query));
-
-                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }
@@ -60,8 +56,6 @@ namespace DataCore.Test
 
                 Assert.IsTrue(database.Exists(query));
 
-                database.DropTableIfExists<TestClass>();
-
                 connection.Close();
             }
         }
@@ -78,8 +72,6 @@ namespace DataCore.Test
                 var query = database.From<TestClass>().Where(t => t.Id == 1);
 
                 Assert.IsFalse(database.Exists(query));
-
-                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }
@@ -98,8 +90,6 @@ namespace DataCore.Test
 
                 database.Select(query);
 
-                database.DropTableIfExists<TestClass>();
-
                 connection.Close();
             }
         }
@@ -117,8 +107,6 @@ namespace DataCore.Test
                 var query = database.From<TestClass>().Where(t => t.Id == 1);
 
                 database.Select(query);
-
-                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }
@@ -176,8 +164,6 @@ namespace DataCore.Test
 
                 database.DropColumnIfExists<TestClass>(t => t.Name);
 
-                database.DropTableIfExists<TestClass>();
-
                 connection.Close();
             }
         }
@@ -192,8 +178,6 @@ namespace DataCore.Test
                 database.CreateTableIfNotExists<TestClass>();
 
                 database.CreateIndexIfNotExists<TestClass>(t => new { t.Id, t.Name }, true);
-
-                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }
@@ -213,8 +197,6 @@ namespace DataCore.Test
                 database.CreateIndexIfNotExists<TestClass>(t => new { t.Id, t.Name }, true, indexName);
                 database.DropIndexIfExists<TestClass>(indexName);
 
-                database.DropTableIfExists<TestClass>();
-
                 connection.Close();
             }
         }
@@ -230,9 +212,6 @@ namespace DataCore.Test
                 database.CreateTableIfNotExists<TestClass2>();
 
                 database.CreateForeignKeyIfNotExists<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id);
-
-                database.DropTableIfExists<TestClass>();
-                database.DropTableIfExists<TestClass2>();
 
                 connection.Close();
             }
@@ -252,8 +231,6 @@ namespace DataCore.Test
 
                 database.CreateForeignKeyIfNotExists<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id, indexName);
                 database.DropForeignKeyIfExists<TestClass>(indexName);
-
-                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }
