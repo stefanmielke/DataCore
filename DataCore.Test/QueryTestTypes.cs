@@ -1,13 +1,13 @@
 ﻿using System;
 using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class QueryTestTypes
     {
-        [TestMethod]
+        [Test]
         public void CanUseInt()
         {
             var query = new Query<TestClass>(new Translator());
@@ -17,7 +17,7 @@ namespace DataCore.Test
             Assert.AreEqual("(TestClass.Id > 0)", query.SqlWhere);
         }
 
-        [TestMethod]
+        [Test]
         public void CanUseFloat()
         {
             var query = new Query<TestClass>(new Translator());
@@ -27,7 +27,7 @@ namespace DataCore.Test
             Assert.AreEqual("(TestClass.Number > 0)", query.SqlWhere);
         }
 
-        [TestMethod]
+        [Test]
         public void CanUseBool()
         {
             var query = new Query<TestClass>(new Translator());
@@ -37,7 +37,7 @@ namespace DataCore.Test
             Assert.AreEqual("(TestClass.Done = 1)", query.SqlWhere);
         }
 
-        [TestMethod]
+        [Test]
         public void CanUseNotBool()
         {
             var query = new Query<TestClass>(new Translator());
@@ -47,7 +47,7 @@ namespace DataCore.Test
             Assert.AreEqual("(TestClass.Done != 1)", query.SqlWhere);
         }
 
-        [TestMethod]
+        [Test]
         public void CanUseString()
         {
             var query = new Query<TestClass>(new Translator());
@@ -57,7 +57,7 @@ namespace DataCore.Test
             Assert.AreEqual("(TestClass.Name != 'test name')", query.SqlWhere);
         }
 
-        [TestMethod]
+        [Test]
         public void CanUseDateTime()
         {
             var query = new Query<TestClass>(new Translator());

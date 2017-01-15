@@ -1,12 +1,12 @@
 ﻿using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class QueryTestOrderBy
     {
-        [TestMethod]
+        [Test]
         public void CanGenerateOrderByWithDynamic()
         {
             var query = new Query<TestClass>(new Translator());
@@ -16,7 +16,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id, TestClass.Name", query.SqlOrderBy);
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateOrderByWithOneField()
         {
             var query = new Query<TestClass>(new Translator());
@@ -26,7 +26,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id", query.SqlOrderBy);
         }
 
-        [TestMethod]
+        [Test]
         public void CanAggregateOrderBy()
         {
             var query = new Query<TestClass>(new Translator());
@@ -37,7 +37,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id, TestClass.Number, TestClass.Name", query.SqlOrderBy);
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateOrderByDescWithDynamic()
         {
             var query = new Query<TestClass>(new Translator());
@@ -47,7 +47,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id DESC, TestClass.Name DESC", query.SqlOrderBy);
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateOrderByDescWithOneField()
         {
             var query = new Query<TestClass>(new Translator());
@@ -57,7 +57,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id DESC", query.SqlOrderBy);
         }
 
-        [TestMethod]
+        [Test]
         public void CanAggregateOrderByDesc()
         {
             var query = new Query<TestClass>(new Translator());
@@ -68,7 +68,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id DESC, TestClass.Number DESC, TestClass.Name DESC", query.SqlOrderBy);
         }
 
-        [TestMethod]
+        [Test]
         public void CanAggregateOrderByAndOrderByDesc()
         {
             var query = new Query<TestClass>(new Translator());

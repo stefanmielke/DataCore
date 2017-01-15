@@ -1,12 +1,12 @@
 ﻿using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class QueryTestSelect
     {
-        [TestMethod]
+        [Test]
         public void DataTestSelectClauseNoWhere()
         {
             var data = new Query<TestClass>(new Translator());
@@ -16,7 +16,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK)");
         }
 
-        [TestMethod]
+        [Test]
         public void DataTestSelectClauseWhere()
         {
             var data = new Query<TestClass>(new Translator());
@@ -26,7 +26,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK) WHERE (TestClass.Id = 0)");
         }
 
-        [TestMethod]
+        [Test]
         public void DataTestSelectClauseWithTop()
         {
             var data = new Query<TestClass>(new Translator());
@@ -36,7 +36,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK) LIMIT 10");
         }
 
-        [TestMethod]
+        [Test]
         public void DataTestSelectClauseWithCount()
         {
             var data = new Query<TestClass>(new Translator());
@@ -46,7 +46,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlCommand.ToString(), "SELECT COUNT(*) FROM TestClass WITH(NOLOCK)");
         }
 
-        [TestMethod]
+        [Test]
         public void DataTestSelectClauseWithTopAndWhere()
         {
             var data = new Query<TestClass>(new Translator());
@@ -56,7 +56,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK) WHERE (TestClass.Id = 0) LIMIT 10");
         }
 
-        [TestMethod]
+        [Test]
         public void ComplexQueryTest()
         {
             var query =
@@ -84,7 +84,7 @@ namespace DataCore.Test
             Assert.AreEqual(expected, query.SqlCommand.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateSelectColumns()
         {
             var query = new Query<TestClass>(new Translator());
@@ -93,7 +93,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id, TestClass.Name", query.SqlColumns);
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateSelectColumnsFromSingle()
         {
             var query = new Query<TestClass>(new Translator());
@@ -102,7 +102,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id", query.SqlColumns);
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateSelectColumnsFromMultipleSelects()
         {
             var query = new Query<TestClass>(new Translator());
@@ -111,7 +111,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id, TestClass.Name, TestClass.Number", query.SqlColumns);
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateSelectColumnsWithTop()
         {
             var query = new Query<TestClass>(new Translator());

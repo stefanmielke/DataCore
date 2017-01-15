@@ -1,12 +1,12 @@
 ﻿using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class QueryTestJoins
     {
-        [TestMethod]
+        [Test]
         public void CanGenerateInnerJoin()
         {
             var data = new Query<TestClass>(new Translator());
@@ -16,7 +16,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass WITH(NOLOCK) INNER JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id)", data.SqlFrom.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateLeftJoin()
         {
             var data = new Query<TestClass>(new Translator());
@@ -26,7 +26,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass WITH(NOLOCK) LEFT JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id)", data.SqlFrom.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateRightJoin()
         {
             var data = new Query<TestClass>(new Translator());
@@ -36,7 +36,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass WITH(NOLOCK) RIGHT JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id)", data.SqlFrom.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateInnerJoinAlso()
         {
             var data = new Query<TestClass>(new Translator());
@@ -47,7 +47,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass WITH(NOLOCK) INNER JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id) INNER JOIN TestClass3 WITH(NOLOCK) ON (TestClass2.Id = TestClass3.Id)", data.SqlFrom.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateLeftJoinAlso()
         {
             var data = new Query<TestClass>(new Translator());
@@ -58,7 +58,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass WITH(NOLOCK) LEFT JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id) LEFT JOIN TestClass3 WITH(NOLOCK) ON (TestClass2.Id = TestClass3.Id)", data.SqlFrom.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateRightJoinAlso()
         {
             var data = new Query<TestClass>(new Translator());

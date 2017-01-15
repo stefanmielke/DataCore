@@ -1,12 +1,12 @@
 ﻿using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class QueryTestQueryTree
     {
-        [TestMethod]
+        [Test]
         public void CanGenerateAndClause()
         {
             var data = new Query<TestClass>(new Translator());
@@ -16,7 +16,7 @@ namespace DataCore.Test
             Assert.AreEqual("((TestClass.Id = 0) AND (TestClass.Number = 1))", data.SqlWhere.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateOrClause()
         {
             var data = new Query<TestClass>(new Translator());
@@ -26,7 +26,7 @@ namespace DataCore.Test
             Assert.AreEqual("((TestClass.Id = 0) OR (TestClass.Number = 1))", data.SqlWhere.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateAndClauseCapsuled()
         {
             var data = new Query<TestClass>(new Translator());
@@ -36,7 +36,7 @@ namespace DataCore.Test
             Assert.AreEqual("(((TestClass.Id = 0) AND (TestClass.Number = 1)) AND (TestClass.Id = 1))", data.SqlWhere.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateClauseDoubleCapsuled()
         {
             var data = new Query<TestClass>(new Translator());
@@ -46,7 +46,7 @@ namespace DataCore.Test
             Assert.AreEqual("(((TestClass.Id = 0) AND (TestClass.Number = 1)) OR ((TestClass.Id = 1) AND (TestClass.Number = 0)))", data.SqlWhere.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateClauseDoubleWhere()
         {
             var data = new Query<TestClass>(new Translator());
@@ -57,7 +57,7 @@ namespace DataCore.Test
             Assert.AreEqual("(((TestClass.Id = 1) AND (TestClass.Number = 0))) AND ((TestClass.Name = 'test'))", data.SqlWhere.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateClauseDoubleWhereWithOr()
         {
             var data = new Query<TestClass>(new Translator());

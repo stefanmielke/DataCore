@@ -1,15 +1,15 @@
 ﻿using System.Data.SQLite;
 using DataCore.Database.Sqlite;
 using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class DatabaseTest
     {
-        [TestMethod]
+        [Test]
         public void CanSelect()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -28,7 +28,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanSelectSingle()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -47,7 +47,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ExistsReturnTrueWhenExists()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -66,7 +66,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void ExistsReturnFalseWhenNotExists()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -85,7 +85,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanCreateTable()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -104,7 +104,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void DoNotErrorOnDoubleCreateTable()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -124,7 +124,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanDropTable()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -143,7 +143,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanCreateColumn()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -166,7 +166,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanDropColumn()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -183,7 +183,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanCreateIndex()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -200,7 +200,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanDropIndex()
         {
             const string indexName = "IX_TestClass";
@@ -220,7 +220,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanCreateForeignKey()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -238,7 +238,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanDropForeignKey()
         {
             const string indexName = "FK_TestClass";

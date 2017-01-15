@@ -1,13 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using DataCore.Test.Models;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class QueryTestPropAndProp
     {
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseEquals()
         {
             var data = new Query<TestClass>(new Translator());
@@ -17,7 +17,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere, "(TestClass.Id = TestClass.Id)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseGreaterThan()
         {
             var data = new Query<TestClass>(new Translator());
@@ -27,7 +27,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere, "(TestClass.Id > TestClass.Id)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseGreaterThanOrEqual()
         {
             var data = new Query<TestClass>(new Translator());
@@ -37,7 +37,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere, "(TestClass.Id >= TestClass.Id)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseLessThan()
         {
             var data = new Query<TestClass>(new Translator());
@@ -47,7 +47,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere, "(TestClass.Id < TestClass.Id)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseLessThanOrEqual()
         {
             var data = new Query<TestClass>(new Translator());
@@ -57,7 +57,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere, "(TestClass.Id <= TestClass.Id)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseNotEqual()
         {
             var data = new Query<TestClass>(new Translator());
@@ -67,7 +67,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere, "(TestClass.Id != TestClass.Id)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseString()
         {
             var data = new Query<TestClass>(new Translator());
@@ -77,7 +77,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere, "(TestClass.Name != 'test')");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseDateTimeInVariable()
         {
             var data = new Query<TestClass>(new Translator());
@@ -89,7 +89,7 @@ namespace DataCore.Test
             Assert.AreEqual("(TestClass.InsertDate > '2017-01-01 17:25:47.789')", data.SqlWhere);
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseDateTimeDirect()
         {
             var data = new Query<TestClass>(new Translator());
@@ -99,7 +99,7 @@ namespace DataCore.Test
             Assert.AreEqual("(TestClass.InsertDate > '2017-01-01 17:25:47.789')", data.SqlWhere);
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseMethod()
         {
             var testClass = new TestClass { Name = "test" };

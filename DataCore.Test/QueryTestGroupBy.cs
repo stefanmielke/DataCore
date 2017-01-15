@@ -1,12 +1,12 @@
 ﻿using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class QueryTestGroupBy
     {
-        [TestMethod]
+        [Test]
         public void CanGenerateGroupByWithDynamic()
         {
             var query = new Query<TestClass>(new Translator());
@@ -16,7 +16,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id, TestClass.Name", query.SqlGroupBy);
         }
 
-        [TestMethod]
+        [Test]
         public void CanGenerateGroupByWithOneField()
         {
             var query = new Query<TestClass>(new Translator());
@@ -26,7 +26,7 @@ namespace DataCore.Test
             Assert.AreEqual("TestClass.Id", query.SqlGroupBy);
         }
 
-        [TestMethod]
+        [Test]
         public void CanAggregateGroupBy()
         {
             var query = new Query<TestClass>(new Translator());

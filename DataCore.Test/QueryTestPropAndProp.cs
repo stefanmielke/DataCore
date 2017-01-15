@@ -1,12 +1,12 @@
 ﻿using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class QueryTestPropAndConst
     {
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseEquals()
         {
             var data = new Query<TestClass>(new Translator());
@@ -16,7 +16,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id = 1)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseGreaterThan()
         {
             var data = new Query<TestClass>(new Translator());
@@ -26,7 +26,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id > 1)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseGreaterThanOrEqual()
         {
             var data = new Query<TestClass>(new Translator());
@@ -36,7 +36,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id >= 1)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseLessThan()
         {
             var data = new Query<TestClass>(new Translator());
@@ -46,7 +46,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id < 1)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseLessThanOrEqual()
         {
             var data = new Query<TestClass>(new Translator());
@@ -56,7 +56,7 @@ namespace DataCore.Test
             Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id <= 1)");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTransformWhereClauseNotEqual()
         {
             var data = new Query<TestClass>(new Translator());

@@ -1,12 +1,12 @@
 ﻿using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class QueryTestPagination
     {
-        [TestMethod]
+        [Test]
         public void CanGeneratePagination()
         {
             var query = new Query<TestClass>(new Translator());

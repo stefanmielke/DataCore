@@ -1,14 +1,15 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DataCore.Test")]
+[assembly: AssemblyTitle("DataCore.Database.SqlServer")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DataCore.Test")]
+[assembly: AssemblyProduct("DataCore.Database.SqlServer")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -19,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b1aa69a1-3848-47c6-8d1b-8810a28d4315")]
+[assembly: Guid("a14390cf-046b-4ebe-af9b-e5d4c3c9372c")]
 
 // Version information for an assembly consists of the following four values:
 //

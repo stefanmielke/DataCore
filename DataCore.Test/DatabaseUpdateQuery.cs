@@ -2,14 +2,14 @@
 using System.Data.SQLite;
 using DataCore.Database.Sqlite;
 using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class DatabaseUpdateQuery
     {
-        [TestMethod]
+        [Test]
         public void CanUpdate()
         {
             var updatedName = "test updated";
@@ -45,7 +45,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanUpdateOnlyOneField()
         {
             var updatedName = "test updated";
@@ -85,7 +85,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanUpdateOnlyManyFields()
         {
             var updatedName = "test updated";

@@ -3,14 +3,14 @@ using System.Data.SQLite;
 using System.Linq;
 using DataCore.Database.Sqlite;
 using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class DatabaseInsertTest
     {
-        [TestMethod]
+        [Test]
         public void CanInsert()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))

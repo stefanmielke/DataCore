@@ -2,14 +2,14 @@
 using System.Data.SQLite;
 using DataCore.Database.Sqlite;
 using DataCore.Test.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DataCore.Test
 {
-    [TestClass]
+    [TestFixture]
     public class DatabaseDeleteTest
     {
-        [TestMethod]
+        [Test]
         public void CanDeleteOne()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))
@@ -42,7 +42,7 @@ namespace DataCore.Test
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanDeleteMany()
         {
             using (var connection = new SQLiteConnection("Data Source=:memory:"))

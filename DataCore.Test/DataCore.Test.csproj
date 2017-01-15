@@ -37,6 +37,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.6.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.6.0\lib\net40\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -53,11 +57,7 @@
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
   <ItemGroup>
     <Compile Include="DatabaseDeleteTest.cs" />
@@ -82,6 +82,10 @@
     <ProjectReference Include="..\DataCore.Database.Sqlite\DataCore.Database.Sqlite.csproj">
       <Project>{4656bb1d-d2e8-4e08-9c35-e5ceaeeb2fd2}</Project>
       <Name>DataCore.Database.Sqlite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataCore.Database.SqlServer\DataCore.Database.SqlServer.csproj">
+      <Project>{a14390cf-046b-4ebe-af9b-e5d4c3c9372c}</Project>
+      <Name>DataCore.Database.SqlServer</Name>
     </ProjectReference>
     <ProjectReference Include="..\DataCore.Database\DataCore.Database.csproj">
       <Project>{bb807b00-3b7d-4aad-9b56-a73ec1458366}</Project>
