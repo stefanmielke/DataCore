@@ -119,5 +119,32 @@ namespace DataCore.Test
 
             Assert.AreEqual("SELECT TestClass.Id, TestClass.Name FROM TestClass WITH(NOLOCK) LIMIT 10", query.SqlCommand.ToString());
         }
+
+        [Test]
+        public void CanGenerateSelectWithMin()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Select(t => t.Id.Min() );
+
+            Assert.That(query.SqlColumns, Is.EqualTo("MIN(TestClass.Id)"));
+        }
+
+        [Test]
+        public void CanGenerateSelectWithMax()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Select(t => t.Id.Max());
+
+            Assert.That(query.SqlColumns, Is.EqualTo("MAX(TestClass.Id)"));
+        }
+
+        [Test]
+        public void CanGenerateSelectWithMaxAndMin()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Select(t => new { Max = t.Id.Max(), Min = t.Id.Min() });
+
+            Assert.That(query.SqlColumns, Is.EqualTo("MAX(TestClass.Id), MIN(TestClass.Id)"));
+        }
     }
 }

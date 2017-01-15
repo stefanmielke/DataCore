@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace DataCore
 {
@@ -22,6 +23,10 @@ namespace DataCore
             var memberExpression = clause.Body as MemberExpression;
             if (memberExpression != null)
                 arguments = new Expression[] { memberExpression };
+
+            var methodExpression = clause.Body as MethodCallExpression;
+            if (methodExpression != null)
+                arguments = new Expression[] { methodExpression };
 
             return arguments;
         }
@@ -171,14 +176,32 @@ namespace DataCore
                     returnString += ", ";
 
                 returnString += string.Join(", ",
-                    arguments.Select(
-                        f =>
-                            string.Format(format,
-                                string.Concat(((MemberExpression) f).Member.DeclaringType.Name, ".",
-                                    ((MemberExpression) f).Member.Name))));
+                    arguments.Select(f => string.Format(format, GetStringForExpression(f))));
             }
 
             return returnString;
+        }
+
+        private static string GetStringForExpression(Expression expression)
+        {
+            var memberExpression = expression as MemberExpression;
+            if (memberExpression != null)
+                return string.Concat(memberExpression.Member.DeclaringType.Name, ".", memberExpression.Member.Name);
+
+            var constExpr = expression as ConstantExpression;
+            if (constExpr != null)
+                return Convert.ToString(constExpr.Value);
+
+            var methodExpression = expression as MethodCallExpression;
+            if (methodExpression != null)
+            {
+                if (methodExpression.Method.Name == "Min" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+                    return string.Concat("MIN(", GetStringForExpression(methodExpression.Arguments[0]), ")");
+                if (methodExpression.Method.Name == "Max" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+                    return string.Concat("MAX(", GetStringForExpression(methodExpression.Arguments[0]), ")");
+            }
+
+            return string.Empty;
         }
 
         public static IEnumerable<string> GetStringsFromArguments<T>(Expression<Func<T, dynamic>> clause)
