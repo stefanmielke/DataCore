@@ -159,7 +159,7 @@ namespace DataCore
             }
         }
 
-        public static string FormatStringFromArguments<T>(Expression<Func<T, dynamic>> clause, string startString)
+        public static string FormatStringFromArguments<T>(Expression<Func<T, dynamic>> clause, string startString, string format = "{0}")
         {
             var returnString = startString;
 
@@ -173,9 +173,9 @@ namespace DataCore
                 returnString += string.Join(", ",
                     arguments.Select(
                         f =>
-                            string.Concat(((MemberExpression)f).Member.DeclaringType.Name, ".",
-                                ((MemberExpression)f).Member.Name))
-                );
+                            string.Format(format,
+                                string.Concat(((MemberExpression) f).Member.DeclaringType.Name, ".",
+                                    ((MemberExpression) f).Member.Name))));
             }
 
             return returnString;

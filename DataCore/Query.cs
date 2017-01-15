@@ -181,6 +181,13 @@ namespace DataCore
             return this;
         }
 
+        public Query<T> OrderByDescending(Expression<Func<T, dynamic>> clause)
+        {
+            SqlOrderBy = ExpressionHelper.FormatStringFromArguments(clause, SqlOrderBy, _translator.GetOrderByDescendingFormat());
+
+            return this;
+        }
+
         public Query<T> GroupBy(Expression<Func<T, dynamic>> clause)
         {
             SqlGroupBy = ExpressionHelper.FormatStringFromArguments(clause, SqlGroupBy);

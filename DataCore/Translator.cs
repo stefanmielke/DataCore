@@ -241,5 +241,10 @@ namespace DataCore
         {
             return string.Concat("SELECT EXISTS (", query, ")");
         }
+
+        public string GetOrderByDescendingFormat()
+        {
+            return "{0} DESC";
+        }
     }
 }

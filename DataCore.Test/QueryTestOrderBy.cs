@@ -36,5 +36,47 @@ namespace DataCore.Test
 
             Assert.AreEqual("TestClass.Id, TestClass.Number, TestClass.Name", query.SqlOrderBy);
         }
+
+        [TestMethod]
+        public void CanGenerateOrderByDescWithDynamic()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.OrderByDescending(t => new { t.Id, t.Name });
+
+            Assert.AreEqual("TestClass.Id DESC, TestClass.Name DESC", query.SqlOrderBy);
+        }
+
+        [TestMethod]
+        public void CanGenerateOrderByDescWithOneField()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.OrderByDescending(t => t.Id);
+
+            Assert.AreEqual("TestClass.Id DESC", query.SqlOrderBy);
+        }
+
+        [TestMethod]
+        public void CanAggregateOrderByDesc()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.OrderByDescending(t => t.Id);
+            query.OrderByDescending(t => new { t.Number, t.Name });
+
+            Assert.AreEqual("TestClass.Id DESC, TestClass.Number DESC, TestClass.Name DESC", query.SqlOrderBy);
+        }
+
+        [TestMethod]
+        public void CanAggregateOrderByAndOrderByDesc()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.OrderByDescending(t => t.Id);
+            query.OrderBy(t => new { t.Number, t.Name });
+
+            Assert.AreEqual("TestClass.Id DESC, TestClass.Number, TestClass.Name", query.SqlOrderBy);
+        }
     }
 }

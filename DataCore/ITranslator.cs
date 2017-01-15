@@ -30,5 +30,6 @@ namespace DataCore
         string GetCreateForeignKeyIfNotExistsQuery(string indexName, string tableNameFrom, string columnNameFrom, string tableNameTo, string columnNameTo);
         string GetDropForeignKeyIfExistsQuery(string tableName, string indexName);
         string GetExistsQuery(string query);
+        string GetOrderByDescendingFormat();
     }
 }
