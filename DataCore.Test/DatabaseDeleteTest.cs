@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Data.SQLite;
-using DataCore.Database.Sqlite;
 using DataCore.Test.Models;
 using NUnit.Framework;
 
@@ -9,14 +7,14 @@ namespace DataCore.Test
     [TestFixture]
     public class DatabaseDeleteTest
     {
-        [Test]
-        public void CanDeleteOne()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanDeleteOne(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
@@ -38,18 +36,20 @@ namespace DataCore.Test
                 var result = database.SelectSingle(query);
                 Assert.IsNull(result);
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void CanDeleteMany()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanDeleteMany(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
@@ -73,6 +73,8 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.IsNull(result);
+
+                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }

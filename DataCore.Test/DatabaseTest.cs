@@ -1,6 +1,4 @@
-﻿using System.Data.SQLite;
-using DataCore.Database.Sqlite;
-using DataCore.Test.Models;
+﻿using DataCore.Test.Models;
 using System;
 using NUnit.Framework;
 
@@ -9,90 +7,100 @@ namespace DataCore.Test
     [TestFixture]
     public class DatabaseTest
     {
-        [Test]
-        public void CanSelect()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanSelect(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.Execute("CREATE TABLE TestClass ( Id INT not null, Number INT not null, Name VARCHAR(250) not null, InsertDate DATETIME not null );");
+                database.CreateTableIfNotExists<TestClass>();
 
                 var query = database.From<TestClass>().Where(t => t.Id == 1);
 
                 database.Select(query);
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void CanSelectSingle()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanSelectSingle(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.Execute("CREATE TABLE TestClass ( Id INT not null, Number INT not null);INSERT INTO TestClass (Id, Number) VALUES (1, 1)");
+                database.CreateTableIfNotExists<TestClass>();
+                database.Insert(TestHelper.GetNewTestClass());
 
                 var query = database.From<TestClass>().Where(t => t.Id == 1);
 
                 Assert.IsNotNull(database.SelectSingle(query));
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void ExistsReturnTrueWhenExists()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void ExistsReturnTrueWhenExists(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.Execute("CREATE TABLE TestClass ( Id INT not null, Number INT not null);INSERT INTO TestClass (Id, Number) VALUES (1, 1)");
+                database.CreateTableIfNotExists<TestClass>();
+                database.Insert(TestHelper.GetNewTestClass());
 
                 var query = database.From<TestClass>().Where(t => t.Id == 1);
 
                 Assert.IsTrue(database.Exists(query));
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void ExistsReturnFalseWhenNotExists()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void ExistsReturnFalseWhenNotExists(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.Execute("CREATE TABLE TestClass (Id INT not null, Number INT not null);");
+                database.CreateTableIfNotExists<TestClass>();
 
                 var query = database.From<TestClass>().Where(t => t.Id == 1);
 
                 Assert.IsFalse(database.Exists(query));
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void CanCreateTable()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanCreateTable(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
@@ -100,18 +108,20 @@ namespace DataCore.Test
 
                 database.Select(query);
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void DoNotErrorOnDoubleCreateTable()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void DoNotErrorOnDoubleCreateTable(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
                 database.CreateTableIfNotExists<TestClass>();
@@ -120,18 +130,20 @@ namespace DataCore.Test
 
                 database.Select(query);
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void CanDropTable()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanDropTable(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
@@ -143,116 +155,130 @@ namespace DataCore.Test
             }
         }
 
-        [Test]
-        public void CanCreateColumn()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanCreateColumn(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.Execute("CREATE TABLE TestClass ( Id INT not null, Number INT not null, Name VARCHAR(250) not null );");
+                database.DropTableIfExists<TestClass4>();
+                database.Execute("CREATE TABLE TestClass4 ( Id INT not null, Number INT not null, Name VARCHAR(250) not null )");
 
-                database.CreateColumnIfNotExists<TestClass>(t => t.InsertDate);
+                database.CreateColumnIfNotExists<TestClass4>(t => t.InsertDate);
 
                 var date = DateTime.Now;
 
-                var query = database.From<TestClass>().Where(t => t.InsertDate == date);
+                var query = database.From<TestClass4>().Where(t => t.InsertDate == date);
 
                 database.Select(query);
+
+                database.Execute("DROP TABLE TestClass4");
 
                 connection.Close();
             }
         }
 
-        [Test]
-        public void CanDropColumn()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanDropColumn(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
                 database.DropColumnIfExists<TestClass>(t => t.Id);
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void CanCreateIndex()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanCreateIndex(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
                 database.CreateIndexIfNotExists<TestClass>(t => new { t.Id, t.Name }, true);
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
-
-        [Test]
-        public void CanDropIndex()
+        
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanDropIndex(TestHelper.DatabaseType dbType, string connectionString)
         {
-            const string indexName = "IX_TestClass";
+            string indexName = "IX_TestClass" + Guid.NewGuid().ToString().Replace("-", "");
 
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
                 database.CreateIndexIfNotExists<TestClass>(t => new { t.Id, t.Name }, true, indexName);
                 database.DropIndexIfExists<TestClass>(indexName);
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void CanCreateForeignKey()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanCreateForeignKey(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
                 database.CreateTableIfNotExists<TestClass2>();
 
                 database.CreateForeignKeyIfNotExists<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id);
 
+                database.DropTableIfExists<TestClass>();
+                database.DropTableIfExists<TestClass2>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void CanDropForeignKey()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanDropForeignKey(TestHelper.DatabaseType dbType, string connectionString)
         {
-            const string indexName = "FK_TestClass";
+            string indexName = "FK_TestClass" + Guid.NewGuid().ToString().Replace("-", "");
 
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
                 database.CreateForeignKeyIfNotExists<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id, indexName);
                 database.DropForeignKeyIfExists<TestClass>(indexName);
+
+                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }

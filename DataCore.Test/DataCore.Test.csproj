@@ -64,6 +64,7 @@
     <Compile Include="DatabaseInsertTest.cs" />
     <Compile Include="DatabaseTest.cs" />
     <Compile Include="DatabaseUpdateQuery.cs" />
+    <Compile Include="Models\TestClass4.cs" />
     <Compile Include="QueryTestGroupBy.cs" />
     <Compile Include="QueryTestJoins.cs" />
     <Compile Include="QueryTestOrderBy.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Models\TestClass2.cs" />
     <Compile Include="Models\TestClass3.cs" />
     <Compile Include="QueryTestTypes.cs" />
+    <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataCore.Database.Sqlite\DataCore.Database.Sqlite.csproj">

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Data.SQLite;
 using System.Linq;
-using DataCore.Database.Sqlite;
 using DataCore.Test.Models;
 using NUnit.Framework;
 
@@ -10,14 +8,14 @@ namespace DataCore.Test
     [TestFixture]
     public class DatabaseInsertTest
     {
-        [Test]
-        public void CanInsert()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanInsert(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
@@ -35,6 +33,8 @@ namespace DataCore.Test
 
                 var results = database.Select(query);
                 Assert.IsTrue(results.Any());
+
+                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Data.SQLite;
-using DataCore.Database.Sqlite;
 using DataCore.Test.Models;
 using NUnit.Framework;
 
@@ -9,16 +7,16 @@ namespace DataCore.Test
     [TestFixture]
     public class DatabaseUpdateQuery
     {
-        [Test]
-        public void CanUpdate()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanUpdate(TestHelper.DatabaseType dbType, string connectionString)
         {
             var updatedName = "test updated";
 
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
@@ -41,21 +39,23 @@ namespace DataCore.Test
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void CanUpdateOnlyOneField()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanUpdateOnlyOneField(TestHelper.DatabaseType dbType, string connectionString)
         {
             var updatedName = "test updated";
             var updatedNumber = 2;
 
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
@@ -81,21 +81,23 @@ namespace DataCore.Test
                 Assert.AreEqual(updatedName, result.Name);
                 Assert.AreNotEqual(updatedNumber, result.Number);
 
+                database.DropTableIfExists<TestClass>();
+
                 connection.Close();
             }
         }
 
-        [Test]
-        public void CanUpdateOnlyManyFields()
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanUpdateOnlyManyFields(TestHelper.DatabaseType dbType, string connectionString)
         {
             var updatedName = "test updated";
             var updatedNumber = 2;
 
-            using (var connection = new SQLiteConnection("Data Source=:memory:"))
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 connection.Open();
 
-                var database = new SqliteDatabase(connection);
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
@@ -120,6 +122,8 @@ namespace DataCore.Test
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
                 Assert.AreNotEqual(updatedNumber, result.Number);
+
+                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }

@@ -87,16 +87,13 @@ namespace DataCore
             return string.Concat("'", date.ToString("yyyy-MM-dd HH:mm:ss.fff"), "'");
         }
 
-        public string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
+        public virtual string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
         {
             var query = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
             query.Append(tableName)
                 .Append(" (");
 
-            query.Append(string.Join(",",
-                fields.Select(
-                    field => GetStringForColumn(field))
-                ));
+            query.Append(string.Join(",", fields.Select(GetStringForColumn)));
 
             query.Append(")");
 
@@ -151,7 +148,7 @@ namespace DataCore
             }
         }
 
-        private string GetTextFor(DbType type)
+        protected virtual string GetTextFor(DbType type)
         {
             switch (type)
             {
@@ -194,7 +191,7 @@ namespace DataCore
             }
         }
 
-        public string GetCreateColumnIfNoExistsQuery(string tableName, FieldDefinition field)
+        public virtual string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field)
         {
             return string.Concat("ALTER TABLE ", tableName, " ADD COLUMN ", GetStringForColumn(field));
         }
@@ -204,23 +201,17 @@ namespace DataCore
             return string.Concat(tableName, " WITH(NOLOCK)");
         }
 
-        private string GetStringForColumn(FieldDefinition field)
-        {
-            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size,
-                           field.Nullable ? "NULL" : "NOT NULL");
-        }
-
         public virtual string GetDropColumnIfExistsQuery(string tableName, string memberName)
         {
             return string.Concat("ALTER TABLE ", tableName, " DROP COLUMN ", memberName);
         }
 
-        public string GetCreateIndexIfNotExistsQuery(string indexName, string tableName, string columns, bool unique)
+        public virtual string GetCreateIndexIfNotExistsQuery(string indexName, string tableName, string columns, bool unique)
         {
             return string.Concat("CREATE", unique ? " UNIQUE" : "", " INDEX IF NOT EXISTS ", indexName, " ON ", tableName, "(", columns, ")");
         }
 
-        public string GetDropIndexIfExistsQuery(string tableName, string indexName)
+        public virtual string GetDropIndexIfExistsQuery(string tableName, string indexName)
         {
             return string.Concat("DROP INDEX IF EXISTS ", indexName);
         }
@@ -237,7 +228,7 @@ namespace DataCore
             return string.Concat("ALTER TABLE ", tableName, " DROP CONSTRAINT ", indexName);
         }
 
-        public string GetExistsQuery(string query)
+        public virtual string GetExistsQuery(string query)
         {
             return string.Concat("SELECT EXISTS (", query, ")");
         }
@@ -245,6 +236,12 @@ namespace DataCore
         public string GetOrderByDescendingFormat()
         {
             return "{0} DESC";
+        }
+
+        protected string GetStringForColumn(FieldDefinition field)
+        {
+            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size,
+                           field.Nullable ? "NULL" : "NOT NULL");
         }
     }
 }

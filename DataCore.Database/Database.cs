@@ -136,7 +136,7 @@ namespace DataCore.Database
                 var query = string.Join(";",
                     arguments.Select(
                         f =>
-                            _translator.GetCreateColumnIfNoExistsQuery(
+                            _translator.GetCreateColumnIfNotExistsQuery(
                                 tableName,
                                 new FieldDefinition
                                 {
