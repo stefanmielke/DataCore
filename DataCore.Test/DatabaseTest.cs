@@ -12,8 +12,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
@@ -33,8 +31,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
@@ -55,8 +51,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
@@ -77,8 +71,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
@@ -98,8 +90,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
@@ -119,8 +109,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
@@ -141,8 +129,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
@@ -160,8 +146,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.DropTableIfExists<TestClass4>();
@@ -186,13 +170,11 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
 
-                database.DropColumnIfExists<TestClass>(t => t.Id);
+                database.DropColumnIfExists<TestClass>(t => t.Name);
 
                 database.DropTableIfExists<TestClass>();
 
@@ -205,8 +187,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
@@ -226,8 +206,6 @@ namespace DataCore.Test
 
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
@@ -246,8 +224,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
@@ -269,11 +245,10 @@ namespace DataCore.Test
 
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
+                database.CreateTableIfNotExists<TestClass2>();
 
                 database.CreateForeignKeyIfNotExists<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id, indexName);
                 database.DropForeignKeyIfExists<TestClass>(indexName);

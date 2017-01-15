@@ -105,7 +105,7 @@ namespace DataCore
             return string.Concat("DROP TABLE IF EXISTS ", tableName);
         }
 
-        private string GetFormatFor(FieldDefinition field)
+        protected string GetFormatFor(FieldDefinition field)
         {
             switch (field.Type)
             {
@@ -238,7 +238,7 @@ namespace DataCore
             return "{0} DESC";
         }
 
-        protected string GetStringForColumn(FieldDefinition field)
+        protected virtual string GetStringForColumn(FieldDefinition field)
         {
             return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size,
                            field.Nullable ? "NULL" : "NOT NULL");

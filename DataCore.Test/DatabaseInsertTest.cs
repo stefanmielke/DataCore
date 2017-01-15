@@ -13,8 +13,6 @@ namespace DataCore.Test
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
-                connection.Open();
-
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();

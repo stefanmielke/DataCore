@@ -8,5 +8,6 @@ namespace DataCore
         public DbType Type { get; set; }
         public int Size { get; set; }
         public bool Nullable { get; set; }
+        public bool IsPrimaryKey { get; set; }
     }
 }

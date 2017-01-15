@@ -58,6 +58,16 @@ namespace DataCore.Database.SqlServer
             return string.Concat("IF EXISTS (", query, ") SELECT 1 ELSE SELECT 0");
         }
 
+        protected override string GetStringForColumn(FieldDefinition field)
+        {
+            var nullable = field.Nullable ? "NULL" : "NOT NULL";
+            var primaryKey = field.IsPrimaryKey ? " PRIMARY KEY" : "";
+
+            var extra = string.Concat(nullable, primaryKey);
+
+            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, extra);
+        }
+
         protected override string GetTextFor(DbType type)
         {
             switch (type)

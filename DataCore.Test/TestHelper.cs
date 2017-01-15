@@ -23,9 +23,24 @@ namespace DataCore.Test
         }
     }
 
-    public class TestHelper
+    public static class TestHelper
     {
         public static IDbConnection GetConnectionFor(DatabaseType dbType, string connectionString)
+        {
+            var connection = GetConnectionForInternal(dbType, connectionString);
+            connection.Open();
+
+            var database = GetDatabaseFor(dbType, connection);
+
+            database.DropTableIfExists<TestClass>();
+            database.DropTableIfExists<TestClass2>();
+            database.DropTableIfExists<TestClass3>();
+            database.DropTableIfExists<TestClass4>();
+
+            return connection;
+        }
+
+        private static IDbConnection GetConnectionForInternal(DatabaseType dbType, string connectionString)
         {
             switch (dbType)
             {

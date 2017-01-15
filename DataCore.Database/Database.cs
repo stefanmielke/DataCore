@@ -5,6 +5,7 @@ using System.Reflection;
 using Dapper;
 using System.Linq.Expressions;
 using System;
+using DataCore.Attributes;
 
 namespace DataCore.Database
 {
@@ -112,7 +113,16 @@ namespace DataCore.Database
             var tableName = type.Name;
             var fields =
                 type.GetProperties()
-                    .Select(p => new FieldDefinition { Name = p.Name, Nullable = false, Size = 255, Type = GetTypeForProperty(p) });
+                    .Select(
+                        p =>
+                            new FieldDefinition
+                            {
+                                Name = p.Name,
+                                Nullable = false,
+                                Size = 255,
+                                Type = GetTypeForProperty(p),
+                                IsPrimaryKey = p.GetCustomAttributes(typeof(PrimaryKeyAttribute), true).Length > 0
+                            });
 
             var query = _translator.GetCreateTableIfNotExistsQuery(tableName, fields);
 
