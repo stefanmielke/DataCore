@@ -50,6 +50,10 @@ namespace DataCore
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
+            string constantValue;
+            if (ExpressionHelper.GetSqlExtensionMethodCallConstant(node, out constantValue))
+                return node;
+
             var obj = node.Object == null ? null : ((ConstantExpression)node.Object).Value;
             var args = node.Arguments.Select(
                 a =>

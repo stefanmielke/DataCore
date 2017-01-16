@@ -109,21 +109,12 @@ namespace DataCore
 
         public static IEnumerable<Expression> GetMemberExpressions(Expression body)
         {
-            // A Queue preserves left to right reading order of expressions in the tree
             var candidates = new Queue<Expression>(new[] { body });
             while (candidates.Count > 0)
             {
                 var expr = candidates.Dequeue();
                 if (expr is MemberExpression)
                 {
-                    //var member = ((MemberExpression)expr).Member;
-                    //var property = member as PropertyInfo;
-                    //if (property != null && property.PropertyType.Name == "Boolean")
-                    //{
-                    //    candidates.Enqueue(Expression.MakeBinary(ExpressionType.Equal, expr, Expression.Constant(true)));
-                    //    continue;
-                    //}
-
                     yield return expr;
                 }
                 else if (expr is ConstantExpression)
@@ -161,6 +152,12 @@ namespace DataCore
                 {
                     candidates.Enqueue(((LambdaExpression)expr).Body);
                 }
+                else if (expr is MethodCallExpression)
+                {
+                    string constantValue;
+                    if (GetSqlExtensionMethodCallConstant((MethodCallExpression)expr, out constantValue))
+                        yield return Expression.Constant(new StringAsIs(constantValue));
+                }
             }
         }
 
@@ -195,13 +192,36 @@ namespace DataCore
             var methodExpression = expression as MethodCallExpression;
             if (methodExpression != null)
             {
-                if (methodExpression.Method.Name == "Min" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
-                    return string.Concat("MIN(", GetStringForExpression(methodExpression.Arguments[0]), ")");
-                if (methodExpression.Method.Name == "Max" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
-                    return string.Concat("MAX(", GetStringForExpression(methodExpression.Arguments[0]), ")");
+                string concat;
+                if (GetSqlExtensionMethodCallConstant(methodExpression, out concat))
+                    return concat;
             }
 
             return string.Empty;
+        }
+
+        public static bool GetSqlExtensionMethodCallConstant(MethodCallExpression methodExpression, out string concat)
+        {
+            if (methodExpression.Method.Name == "Min" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = string.Concat("MIN(", GetStringForExpression(methodExpression.Arguments[0]), ")");
+                return true;
+            }
+
+            if (methodExpression.Method.Name == "Max" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = string.Concat("MAX(", GetStringForExpression(methodExpression.Arguments[0]), ")");
+                return true;
+            }
+
+            if (methodExpression.Method.Name == "Sum" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = string.Concat("SUM(", GetStringForExpression(methodExpression.Arguments[0]), ")");
+                return true;
+            }
+
+            concat = "";
+            return false;
         }
 
         public static IEnumerable<string> GetStringsFromArguments<T>(Expression<Func<T, dynamic>> clause)

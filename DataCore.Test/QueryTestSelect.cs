@@ -148,5 +148,50 @@ namespace DataCore.Test
 
             Assert.That(query.SqlColumns, Is.EqualTo("MAX(TestClass.Id), MIN(TestClass.Id)"));
         }
+
+        [Test]
+        public void CanGenerateHavingWithMin()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Having(t => t.Id.Min() == 10);
+
+            Assert.That(query.SqlHaving, Is.EqualTo("(MIN(TestClass.Id) = 10)"));
+        }
+
+        [Test]
+        public void CanGenerateHavingWithMax()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Having(t => t.Id.Max() != 10);
+
+            Assert.That(query.SqlHaving, Is.EqualTo("(MAX(TestClass.Id) != 10)"));
+        }
+
+        [Test]
+        public void CanGenerateHavingWithMaxAndMin()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Having(t => t.Id.Max() > 0 && t.Id.Min() < 10);
+
+            Assert.That(query.SqlHaving, Is.EqualTo("((MAX(TestClass.Id) > 0) AND (MIN(TestClass.Id) < 10))"));
+        }
+
+        [Test]
+        public void CanGenerateSelectWithSum()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Select(t => t.Id.Sum());
+
+            Assert.That(query.SqlColumns, Is.EqualTo("SUM(TestClass.Id)"));
+        }
+
+        [Test]
+        public void CanGenerateHavingWithSum()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Having(t => t.Id.Sum() > 0);
+
+            Assert.That(query.SqlHaving, Is.EqualTo("(SUM(TestClass.Id) > 0)"));
+        }
     }
 }
