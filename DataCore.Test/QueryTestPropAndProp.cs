@@ -89,5 +89,38 @@ namespace DataCore.Test
 
             Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.InsertDate BETWEEN '2016-01-01 00:00:00.000' AND '2016-01-02 00:00:00.000')"));
         }
+
+        [Test]
+        public void CanGenerateInInt()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Where(t => t.Id.In(1, 2, 3));
+
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Id IN (1,2,3)"));
+        }
+
+        [Test]
+        public void CanGenerateInString()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Where(t => t.Name.In("test", "test2"));
+
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name IN ('test','test2')"));
+        }
+
+        [Test]
+        public void CanGenerateInDateTime()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            var dateOne = new DateTime(2016, 01, 01);
+            var dateTwo = new DateTime(2016, 01, 02);
+
+            query.Where(t => t.InsertDate.In(dateOne, dateTwo));
+
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.InsertDate IN ('2016-01-01 00:00:00.000','2016-01-02 00:00:00.000')"));
+        }
     }
 }

@@ -220,6 +220,10 @@ namespace DataCore
                     return concat;
             }
 
+            var newArrayExpression = expression as NewArrayExpression;
+            if (newArrayExpression != null)
+                return string.Join(",", newArrayExpression.Expressions.Select(ex => GetStringForExpression(translator, ex)));
+
             return string.Empty;
         }
 
@@ -255,6 +259,14 @@ namespace DataCore
                 concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0]), " BETWEEN ",
                     GetStringForExpression(translator, methodExpression.Arguments[1]), " AND ",
                     GetStringForExpression(translator, methodExpression.Arguments[2]), ")");
+                return true;
+            }
+
+            if (methodExpression.Method.Name == "In" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0]), " IN (",
+                    GetStringForExpression(translator, methodExpression.Arguments[1]), ")");
+
                 return true;
             }
 

@@ -29,5 +29,10 @@
         {
             return true;
         }
+
+        public static bool In<T>(this T property, params T[] pars)
+        {
+            return true;
+        }
     }
 }
