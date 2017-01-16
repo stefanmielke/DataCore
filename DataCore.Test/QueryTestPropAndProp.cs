@@ -13,7 +13,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id == 1);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id = 1)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id = 1)");
         }
 
         [Test]
@@ -23,7 +23,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id > 1);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id > 1)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id > 1)");
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id >= 1);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id >= 1)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id >= 1)");
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id < 1);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id < 1)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id < 1)");
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id <= 1);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id <= 1)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id <= 1)");
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace DataCore.Test
 
             data.Where(t => t.Id != 1);
 
-            Assert.AreEqual(data.SqlWhere.ToString(), "(TestClass.Id != 1)");
+            Assert.AreEqual(data.SqlWhere, "(TestClass.Id != 1)");
         }
     }
 }
