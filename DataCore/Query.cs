@@ -17,6 +17,7 @@ namespace DataCore
         public string SqlFrom { get; set; }
         public string SqlWhere { get; set; }
         public string SqlOrderBy { get; set; }
+        public string SqlHaving { get; set; }
         public string SqlGroupBy { get; set; }
         public string SqlEnd { get; set; }
         public StringBuilder SqlCommand { get; private set; }
@@ -50,6 +51,9 @@ namespace DataCore
 
             if (!string.IsNullOrWhiteSpace(SqlGroupBy))
                 SqlCommand.AppendFormat(" GROUP BY {0}", SqlGroupBy);
+
+            if (!string.IsNullOrWhiteSpace(SqlHaving))
+                SqlCommand.AppendFormat(" HAVING {0}", SqlHaving);
 
             if (!string.IsNullOrWhiteSpace(SqlOrderBy))
                 SqlCommand.AppendFormat(" ORDER BY {0}", SqlOrderBy);
@@ -184,6 +188,17 @@ namespace DataCore
         public Query<T> OrderByDescending(Expression<Func<T, dynamic>> clause)
         {
             SqlOrderBy = ExpressionHelper.FormatStringFromArguments(clause, SqlOrderBy, _translator.GetOrderByDescendingFormat());
+
+            return this;
+        }
+
+        public Query<T> Having(Expression<Func<T, bool>> clause)
+        {
+            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
+
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+
+            SqlHaving = string.IsNullOrEmpty(SqlHaving) ? query : string.Concat("(", SqlHaving, ") AND (", query, ")");
 
             return this;
         }

@@ -66,6 +66,7 @@ namespace DataCore.Test
                     .RightJoin<TestClass2, TestClass3>((t, t2) => t.Id == t2.Id && t2.Id > 1)
                     .Where(t => t.Number > 105)
                     .GroupBy(t => new { t.Id, t.Name })
+                    .Having(t => t.Id > 0)
                     .OrderBy(t => t.Id)
                     .Select(t => new { t.Id, t.Name })
                     .Top(103)
@@ -78,6 +79,7 @@ namespace DataCore.Test
                             + " RIGHT JOIN TestClass3 WITH(NOLOCK) ON ((TestClass2.Id = TestClass3.Id) AND (TestClass3.Id > 1))"
                             + " WHERE (TestClass.Number > 105)"
                             + " GROUP BY TestClass.Id, TestClass.Name"
+                            + " HAVING (TestClass.Id > 0)"
                             + " ORDER BY TestClass.Id"
                             + " LIMIT 103";
 

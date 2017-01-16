@@ -66,6 +66,7 @@
     <Compile Include="DatabaseUpdateQuery.cs" />
     <Compile Include="Models\TestClass4.cs" />
     <Compile Include="QueryTestGroupBy.cs" />
+    <Compile Include="QueryTestHaving.cs" />
     <Compile Include="QueryTestJoins.cs" />
     <Compile Include="QueryTestOrderBy.cs" />
     <Compile Include="QueryTestPagination.cs" />
