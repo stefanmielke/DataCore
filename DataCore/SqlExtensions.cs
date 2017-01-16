@@ -34,5 +34,10 @@
         {
             return true;
         }
+
+        public static bool Like(this string property, string likeString)
+        {
+            return true;
+        }
     }
 }

@@ -97,7 +97,7 @@ namespace DataCore.Test
 
             query.Where(t => t.Id.In(1, 2, 3));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Id IN (1,2,3)"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Id IN (1,2,3))"));
         }
 
         [Test]
@@ -107,7 +107,7 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.In("test", "test2"));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name IN ('test','test2')"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name IN ('test','test2'))"));
         }
 
         [Test]
@@ -120,7 +120,17 @@ namespace DataCore.Test
 
             query.Where(t => t.InsertDate.In(dateOne, dateTwo));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.InsertDate IN ('2016-01-01 00:00:00.000','2016-01-02 00:00:00.000')"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.InsertDate IN ('2016-01-01 00:00:00.000','2016-01-02 00:00:00.000'))"));
+        }
+
+        [Test]
+        public void CanGenerateLike()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Where(t => t.Name.Like("%test%"));
+
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name LIKE '%test%')"));
         }
     }
 }

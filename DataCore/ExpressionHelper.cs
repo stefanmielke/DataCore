@@ -265,6 +265,14 @@ namespace DataCore
             if (methodExpression.Method.Name == "In" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
                 concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0]), " IN (",
+                    GetStringForExpression(translator, methodExpression.Arguments[1]), "))");
+
+                return true;
+            }
+
+            if (methodExpression.Method.Name == "Like" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0]), " LIKE ",
                     GetStringForExpression(translator, methodExpression.Arguments[1]), ")");
 
                 return true;
