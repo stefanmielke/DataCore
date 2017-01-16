@@ -39,5 +39,10 @@
         {
             return true;
         }
+
+        public static string TrimSql(this string property)
+        {
+            return property;
+        }
     }
 }

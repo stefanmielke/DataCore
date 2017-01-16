@@ -132,5 +132,25 @@ namespace DataCore.Test
 
             Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name LIKE '%test%')"));
         }
+
+        [Test]
+        public void CanGenerateTrimOnSelect()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Select(t => t.Name.TrimSql().As("Name"));
+
+            Assert.That(query.SqlColumns, Is.EqualTo("LTRIM(RTRIM(TestClass.Name)) AS 'Name'"));
+        }
+
+        [Test]
+        public void CanGenerateTrimOnWhere()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Where(t => t.Name.TrimSql() == "test");
+
+            Assert.That(query.SqlWhere, Is.EqualTo("(LTRIM(RTRIM(TestClass.Name)) = 'test')"));
+        }
     }
 }

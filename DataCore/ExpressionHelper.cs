@@ -278,6 +278,13 @@ namespace DataCore
                 return true;
             }
 
+            if (methodExpression.Method.Name == "TrimSql" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = string.Concat("LTRIM(RTRIM(", GetStringForExpression(translator, methodExpression.Arguments[0]), "))");
+
+                return true;
+            }
+
             concat = "";
             return false;
         }
