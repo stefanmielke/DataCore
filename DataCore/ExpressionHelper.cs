@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace DataCore
 {
@@ -32,7 +33,7 @@ namespace DataCore
 
         public static string GetQueryFromExpression(ITranslator translator, Expression clause)
         {
-            var members = GetMemberExpressions(clause);
+            var members = GetMemberExpressions(translator, clause);
             if (!members.Any())
                 return string.Empty;
 
@@ -106,7 +107,7 @@ namespace DataCore
             }
         }
 
-        public static IEnumerable<Expression> GetMemberExpressions(Expression body)
+        public static IEnumerable<Expression> GetMemberExpressions(ITranslator translator, Expression body)
         {
             var candidates = new Queue<Expression>(new[] { body });
             while (candidates.Count > 0)
@@ -154,13 +155,13 @@ namespace DataCore
                 else if (expr is MethodCallExpression)
                 {
                     string constantValue;
-                    if (GetSqlExtensionMethodCallConstant((MethodCallExpression)expr, out constantValue))
+                    if (GetSqlExtensionMethodCallConstant(translator, (MethodCallExpression)expr, out constantValue))
                         yield return Expression.Constant(new StringAsIs(constantValue));
                 }
             }
         }
 
-        public static string FormatStringFromArguments<T>(Expression<Func<T, dynamic>> clause, string startString, string format = "{0}")
+        public static string FormatStringFromArguments<T>(ITranslator translator, Expression<Func<T, dynamic>> clause, string startString, string format = "{0}")
         {
             var returnString = startString;
 
@@ -172,57 +173,88 @@ namespace DataCore
                     returnString += ", ";
 
                 returnString += string.Join(", ",
-                    arguments.Select(f => string.Format(format, GetStringForExpression(f))));
+                    arguments.Select(f => string.Format(format, GetStringForExpression(translator, f))));
             }
 
             return returnString;
         }
 
-        private static string GetStringForExpression(Expression expression)
+        private static string GetStringForExpression(ITranslator translator, Expression expression)
         {
             var memberExpression = expression as MemberExpression;
             if (memberExpression != null)
+            {
+                var constantExpression = memberExpression.Expression as ConstantExpression;
+                if (constantExpression != null)
+                {
+                    var container = constantExpression.Value;
+                    var member = memberExpression.Member;
+
+                    var fieldInfo = member as FieldInfo;
+                    if (fieldInfo != null)
+                    {
+                        var value = fieldInfo.GetValue(container);
+                        return GetStringForExpression(translator, Expression.Constant(value));
+                    }
+
+                    var propertyInfo = member as PropertyInfo;
+                    if (propertyInfo != null)
+                    {
+                        var value = propertyInfo.GetValue(container, null);
+                        return GetStringForExpression(translator, Expression.Constant(value));
+                    }
+                }
+
                 return string.Concat(memberExpression.Member.DeclaringType.Name, ".", memberExpression.Member.Name);
+            }
 
             var constExpr = expression as ConstantExpression;
             if (constExpr != null)
-                return Convert.ToString(constExpr.Value);
+                return GetValueFrom(translator, constExpr.Type, constExpr.Value);
 
             var methodExpression = expression as MethodCallExpression;
             if (methodExpression != null)
             {
                 string concat;
-                if (GetSqlExtensionMethodCallConstant(methodExpression, out concat))
+                if (GetSqlExtensionMethodCallConstant(translator, methodExpression, out concat))
                     return concat;
             }
 
             return string.Empty;
         }
 
-        public static bool GetSqlExtensionMethodCallConstant(MethodCallExpression methodExpression, out string concat)
+        public static bool GetSqlExtensionMethodCallConstant(ITranslator translator, MethodCallExpression methodExpression, out string concat)
         {
             if (methodExpression.Method.Name == "Min" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("MIN(", GetStringForExpression(methodExpression.Arguments[0]), ")");
+                concat = string.Concat("MIN(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
                 return true;
             }
 
             if (methodExpression.Method.Name == "Max" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("MAX(", GetStringForExpression(methodExpression.Arguments[0]), ")");
+                concat = string.Concat("MAX(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
                 return true;
             }
 
             if (methodExpression.Method.Name == "Sum" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("SUM(", GetStringForExpression(methodExpression.Arguments[0]), ")");
+                concat = string.Concat("SUM(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
                 return true;
             }
 
             if (methodExpression.Method.Name == "As" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat(GetStringForExpression(methodExpression.Arguments[0]), " AS '",
+                concat = string.Concat(GetStringForExpression(translator, methodExpression.Arguments[0]), " AS '",
                     Convert.ToString(methodExpression.Arguments[1]).Replace("\"", ""), "'");
+                return true;
+            }
+
+            if (methodExpression.Method.Name == "Between" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0]), " BETWEEN ",
+                    GetStringForExpression(translator, methodExpression.Arguments[1]), " AND ",
+                    GetStringForExpression(translator, methodExpression.Arguments[2]), ")");
                 return true;
             }
 

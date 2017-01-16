@@ -71,7 +71,7 @@ namespace DataCore
             if (SqlColumns == "*")
                 SqlColumns = string.Empty;
 
-            SqlColumns = ExpressionHelper.FormatStringFromArguments(clause, SqlColumns);
+            SqlColumns = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlColumns);
 
             return this;
         }
@@ -180,14 +180,14 @@ namespace DataCore
 
         public Query<T> OrderBy(Expression<Func<T, dynamic>> clause)
         {
-            SqlOrderBy = ExpressionHelper.FormatStringFromArguments(clause, SqlOrderBy);
+            SqlOrderBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlOrderBy);
 
             return this;
         }
 
         public Query<T> OrderByDescending(Expression<Func<T, dynamic>> clause)
         {
-            SqlOrderBy = ExpressionHelper.FormatStringFromArguments(clause, SqlOrderBy, _translator.GetOrderByDescendingFormat());
+            SqlOrderBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlOrderBy, _translator.GetOrderByDescendingFormat());
 
             return this;
         }
@@ -205,7 +205,7 @@ namespace DataCore
 
         public Query<T> GroupBy(Expression<Func<T, dynamic>> clause)
         {
-            SqlGroupBy = ExpressionHelper.FormatStringFromArguments(clause, SqlGroupBy);
+            SqlGroupBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlGroupBy);
 
             return this;
         }

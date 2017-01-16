@@ -1,5 +1,8 @@
 ﻿namespace DataCore
 {
+    /// <summary>
+    /// Class holding methods used in Expression (methods are not called)
+    /// </summary>
     public static class SqlExtensions
     {
         public static T Min<T>(this T property)
@@ -20,6 +23,11 @@
         public static T As<T>(this T property, string alias)
         {
             return property;
+        }
+
+        public static bool Between<T>(this T property, T start, T end)
+        {
+            return true;
         }
     }
 }
