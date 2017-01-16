@@ -220,6 +220,13 @@ namespace DataCore
                 return true;
             }
 
+            if (methodExpression.Method.Name == "As" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = string.Concat(GetStringForExpression(methodExpression.Arguments[0]), " AS '",
+                    Convert.ToString(methodExpression.Arguments[1]).Replace("\"", ""), "'");
+                return true;
+            }
+
             concat = "";
             return false;
         }

@@ -16,5 +16,10 @@
         {
             return property;
         }
+
+        public static T As<T>(this T property, string alias)
+        {
+            return property;
+        }
     }
 }

@@ -193,5 +193,23 @@ namespace DataCore.Test
 
             Assert.That(query.SqlHaving, Is.EqualTo("(SUM(TestClass.Id) > 0)"));
         }
+
+        [Test]
+        public void CanGenerateHavingWithAlias()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Select(t => t.Id.Sum().As("ID TEST"));
+
+            Assert.That(query.SqlColumns, Is.EqualTo("SUM(TestClass.Id) AS 'ID TEST'"));
+        }
+
+        [Test]
+        public void CanGenerateHavingWithAliases()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Select(t => new { Sum = t.Id.Sum().As("ID TEST SUM"), NewName = t.Name.As("NewName") });
+
+            Assert.That(query.SqlColumns, Is.EqualTo("SUM(TestClass.Id) AS 'ID TEST SUM', TestClass.Name AS 'NewName'"));
+        }
     }
 }
