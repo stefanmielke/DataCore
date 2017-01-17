@@ -9,63 +9,80 @@ namespace DataCore.Test
         [Test]
         public void CanGenerateAndClause()
         {
-            var data = new Query<TestClass>(new Translator());
+            var query = new Query<TestClass>(new Translator());
 
-            data.Where(t => t.Id == 0 && t.Number == 1);
+            query.Where(t => t.Id == 0 && t.Number == 1);
 
-            Assert.AreEqual("((TestClass.Id = 0) AND (TestClass.Number = 1))", data.SqlWhere.ToString());
+            Assert.AreEqual("((TestClass.Id = @p0) AND (TestClass.Number = @p1))", query.SqlWhere);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p1"]);
         }
 
         [Test]
         public void CanGenerateOrClause()
         {
-            var data = new Query<TestClass>(new Translator());
+            var query = new Query<TestClass>(new Translator());
 
-            data.Where(t => t.Id == 0 || t.Number == 1);
+            query.Where(t => t.Id == 0 || t.Number == 1);
 
-            Assert.AreEqual("((TestClass.Id = 0) OR (TestClass.Number = 1))", data.SqlWhere.ToString());
+            Assert.AreEqual("((TestClass.Id = @p0) OR (TestClass.Number = @p1))", query.SqlWhere);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p1"]);
         }
 
         [Test]
         public void CanGenerateAndClauseCapsuled()
         {
-            var data = new Query<TestClass>(new Translator());
+            var query = new Query<TestClass>(new Translator());
 
-            data.Where(t => (t.Id == 0 && t.Number == 1) && t.Id == 1);
+            query.Where(t => (t.Id == 0 && t.Number == 1) && t.Id == 1);
 
-            Assert.AreEqual("(((TestClass.Id = 0) AND (TestClass.Number = 1)) AND (TestClass.Id = 1))", data.SqlWhere.ToString());
+            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.Number = @p1)) AND (TestClass.Id = @p2))", query.SqlWhere);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p1"]);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p2"]);
         }
 
         [Test]
         public void CanGenerateClauseDoubleCapsuled()
         {
-            var data = new Query<TestClass>(new Translator());
+            var query = new Query<TestClass>(new Translator());
 
-            data.Where(t => (t.Id == 0 && t.Number == 1) || (t.Id == 1 && t.Number == 0));
+            query.Where(t => (t.Id == 0 && t.Number == 1) || (t.Id == 1 && t.Number == 0));
 
-            Assert.AreEqual("(((TestClass.Id = 0) AND (TestClass.Number = 1)) OR ((TestClass.Id = 1) AND (TestClass.Number = 0)))", data.SqlWhere.ToString());
+            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.Number = @p1)) OR ((TestClass.Id = @p2) AND (TestClass.Number = @p3)))", query.SqlWhere);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p1"]);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p2"]);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p3"]);
         }
 
         [Test]
         public void CanGenerateClauseDoubleWhere()
         {
-            var data = new Query<TestClass>(new Translator());
+            var query = new Query<TestClass>(new Translator());
 
-            data.Where(t => t.Id == 1 && t.Number == 0);
-            data.Where(t => t.Name == "test");
+            query.Where(t => t.Id == 1 && t.Number == 0);
+            query.Where(t => t.Name == "test");
 
-            Assert.AreEqual("(((TestClass.Id = 1) AND (TestClass.Number = 0))) AND ((TestClass.Name = 'test'))", data.SqlWhere.ToString());
+            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.Number = @p1))) AND ((TestClass.Name = @p2))", query.SqlWhere);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p1"]);
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p2"]);
         }
 
         [Test]
         public void CanGenerateClauseDoubleWhereWithOr()
         {
-            var data = new Query<TestClass>(new Translator());
+            var query = new Query<TestClass>(new Translator());
 
-            data.Where(t => t.Id == 1 && t.Number == 0);
-            data.Or(t => t.Name == "test");
+            query.Where(t => t.Id == 1 && t.Number == 0);
+            query.Or(t => t.Name == "test");
 
-            Assert.AreEqual("(((TestClass.Id = 1) AND (TestClass.Number = 0))) OR ((TestClass.Name = 'test'))", data.SqlWhere.ToString());
+            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.Number = @p1))) OR ((TestClass.Name = @p2))", query.SqlWhere);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p1"]);
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p2"]);
         }
     }
 }

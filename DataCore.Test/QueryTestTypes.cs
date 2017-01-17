@@ -14,7 +14,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Id > 0);
 
-            Assert.AreEqual("(TestClass.Id > 0)", query.SqlWhere);
+            Assert.AreEqual("(TestClass.Id > @p0)", query.SqlWhere);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -24,7 +25,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Number > 0);
 
-            Assert.AreEqual("(TestClass.Number > 0)", query.SqlWhere);
+            Assert.AreEqual("(TestClass.Number > @p0)", query.SqlWhere);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -34,7 +36,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Done);
 
-            Assert.AreEqual("(TestClass.Done = 1)", query.SqlWhere);
+            Assert.AreEqual("(TestClass.Done = @p0)", query.SqlWhere);
+            Assert.AreEqual(true, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -44,7 +47,8 @@ namespace DataCore.Test
 
             query.Where(t => !t.Done);
 
-            Assert.AreEqual("(TestClass.Done != 1)", query.SqlWhere);
+            Assert.AreEqual("(TestClass.Done != @p0)", query.SqlWhere);
+            Assert.AreEqual(true, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -54,7 +58,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Name != "test name");
 
-            Assert.AreEqual("(TestClass.Name != 'test name')", query.SqlWhere);
+            Assert.AreEqual("(TestClass.Name != @p0)", query.SqlWhere);
+            Assert.AreEqual("test name", query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -66,7 +71,8 @@ namespace DataCore.Test
 
             query.Where(t => t.InsertDate != now);
 
-            Assert.AreEqual("(TestClass.InsertDate != '" + now.ToString("yyyy-MM-dd HH:mm:ss.fff")  + "')", query.SqlWhere);
+            Assert.AreEqual("(TestClass.InsertDate != @p0)", query.SqlWhere);
+            Assert.AreEqual(now, query.Parameters.GetValues()["@p0"]);
         }
     }
 }

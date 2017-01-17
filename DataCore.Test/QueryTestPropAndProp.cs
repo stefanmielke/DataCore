@@ -14,7 +14,8 @@ namespace DataCore.Test
 
             data.Where(t => t.Id == 1);
 
-            Assert.AreEqual(data.SqlWhere, "(TestClass.Id = 1)");
+            Assert.AreEqual("(TestClass.Id = @p0)", data.SqlWhere);
+            Assert.AreEqual(1, data.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -24,7 +25,8 @@ namespace DataCore.Test
 
             data.Where(t => t.Id > 1);
 
-            Assert.AreEqual(data.SqlWhere, "(TestClass.Id > 1)");
+            Assert.AreEqual("(TestClass.Id > @p0)", data.SqlWhere);
+            Assert.AreEqual(1, data.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -34,7 +36,8 @@ namespace DataCore.Test
 
             data.Where(t => t.Id >= 1);
 
-            Assert.AreEqual(data.SqlWhere, "(TestClass.Id >= 1)");
+            Assert.AreEqual("(TestClass.Id >= @p0)", data.SqlWhere);
+            Assert.AreEqual(1, data.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -44,7 +47,8 @@ namespace DataCore.Test
 
             data.Where(t => t.Id < 1);
 
-            Assert.AreEqual(data.SqlWhere, "(TestClass.Id < 1)");
+            Assert.AreEqual("(TestClass.Id < @p0)", data.SqlWhere);
+            Assert.AreEqual(1, data.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -54,7 +58,8 @@ namespace DataCore.Test
 
             data.Where(t => t.Id <= 1);
 
-            Assert.AreEqual(data.SqlWhere, "(TestClass.Id <= 1)");
+            Assert.AreEqual("(TestClass.Id <= @p0)", data.SqlWhere);
+            Assert.AreEqual(1, data.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -64,7 +69,8 @@ namespace DataCore.Test
 
             data.Where(t => t.Id != 1);
 
-            Assert.AreEqual(data.SqlWhere, "(TestClass.Id != 1)");
+            Assert.AreEqual("(TestClass.Id != @p0)", data.SqlWhere);
+            Assert.AreEqual(1, data.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -74,7 +80,9 @@ namespace DataCore.Test
 
             query.Where(t => t.Id.Between(1, 10));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Id BETWEEN 1 AND 10)"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Id BETWEEN @p0 AND @p1)"));
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(10, query.Parameters.GetValues()["@p1"]);
         }
 
         [Test]
@@ -87,7 +95,9 @@ namespace DataCore.Test
 
             query.Where(t => t.InsertDate.Between(dateFrom, dateTo));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.InsertDate BETWEEN '2016-01-01 00:00:00.000' AND '2016-01-02 00:00:00.000')"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.InsertDate BETWEEN @p0 AND @p1)"));
+            Assert.AreEqual(dateFrom, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(dateTo, query.Parameters.GetValues()["@p1"]);
         }
 
         [Test]
@@ -97,7 +107,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Id.In(1, 2, 3));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Id IN (1,2,3))"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Id IN @p0)"));
+            Assert.AreEqual(new[] { 1, 2, 3 }, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -107,7 +118,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.In("test", "test2"));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name IN ('test','test2'))"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name IN @p0)"));
+            Assert.AreEqual(new[] { "test", "test2" }, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -120,7 +132,8 @@ namespace DataCore.Test
 
             query.Where(t => t.InsertDate.In(dateOne, dateTwo));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.InsertDate IN ('2016-01-01 00:00:00.000','2016-01-02 00:00:00.000'))"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.InsertDate IN @p0)"));
+            Assert.AreEqual(new[] { dateOne, dateTwo }, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -150,7 +163,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.TrimSql() == "test");
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(LTRIM(RTRIM(TestClass.Name)) = 'test')"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(LTRIM(RTRIM(TestClass.Name)) = @p0)"));
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -170,7 +184,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.Length() > 10);
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(LEN(TestClass.Name) > 10)"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(LEN(TestClass.Name) > @p0)"));
+            Assert.AreEqual(10, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -190,7 +205,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.Upper() == "TEST");
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(UPPER(TestClass.Name) = 'TEST')"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(UPPER(TestClass.Name) = @p0)"));
+            Assert.AreEqual("TEST", query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -210,7 +226,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.Lower() == "test");
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(LOWER(TestClass.Name) = 'test')"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(LOWER(TestClass.Name) = @p0)"));
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -230,7 +247,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.IsNull("test") == "test");
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(ISNULL(TestClass.Name,'test') = 'test')"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(ISNULL(TestClass.Name,'test') = @p0)"));
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -250,7 +268,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.Cast<string, int>() == 10);
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(CAST(TestClass.Name AS INT) = 10)"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(CAST(TestClass.Name AS INT) = @p0)"));
+            Assert.AreEqual(10, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -270,7 +289,8 @@ namespace DataCore.Test
 
             query.Having(t => t.Number.Average() > 10);
 
-            Assert.That(query.SqlHaving, Is.EqualTo("(AVG(TestClass.Number) > 10)"));
+            Assert.That(query.SqlHaving, Is.EqualTo("(AVG(TestClass.Number) > @p0)"));
+            Assert.AreEqual(10, query.Parameters.GetValues()["@p0"]);
         }
     }
 }

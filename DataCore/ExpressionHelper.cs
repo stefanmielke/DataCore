@@ -31,17 +31,17 @@ namespace DataCore
             return arguments;
         }
 
-        public static string GetQueryFromExpression(ITranslator translator, Expression clause)
+        public static string GetQueryFromExpression(ITranslator translator, Expression clause, Parameters parameters)
         {
             var members = GetMemberExpressions(translator, clause);
             if (!members.Any())
                 return string.Empty;
 
             var enumerator = members.GetEnumerator();
-            return GetString(translator, enumerator);
+            return GetString(translator, enumerator, parameters);
         }
 
-        public static string GetString(ITranslator translator, IEnumerator<Expression> iterator)
+        public static string GetString(ITranslator translator, IEnumerator<Expression> iterator, Parameters parameters)
         {
             if (!iterator.MoveNext())
                 return string.Empty;
@@ -50,25 +50,25 @@ namespace DataCore
 
             var binaryExpression = expression as BinaryExpression;
             if (binaryExpression != null)
-                return BinaryExpressionString(translator, iterator, binaryExpression);
+                return BinaryExpressionString(translator, iterator, binaryExpression, parameters);
 
             var memberExpression = expression as MemberExpression;
             if (memberExpression != null)
-                return MemberExpressionString(memberExpression);
+                return MemberExpressionString(memberExpression, parameters);
 
             var constantExpression = expression as ConstantExpression;
             if (constantExpression != null)
-                return ConstantExpressionString(translator, constantExpression);
+                return ConstantExpressionString(translator, constantExpression, parameters);
 
             return string.Empty;
         }
 
-        public static string MemberExpressionString(MemberExpression memberExpression)
+        public static string MemberExpressionString(MemberExpression memberExpression, Parameters parameters)
         {
             return string.Concat(memberExpression.Member.DeclaringType.Name, ".", memberExpression.Member.Name);
         }
 
-        public static string BinaryExpressionString(ITranslator translator, IEnumerator<Expression> iterator, BinaryExpression binaryExpression)
+        public static string BinaryExpressionString(ITranslator translator, IEnumerator<Expression> iterator, BinaryExpression binaryExpression, Parameters parameters)
         {
             var format = translator.GetFormatFor(binaryExpression.NodeType);
 
@@ -76,20 +76,25 @@ namespace DataCore
             var right = string.Empty;
 
             if (iterator.MoveNext())
-                left = GetQueryFromExpression(translator, iterator.Current);
+                left = GetQueryFromExpression(translator, iterator.Current, parameters);
 
             if (iterator.MoveNext())
-                right = GetQueryFromExpression(translator, iterator.Current);
+                right = GetQueryFromExpression(translator, iterator.Current, parameters);
 
             return string.Format(format, left, right);
         }
 
-        public static string ConstantExpressionString(ITranslator translator, ConstantExpression constantExpression)
+        public static string ConstantExpressionString(ITranslator translator, ConstantExpression constantExpression, Parameters parameters)
         {
-            return GetValueFrom(translator, constantExpression.Type, constantExpression.Value);
+            var value = GetValueFrom(translator, constantExpression.Type, constantExpression.Value);
+
+            if (value.GetType().Name != "StringAsIs")
+                return parameters.Add(value);
+
+            return value.ToString();
         }
 
-        public static string GetValueFrom(ITranslator translator, Type type, object value)
+        public static object GetValueFrom(ITranslator translator, Type type, object value)
         {
             switch (type.Name)
             {
@@ -98,12 +103,11 @@ namespace DataCore
                 case "String":
                     return translator.GetStringValue(value);
                 case "DateTime":
-                    {
-                        var date = Convert.ToDateTime(value);
-                        return translator.GetDateTimeValue(date);
-                    }
+                    return translator.GetDateTimeValue(value);
+                case "StringAsIs":
+                    return value;
                 default:
-                    return Convert.ToString(value);
+                    return Convert.ToInt32(value);
             }
         }
 
@@ -161,7 +165,8 @@ namespace DataCore
             }
         }
 
-        public static string FormatStringFromArguments<T>(ITranslator translator, Expression<Func<T, dynamic>> clause, string startString, string format = "{0}")
+        public static string FormatStringFromArguments<T>(ITranslator translator, Expression<Func<T, dynamic>> clause,
+            string startString, Parameters parameters, string format = "{0}")
         {
             var returnString = startString;
 
@@ -173,13 +178,13 @@ namespace DataCore
                     returnString += ", ";
 
                 returnString += string.Join(", ",
-                    arguments.Select(f => string.Format(format, GetStringForExpression(translator, f))));
+                    arguments.Select(f => string.Format(format, GetStringForExpression(translator, f, parameters))));
             }
 
             return returnString;
         }
 
-        private static string GetStringForExpression(ITranslator translator, Expression expression)
+        private static string GetStringForExpression(ITranslator translator, Expression expression, Parameters parameters)
         {
             var memberExpression = expression as MemberExpression;
             if (memberExpression != null)
@@ -194,14 +199,14 @@ namespace DataCore
                     if (fieldInfo != null)
                     {
                         var value = fieldInfo.GetValue(container);
-                        return GetStringForExpression(translator, Expression.Constant(value));
+                        return GetStringForExpression(translator, Expression.Constant(value), parameters);
                     }
 
                     var propertyInfo = member as PropertyInfo;
                     if (propertyInfo != null)
                     {
                         var value = propertyInfo.GetValue(container, null);
-                        return GetStringForExpression(translator, Expression.Constant(value));
+                        return GetStringForExpression(translator, Expression.Constant(value), parameters);
                     }
                 }
 
@@ -210,7 +215,11 @@ namespace DataCore
 
             var constExpr = expression as ConstantExpression;
             if (constExpr != null)
-                return GetValueFrom(translator, constExpr.Type, constExpr.Value);
+            {
+                var value = GetValueFrom(translator, constExpr.Type, constExpr.Value);
+                var key = parameters.Add(value);
+                return key;
+            }
 
             var methodExpression = expression as MethodCallExpression;
             if (methodExpression != null)
@@ -222,7 +231,7 @@ namespace DataCore
 
             var newArrayExpression = expression as NewArrayExpression;
             if (newArrayExpression != null)
-                return string.Join(",", newArrayExpression.Expressions.Select(ex => GetStringForExpression(translator, ex)));
+                return string.Join(",", newArrayExpression.Expressions.Select(ex => GetStringForExpression(translator, ex, parameters)));
 
             return string.Empty;
         }
@@ -231,56 +240,56 @@ namespace DataCore
         {
             if (methodExpression.Method.Name == "Min" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("MIN(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
+                concat = string.Concat("MIN(", GetStringForExpression(translator, methodExpression.Arguments[0], null), ")");
                 return true;
             }
 
             if (methodExpression.Method.Name == "Max" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("MAX(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
+                concat = string.Concat("MAX(", GetStringForExpression(translator, methodExpression.Arguments[0], null), ")");
                 return true;
             }
 
             if (methodExpression.Method.Name == "Sum" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("SUM(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
+                concat = string.Concat("SUM(", GetStringForExpression(translator, methodExpression.Arguments[0], null), ")");
                 return true;
             }
 
             if (methodExpression.Method.Name == "As" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat(GetStringForExpression(translator, methodExpression.Arguments[0]), " AS '",
+                concat = string.Concat(GetStringForExpression(translator, methodExpression.Arguments[0], null), " AS '",
                     Convert.ToString(methodExpression.Arguments[1]).Replace("\"", ""), "'");
                 return true;
             }
 
             if (methodExpression.Method.Name == "Between" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0]), " BETWEEN ",
-                    GetStringForExpression(translator, methodExpression.Arguments[1]), " AND ",
-                    GetStringForExpression(translator, methodExpression.Arguments[2]), ")");
+                concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0], null), " BETWEEN ",
+                    GetStringForExpression(translator, methodExpression.Arguments[1], null), " AND ",
+                    GetStringForExpression(translator, methodExpression.Arguments[2], null), ")");
                 return true;
             }
 
             if (methodExpression.Method.Name == "In" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0]), " IN (",
-                    GetStringForExpression(translator, methodExpression.Arguments[1]), "))");
+                concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0], null), " IN (",
+                    GetStringForExpression(translator, methodExpression.Arguments[1], null), "))");
 
                 return true;
             }
 
             if (methodExpression.Method.Name == "Like" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0]), " LIKE ",
-                    GetStringForExpression(translator, methodExpression.Arguments[1]), ")");
+                concat = string.Concat("(", GetStringForExpression(translator, methodExpression.Arguments[0], null), " LIKE ",
+                    GetStringForExpression(translator, methodExpression.Arguments[1], null), ")");
 
                 return true;
             }
 
             if (methodExpression.Method.Name == "TrimSql" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("LTRIM(RTRIM(", GetStringForExpression(translator, methodExpression.Arguments[0]), "))");
+                concat = string.Concat("LTRIM(RTRIM(", GetStringForExpression(translator, methodExpression.Arguments[0], null), "))");
 
                 return true;
             }
@@ -289,21 +298,21 @@ namespace DataCore
             {
                 var lengthName = translator.GetLengthFunctionName();
 
-                concat = string.Concat(lengthName, "(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
+                concat = string.Concat(lengthName, "(", GetStringForExpression(translator, methodExpression.Arguments[0], null), ")");
 
                 return true;
             }
 
             if (methodExpression.Method.Name == "Upper" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("UPPER(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
+                concat = string.Concat("UPPER(", GetStringForExpression(translator, methodExpression.Arguments[0], null), ")");
 
                 return true;
             }
 
             if (methodExpression.Method.Name == "Lower" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("LOWER(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
+                concat = string.Concat("LOWER(", GetStringForExpression(translator, methodExpression.Arguments[0], null), ")");
 
                 return true;
             }
@@ -313,8 +322,8 @@ namespace DataCore
                 var isNullName = translator.GetIsNullFunctionName();
 
                 concat = string.Concat(isNullName, "(",
-                    GetStringForExpression(translator, methodExpression.Arguments[0]), ",",
-                    GetStringForExpression(translator, methodExpression.Arguments[1]), ")");
+                    GetStringForExpression(translator, methodExpression.Arguments[0], null), ",",
+                    GetStringForExpression(translator, methodExpression.Arguments[1], null), ")");
 
                 return true;
             }
@@ -322,7 +331,7 @@ namespace DataCore
             if (methodExpression.Method.Name == "Cast" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
                 concat = string.Concat("CAST(",
-                    GetStringForExpression(translator, methodExpression.Arguments[0]), " AS ",
+                    GetStringForExpression(translator, methodExpression.Arguments[0], null), " AS ",
                     translator.GetTextFor(methodExpression.Method.ReturnType), ")");
 
                 return true;
@@ -330,7 +339,7 @@ namespace DataCore
 
             if (methodExpression.Method.Name == "Average" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("AVG(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
+                concat = string.Concat("AVG(", GetStringForExpression(translator, methodExpression.Arguments[0], null), ")");
 
                 return true;
             }

@@ -9,25 +9,30 @@ namespace DataCore.Test
         [Test]
         public void CanGenerateHavingWithOneArgument()
         {
-            var data = new Query<TestClass>(new Translator()).Having(t => t.Id > 0);
+            var query = new Query<TestClass>(new Translator()).Having(t => t.Id > 0);
 
-            Assert.AreEqual("(TestClass.Id > 0)", data.SqlHaving);
+            Assert.AreEqual("(TestClass.Id > @p0)", query.SqlHaving);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
         public void CanGenerateHavingWithManyArguments()
         {
-            var data = new Query<TestClass>(new Translator()).Having(t => t.Id > 0 && t.Name == "test");
+            var query = new Query<TestClass>(new Translator()).Having(t => t.Id > 0 && t.Name == "test");
 
-            Assert.AreEqual("((TestClass.Id > 0) AND (TestClass.Name = 'test'))", data.SqlHaving);
+            Assert.AreEqual("((TestClass.Id > @p0) AND (TestClass.Name = @p1))", query.SqlHaving);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p1"]);
         }
 
         [Test]
         public void CanGenerateHavingWithManyArgumentsAggregated()
         {
-            var data = new Query<TestClass>(new Translator()).Having(t => t.Id > 0).Having(t => t.Name == "test");
+            var query = new Query<TestClass>(new Translator()).Having(t => t.Id > 0).Having(t => t.Name == "test");
 
-            Assert.AreEqual("((TestClass.Id > 0)) AND ((TestClass.Name = 'test'))", data.SqlHaving);
+            Assert.AreEqual("((TestClass.Id > @p0)) AND ((TestClass.Name = @p1))", query.SqlHaving);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p1"]);
         }
     }
 }

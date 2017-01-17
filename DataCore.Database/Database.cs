@@ -31,15 +31,22 @@ namespace DataCore.Database
 
             var tableName = type.Name;
 
-            var properties = GetPropertiesForType(type);
+            var properties = GetPropertiesForType(type).ToList();
+
+            var parameters = new Parameters();
 
             var names = string.Join(", ", properties.Select(p => p.Name));
             var values = string.Join(", ",
-                properties.Select(p => ExpressionHelper.GetValueFrom(_translator, p.PropertyType, p.GetValue(obj, null))));
+                properties.Select(p =>
+                {
+                    var value = ExpressionHelper.GetValueFrom(_translator, p.PropertyType, p.GetValue(obj, null));
+                    return parameters.Add(value);
+                })
+            );
 
-            var query = _translator.GetInsertQuery(tableName, names, values);
+            var query = _translator.GetInsertQuery(tableName, names, values, parameters);
 
-            Execute(query);
+            Execute(query, parameters);
         }
 
         public void Update<T>(T obj, Expression<Func<T, dynamic>> whereClause)
@@ -50,20 +57,22 @@ namespace DataCore.Database
 
             var properties = GetPropertiesForType(type);
 
-            var nameValues = properties.Select(
-                p =>
-                    new KeyValuePair<string, string>(
-                        p.Name,
-                        ExpressionHelper.GetValueFrom(_translator, p.PropertyType, p.GetValue(obj, null))
-                    )
-            );
+            var nameValues = new List<KeyValuePair<string, string>>();
+
+            var parameters = new Parameters();
+            foreach (var prop in properties)
+            {
+                var key = parameters.Add(ExpressionHelper.GetValueFrom(_translator, prop.PropertyType, prop.GetValue(obj, null)));
+                nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
+            }
 
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
-            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
 
-            var query = _translator.GetUpdateQuery(tableName, nameValues, whereQuery);
+            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, parameters);
 
-            Execute(query);
+            var query = _translator.GetUpdateQuery(tableName, nameValues, whereQuery, parameters);
+
+            Execute(query, parameters);
         }
 
         public void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields, Expression<Func<T, dynamic>> whereClause)
@@ -76,20 +85,21 @@ namespace DataCore.Database
 
             var fields = ExpressionHelper.GetStringsFromArguments(onlyFields);
 
-            var nameValues = properties.Where(p => fields.Contains(p.Name)).Select(
-                p =>
-                    new KeyValuePair<string, string>(
-                        p.Name,
-                        ExpressionHelper.GetValueFrom(_translator, p.PropertyType, p.GetValue(obj, null))
-                    )
-            );
+            var nameValues = new List<KeyValuePair<string, string>>();
+
+            var parameters = new Parameters();
+            foreach (var prop in properties.Where(p => fields.Contains(p.Name)))
+            {
+                var key = parameters.Add(ExpressionHelper.GetValueFrom(_translator, prop.PropertyType, prop.GetValue(obj, null)));
+                nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
+            }
 
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
-            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, parameters);
 
-            var query = _translator.GetUpdateQuery(tableName, nameValues, whereQuery);
+            var query = _translator.GetUpdateQuery(tableName, nameValues, whereQuery, parameters);
 
-            Execute(query);
+            Execute(query, parameters);
         }
 
         public void Delete<T>(Expression<Func<T, bool>> whereClause)
@@ -98,12 +108,14 @@ namespace DataCore.Database
 
             var tableName = type.Name;
             
+            var parameters = new Parameters();
+
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
-            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, parameters);
 
-            var query = _translator.GetDeleteQuery(tableName, whereQuery);
+            var query = _translator.GetDeleteQuery(tableName, whereQuery, parameters);
 
-            Execute(query);
+            Execute(query, parameters);
         }
 
         public int CreateTableIfNotExists<T>()
@@ -251,7 +263,7 @@ namespace DataCore.Database
             if (!query.Built)
                 query.Build();
 
-            return Execute<T>(query.SqlCommand.ToString());
+            return Execute<T>(query.SqlCommand.ToString(), query.Parameters);
         }
 
         public T SelectSingle<T>(Query<T> query)
@@ -259,7 +271,7 @@ namespace DataCore.Database
             if (!query.Built)
                 query.Build();
 
-            return Execute<T>(query.SqlCommand.ToString()).FirstOrDefault();
+            return Execute<T>(query.SqlCommand.ToString(), query.Parameters).FirstOrDefault();
         }
 
         public bool Exists<T>(Query<T> query)
@@ -269,7 +281,7 @@ namespace DataCore.Database
 
             var queryWithExists = _translator.GetExistsQuery(query.SqlCommand.ToString());
 
-            return Execute<int>(queryWithExists).FirstOrDefault() == 1;
+            return Execute<int>(queryWithExists, query.Parameters).FirstOrDefault() == 1;
         }
 
         public IEnumerable<T> Execute<T>(string query)
@@ -277,9 +289,19 @@ namespace DataCore.Database
             return _connection.Query<T>(query);
         }
 
+        public IEnumerable<T> Execute<T>(string query, Parameters parameters)
+        {
+            return _connection.Query<T>(query, parameters.GetValues());
+        }
+
         public int Execute(string query)
         {
             return _connection.Execute(query);
+        }
+
+        public int Execute(string query, Parameters parameters)
+        {
+            return _connection.Execute(query, parameters.GetValues());
         }
 
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)

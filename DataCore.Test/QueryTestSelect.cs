@@ -19,11 +19,12 @@ namespace DataCore.Test
         [Test]
         public void DataTestSelectClauseWhere()
         {
-            var data = new Query<TestClass>(new Translator());
+            var query = new Query<TestClass>(new Translator());
 
-            data.Where(t => t.Id == 0).Build();
+            query.Where(t => t.Id == 0).Build();
 
-            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK) WHERE (TestClass.Id = 0)");
+            Assert.AreEqual(query.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK) WHERE (TestClass.Id = @p0)");
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -49,11 +50,12 @@ namespace DataCore.Test
         [Test]
         public void DataTestSelectClauseWithTopAndWhere()
         {
-            var data = new Query<TestClass>(new Translator());
+            var query = new Query<TestClass>(new Translator());
 
-            data.Where(t => t.Id == 0).Top(10).Build();
+            query.Where(t => t.Id == 0).Top(10).Build();
 
-            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK) WHERE (TestClass.Id = 0) LIMIT 10");
+            Assert.AreEqual(query.SqlCommand.ToString(), "SELECT * FROM TestClass WITH(NOLOCK) WHERE (TestClass.Id = @p0) LIMIT 10");
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -75,15 +77,19 @@ namespace DataCore.Test
             var expected = "SELECT TestClass.Id, TestClass.Name"
                             + " FROM TestClass WITH(NOLOCK)"
                             + " INNER JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id)"
-                            + " LEFT JOIN TestClass2 WITH(NOLOCK) ON ((TestClass.Id = TestClass2.Id) AND (TestClass2.Id = 1))"
-                            + " RIGHT JOIN TestClass3 WITH(NOLOCK) ON ((TestClass2.Id = TestClass3.Id) AND (TestClass3.Id > 1))"
-                            + " WHERE (TestClass.Number > 105)"
+                            + " LEFT JOIN TestClass2 WITH(NOLOCK) ON ((TestClass.Id = TestClass2.Id) AND (TestClass2.Id = @p0))"
+                            + " RIGHT JOIN TestClass3 WITH(NOLOCK) ON ((TestClass2.Id = TestClass3.Id) AND (TestClass3.Id > @p1))"
+                            + " WHERE (TestClass.Number > @p2)"
                             + " GROUP BY TestClass.Id, TestClass.Name"
-                            + " HAVING (TestClass.Id > 0)"
+                            + " HAVING (TestClass.Id > @p3)"
                             + " ORDER BY TestClass.Id"
                             + " LIMIT 103";
 
             Assert.AreEqual(expected, query.SqlCommand.ToString());
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p1"]);
+            Assert.AreEqual(105, query.Parameters.GetValues()["@p2"]);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p3"]);
         }
 
         [Test]
@@ -155,7 +161,8 @@ namespace DataCore.Test
             var query = new Query<TestClass>(new Translator());
             query.Having(t => t.Id.Min() == 10);
 
-            Assert.That(query.SqlHaving, Is.EqualTo("(MIN(TestClass.Id) = 10)"));
+            Assert.That(query.SqlHaving, Is.EqualTo("(MIN(TestClass.Id) = @p0)"));
+            Assert.AreEqual(10, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -164,7 +171,8 @@ namespace DataCore.Test
             var query = new Query<TestClass>(new Translator());
             query.Having(t => t.Id.Max() != 10);
 
-            Assert.That(query.SqlHaving, Is.EqualTo("(MAX(TestClass.Id) != 10)"));
+            Assert.That(query.SqlHaving, Is.EqualTo("(MAX(TestClass.Id) != @p0)"));
+            Assert.AreEqual(10, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -173,7 +181,9 @@ namespace DataCore.Test
             var query = new Query<TestClass>(new Translator());
             query.Having(t => t.Id.Max() > 0 && t.Id.Min() < 10);
 
-            Assert.That(query.SqlHaving, Is.EqualTo("((MAX(TestClass.Id) > 0) AND (MIN(TestClass.Id) < 10))"));
+            Assert.That(query.SqlHaving, Is.EqualTo("((MAX(TestClass.Id) > @p0) AND (MIN(TestClass.Id) < @p1))"));
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(10, query.Parameters.GetValues()["@p1"]);
         }
 
         [Test]
@@ -191,11 +201,12 @@ namespace DataCore.Test
             var query = new Query<TestClass>(new Translator());
             query.Having(t => t.Id.Sum() > 0);
 
-            Assert.That(query.SqlHaving, Is.EqualTo("(SUM(TestClass.Id) > 0)"));
+            Assert.That(query.SqlHaving, Is.EqualTo("(SUM(TestClass.Id) > @p0)"));
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
-        public void CanGenerateHavingWithAlias()
+        public void CanGenerateSelectWithAlias()
         {
             var query = new Query<TestClass>(new Translator());
             query.Select(t => t.Id.Sum().As("ID TEST"));
@@ -204,7 +215,7 @@ namespace DataCore.Test
         }
 
         [Test]
-        public void CanGenerateHavingWithAliases()
+        public void CanGenerateSelectWithAliases()
         {
             var query = new Query<TestClass>(new Translator());
             query.Select(t => new { Sum = t.Id.Sum().As("ID TEST SUM"), NewName = t.Name.As("NewName") });

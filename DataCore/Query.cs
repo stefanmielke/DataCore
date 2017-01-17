@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -22,6 +24,8 @@ namespace DataCore
         public string SqlEnd { get; set; }
         public StringBuilder SqlCommand { get; private set; }
 
+        public Parameters Parameters { get; private set; }
+
         public Query(ITranslator translator)
         {
             Built = false;
@@ -36,6 +40,8 @@ namespace DataCore
             SqlEnd = "";
             TableName = typeof(T).Name;
             SqlFrom = _translator.GetTableName(TableName);
+
+            Parameters = new Parameters();
         }
 
         public Query<T> Build()
@@ -71,7 +77,7 @@ namespace DataCore
             if (SqlColumns == "*")
                 SqlColumns = string.Empty;
 
-            SqlColumns = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlColumns);
+            SqlColumns = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlColumns, Parameters);
 
             return this;
         }
@@ -94,7 +100,7 @@ namespace DataCore
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
 
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
 
             SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") AND (", query, ")");
 
@@ -105,7 +111,7 @@ namespace DataCore
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
 
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
 
             SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") OR (", query, ")");
 
@@ -115,7 +121,7 @@ namespace DataCore
         public Query<T> Join<TJoined>(Expression<Func<T, TJoined, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoined).Name);
             SqlFrom = string.Concat(SqlFrom, " INNER JOIN ", joinedTableName, " ON ", query);
@@ -126,7 +132,7 @@ namespace DataCore
         public Query<T> Join<TJoinedLeft, TJoinedRight>(Expression<Func<TJoinedLeft, TJoinedRight, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " INNER JOIN ", joinedTableName, " ON ", query);
@@ -137,7 +143,7 @@ namespace DataCore
         public Query<T> LeftJoin<TJoined>(Expression<Func<T, TJoined, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoined).Name);
             SqlFrom = string.Concat(SqlFrom, " LEFT JOIN ", joinedTableName, " ON ", query);
@@ -148,7 +154,7 @@ namespace DataCore
         public Query<T> LeftJoin<TJoinedLeft, TJoinedRight>(Expression<Func<TJoinedLeft, TJoinedRight, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " LEFT JOIN ", joinedTableName, " ON ", query);
@@ -159,7 +165,7 @@ namespace DataCore
         public Query<T> RightJoin<TJoined>(Expression<Func<T, TJoined, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoined).Name);
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
@@ -170,7 +176,7 @@ namespace DataCore
         public Query<T> RightJoin<TJoinedLeft, TJoinedRight>(Expression<Func<TJoinedLeft, TJoinedRight, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
@@ -180,14 +186,14 @@ namespace DataCore
 
         public Query<T> OrderBy(Expression<Func<T, dynamic>> clause)
         {
-            SqlOrderBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlOrderBy);
+            SqlOrderBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlOrderBy, Parameters);
 
             return this;
         }
 
         public Query<T> OrderByDescending(Expression<Func<T, dynamic>> clause)
         {
-            SqlOrderBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlOrderBy, _translator.GetOrderByDescendingFormat());
+            SqlOrderBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlOrderBy, Parameters, _translator.GetOrderByDescendingFormat());
 
             return this;
         }
@@ -196,7 +202,7 @@ namespace DataCore
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
 
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body);
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
 
             SqlHaving = string.IsNullOrEmpty(SqlHaving) ? query : string.Concat("(", SqlHaving, ") AND (", query, ")");
 
@@ -205,7 +211,7 @@ namespace DataCore
 
         public Query<T> GroupBy(Expression<Func<T, dynamic>> clause)
         {
-            SqlGroupBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlGroupBy);
+            SqlGroupBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlGroupBy, Parameters);
 
             return this;
         }

@@ -12,18 +12,18 @@ namespace DataCore
         void Count<T>(Query<T> query);
         void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage);
 
-        string GetInsertQuery(string tableName, string names, string values);
-        string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where);
-        string GetDeleteQuery(string tableName, string whereQuery);
+        string GetInsertQuery(string tableName, string names, string values, Parameters parameters);
+        string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where, Parameters parameters);
+        string GetDeleteQuery(string tableName, string whereQuery, Parameters parameters);
 
         string GetFormatFor(ExpressionType type);
         string GetTextFor(Type type);
         DbType GetTypeForProperty(Type type);
         DbType GetTypeForProperty(PropertyInfo propertyInfo);
 
-        string GetBooleanValue(object constantExpressionValue);
+        bool GetBooleanValue(object constantExpressionValue);
         string GetStringValue(object value);
-        string GetDateTimeValue(DateTime date);
+        DateTime GetDateTimeValue(object date);
 
         string GetTableName(string tableName);
         string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields);

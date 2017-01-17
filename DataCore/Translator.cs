@@ -25,12 +25,12 @@ namespace DataCore
             query.SqlEnd = string.Concat("LIMIT ", recordsPerPage, ", ", (currentPage - 1) * recordsPerPage);
         }
 
-        public string GetInsertQuery(string tableName, string names, string values)
+        public string GetInsertQuery(string tableName, string names, string values, Parameters parameters)
         {
             return string.Concat("INSERT INTO ", tableName, "(", names, ") VALUES (", values, ")");
         }
 
-        public string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where)
+        public string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where, Parameters parameters)
         {
             var query = string.Concat("UPDATE ", tableName, " SET ");
             query += string.Join(", ", nameValues.Select(nv => string.Concat(nv.Key, "=", nv.Value)));
@@ -41,7 +41,7 @@ namespace DataCore
             return query;
         }
 
-        public string GetDeleteQuery(string tableName, string whereQuery)
+        public string GetDeleteQuery(string tableName, string whereQuery, Parameters parameters)
         {
             return string.Concat("DELETE FROM ", tableName, " WHERE ", whereQuery);
         }
@@ -71,21 +71,19 @@ namespace DataCore
             }
         }
 
-        public string GetBooleanValue(object value)
+        public bool GetBooleanValue(object value)
         {
-            var isTrue = (bool)value;
-
-            return isTrue ? "1" : "0";
+            return (bool)value;
         }
 
         public string GetStringValue(object value)
         {
-            return string.Concat("'", value, "'");
+            return (string)value;
         }
 
-        public string GetDateTimeValue(DateTime date)
+        public DateTime GetDateTimeValue(object date)
         {
-            return string.Concat("'", date.ToString("yyyy-MM-dd HH:mm:ss.fff"), "'");
+            return Convert.ToDateTime(date);
         }
 
         public virtual string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
