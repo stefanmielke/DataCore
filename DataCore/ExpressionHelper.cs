@@ -296,7 +296,6 @@ namespace DataCore
 
             if (methodExpression.Method.Name == "Upper" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-
                 concat = string.Concat("UPPER(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
 
                 return true;
@@ -304,7 +303,6 @@ namespace DataCore
 
             if (methodExpression.Method.Name == "Lower" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-
                 concat = string.Concat("LOWER(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
 
                 return true;
@@ -326,6 +324,13 @@ namespace DataCore
                 concat = string.Concat("CAST(",
                     GetStringForExpression(translator, methodExpression.Arguments[0]), " AS ",
                     translator.GetTextFor(methodExpression.Method.ReturnType), ")");
+
+                return true;
+            }
+
+            if (methodExpression.Method.Name == "Average" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = string.Concat("AVG(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
 
                 return true;
             }

@@ -69,5 +69,10 @@
         {
             return default(TTo);
         }
+
+        public static int Average<T>(this T property)
+        {
+            return default(int);
+        }
     }
 }

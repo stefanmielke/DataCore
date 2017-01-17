@@ -252,5 +252,25 @@ namespace DataCore.Test
 
             Assert.That(query.SqlWhere, Is.EqualTo("(CAST(TestClass.Name AS INT) = 10)"));
         }
+
+        [Test]
+        public void CanGenerateAverageOnSelect()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Select(t => t.Number.Average().As("Name"));
+
+            Assert.That(query.SqlColumns, Is.EqualTo("AVG(TestClass.Number) AS 'Name'"));
+        }
+
+        [Test]
+        public void CanGenerateAverageOnHaving()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Having(t => t.Number.Average() > 10);
+
+            Assert.That(query.SqlHaving, Is.EqualTo("(AVG(TestClass.Number) > 10)"));
+        }
     }
 }
