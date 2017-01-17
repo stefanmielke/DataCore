@@ -32,5 +32,6 @@ namespace DataCore
         string GetExistsQuery(string query);
         string GetOrderByDescendingFormat();
         string GetLengthFunctionName();
+        string GetIsNullFunctionName();
     }
 }

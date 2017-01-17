@@ -59,5 +59,10 @@
         {
             return property;
         }
+
+        public static T IsNull<T>(this T property, T whenNullValue)
+        {
+            return property;
+        }
     }
 }

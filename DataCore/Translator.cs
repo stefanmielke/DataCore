@@ -248,5 +248,10 @@ namespace DataCore
         {
             return "LEN";
         }
+
+        public virtual string GetIsNullFunctionName()
+        {
+            return "ISNULL";
+        }
     }
 }

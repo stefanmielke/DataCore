@@ -212,5 +212,25 @@ namespace DataCore.Test
 
             Assert.That(query.SqlWhere, Is.EqualTo("(LOWER(TestClass.Name) = 'test')"));
         }
+
+        [Test]
+        public void CanGenerateIsNullOnSelect()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Select(t => t.Name.IsNull("test").As("Name"));
+
+            Assert.That(query.SqlColumns, Is.EqualTo("ISNULL(TestClass.Name,'test') AS 'Name'"));
+        }
+
+        [Test]
+        public void CanGenerateIsNullOnWhere()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Where(t => t.Name.IsNull("test") == "test");
+
+            Assert.That(query.SqlWhere, Is.EqualTo("(ISNULL(TestClass.Name,'test') = 'test')"));
+        }
     }
 }

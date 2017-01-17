@@ -310,6 +310,17 @@ namespace DataCore
                 return true;
             }
 
+            if (methodExpression.Method.Name == "IsNull" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                var isNullName = translator.GetIsNullFunctionName();
+
+                concat = string.Concat(isNullName, "(",
+                    GetStringForExpression(translator, methodExpression.Arguments[0]), ",",
+                    GetStringForExpression(translator, methodExpression.Arguments[1]), ")");
+
+                return true;
+            }
+
             concat = "";
             return false;
         }

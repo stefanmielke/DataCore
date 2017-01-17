@@ -36,5 +36,10 @@
         {
             return "length";
         }
+
+        public override string GetIsNullFunctionName()
+        {
+            return "IFNULL";
+        }
     }
 }
