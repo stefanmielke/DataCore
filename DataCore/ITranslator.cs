@@ -31,5 +31,6 @@ namespace DataCore
         string GetDropForeignKeyIfExistsQuery(string tableName, string indexName);
         string GetExistsQuery(string query);
         string GetOrderByDescendingFormat();
+        string GetLengthFunctionName();
     }
 }

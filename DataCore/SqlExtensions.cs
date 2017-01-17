@@ -44,5 +44,10 @@
         {
             return property;
         }
+
+        public static int Length(this string property)
+        {
+            return property.Length;
+        }
     }
 }

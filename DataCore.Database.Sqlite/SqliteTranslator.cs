@@ -31,5 +31,10 @@
         {
             return "SELECT 1";
         }
+
+        public override string GetLengthFunctionName()
+        {
+            return "length";
+        }
     }
 }

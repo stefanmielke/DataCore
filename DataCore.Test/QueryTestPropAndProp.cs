@@ -152,5 +152,25 @@ namespace DataCore.Test
 
             Assert.That(query.SqlWhere, Is.EqualTo("(LTRIM(RTRIM(TestClass.Name)) = 'test')"));
         }
+
+        [Test]
+        public void CanGenerateLengthOnSelect()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Select(t => t.Name.Length().As("Name Length"));
+
+            Assert.That(query.SqlColumns, Is.EqualTo("LEN(TestClass.Name) AS 'Name Length'"));
+        }
+
+        [Test]
+        public void CanGenerateLengthOnWhere()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Where(t => t.Name.Length() > 10);
+
+            Assert.That(query.SqlWhere, Is.EqualTo("(LEN(TestClass.Name) > 10)"));
+        }
     }
 }

@@ -285,6 +285,15 @@ namespace DataCore
                 return true;
             }
 
+            if (methodExpression.Method.Name == "Length" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                var lengthName = translator.GetLengthFunctionName();
+
+                concat = string.Concat(lengthName, "(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
+
+                return true;
+            }
+
             concat = "";
             return false;
         }
