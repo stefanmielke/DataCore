@@ -7,7 +7,7 @@ namespace DataCore.Test
     [TestFixture]
     public class DatabaseTest
     {
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanSelect(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -24,7 +24,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanSelectSingle(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -42,7 +42,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void ExistsReturnTrueWhenExists(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -60,7 +60,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void ExistsReturnFalseWhenNotExists(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -77,7 +77,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanCreateTable(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -94,7 +94,24 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanCreateTableWithoutIgnoredAttributes(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestIgnore>();
+
+                var query = database.From<TestIgnore>().Where(t => t.Ignored == "exception!");
+
+                Assert.Throws(Is.InstanceOf<Exception>(), () => database.Select(query));
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void DoNotErrorOnDoubleCreateTable(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -112,7 +129,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDropTable(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -129,7 +146,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanCreateColumn(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -153,7 +170,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDropColumn(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -168,7 +185,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanCreateIndex(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -182,8 +199,8 @@ namespace DataCore.Test
                 connection.Close();
             }
         }
-        
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDropIndex(TestHelper.DatabaseType dbType, string connectionString)
         {
             string indexName = "IX_TestClass" + Guid.NewGuid().ToString().Replace("-", "");
@@ -201,7 +218,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanCreateForeignKey(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -217,7 +234,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDropForeignKey(TestHelper.DatabaseType dbType, string connectionString)
         {
             string indexName = "FK_TestClass" + Guid.NewGuid().ToString().Replace("-", "");

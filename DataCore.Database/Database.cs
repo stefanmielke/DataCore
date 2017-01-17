@@ -112,7 +112,7 @@ namespace DataCore.Database
 
             var tableName = type.Name;
             var fields =
-                type.GetProperties()
+                GetPropertiesForType(type)
                     .Select(
                         p =>
                             new FieldDefinition
@@ -282,9 +282,9 @@ namespace DataCore.Database
             return _connection.Execute(query);
         }
 
-        private PropertyInfo[] GetPropertiesForType(Type type)
+        private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
         {
-            return type.GetProperties();
+            return type.GetProperties().Where(p => p.GetCustomAttributes(typeof(IgnoreAttribute), true).Length == 0);
         }
     }
 }

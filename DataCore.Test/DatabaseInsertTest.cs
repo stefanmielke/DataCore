@@ -8,7 +8,7 @@ namespace DataCore.Test
     [TestFixture]
     public class DatabaseInsertTest
     {
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanInsert(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
@@ -31,6 +31,31 @@ namespace DataCore.Test
 
                 var results = database.Select(query);
                 Assert.IsTrue(results.Any());
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CannotInsertIgnoredAttributes(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestIgnore>();
+
+                database.Insert(new TestIgnore
+                {
+                    Id = 1,
+                    Name = "test",
+                    Ignored = "yey"
+                });
+
+                var query = database.From<TestIgnore>().Where(t => t.Id == 1);
+
+                var result = database.SelectSingle(query);
+                Assert.IsNotNull(result);
 
                 connection.Close();
             }

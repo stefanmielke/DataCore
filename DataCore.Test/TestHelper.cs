@@ -36,6 +36,7 @@ namespace DataCore.Test
             database.DropTableIfExists<TestClass2>();
             database.DropTableIfExists<TestClass3>();
             database.DropTableIfExists<TestClass4>();
+            database.DropTableIfExists<TestIgnore>();
 
             return connection;
         }
