@@ -232,5 +232,25 @@ namespace DataCore.Test
 
             Assert.That(query.SqlWhere, Is.EqualTo("(ISNULL(TestClass.Name,'test') = 'test')"));
         }
+
+        [Test]
+        public void CanGenerateCastOnSelect()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Select(t => t.Name.Cast<string, int>().As("Name"));
+
+            Assert.That(query.SqlColumns, Is.EqualTo("CAST(TestClass.Name AS INT) AS 'Name'"));
+        }
+
+        [Test]
+        public void CanGenerateCastOnWhere()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Where(t => t.Name.Cast<string, int>() == 10);
+
+            Assert.That(query.SqlWhere, Is.EqualTo("(CAST(TestClass.Name AS INT) = 10)"));
+        }
     }
 }

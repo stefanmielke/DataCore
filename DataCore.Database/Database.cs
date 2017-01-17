@@ -120,7 +120,7 @@ namespace DataCore.Database
                                 Name = p.Name,
                                 Nullable = false,
                                 Size = 255,
-                                Type = GetTypeForProperty(p),
+                                Type = _translator.GetTypeForProperty(p),
                                 IsPrimaryKey = p.GetCustomAttributes(typeof(PrimaryKeyAttribute), true).Length > 0
                             });
 
@@ -153,7 +153,7 @@ namespace DataCore.Database
                                     Name = ((MemberExpression)f).Member.Name,
                                     Nullable = true,
                                     Size = 255,
-                                    Type = GetTypeForProperty(((MemberExpression)f).Member as PropertyInfo)
+                                    Type = _translator.GetTypeForProperty(((MemberExpression)f).Member as PropertyInfo)
                                 }
                             )
                     )
@@ -280,27 +280,6 @@ namespace DataCore.Database
         public int Execute(string query)
         {
             return _connection.Execute(query);
-        }
-
-        private static DbType GetTypeForProperty(PropertyInfo propertyInfo)
-        {
-            switch (propertyInfo.PropertyType.Name)
-            {
-                case "String":
-                    return DbType.String;
-                case "Int":
-                    return DbType.Int32;
-                case "Boolean":
-                    return DbType.Boolean;
-                case "Float":
-                    return DbType.Single;
-                case "Decimal":
-                    return DbType.Decimal;
-                case "DateTime":
-                    return DbType.DateTime;
-                default:
-                    return DbType.Int32;
-            }
         }
 
         private PropertyInfo[] GetPropertiesForType(Type type)

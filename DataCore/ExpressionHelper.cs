@@ -321,6 +321,16 @@ namespace DataCore
                 return true;
             }
 
+            if (methodExpression.Method.Name == "Cast" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                var isNullName = translator.GetIsNullFunctionName();
+
+                concat = string.Concat("CAST(",
+                    GetStringForExpression(translator, methodExpression.Arguments[0]), " AS ", translator.GetTextFor(methodExpression.Method.ReturnType), ")");
+
+                return true;
+            }
+
             concat = "";
             return false;
         }

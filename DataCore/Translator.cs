@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace DataCore
@@ -148,7 +149,12 @@ namespace DataCore
             }
         }
 
-        protected virtual string GetTextFor(DbType type)
+        public string GetTextFor(Type type)
+        {
+            return GetTextFor(GetTypeForProperty(type));
+        }
+
+        public virtual string GetTextFor(DbType type)
         {
             switch (type)
             {
@@ -188,6 +194,32 @@ namespace DataCore
                     return "DATETIME";
                 default:
                     return "INT";
+            }
+        }
+
+        public DbType GetTypeForProperty(PropertyInfo propertyInfo)
+        {
+            return GetTypeForProperty(propertyInfo.PropertyType);
+        }
+
+        public DbType GetTypeForProperty(Type type)
+        {
+            switch (type.Name)
+            {
+                case "String":
+                    return DbType.String;
+                case "Int":
+                    return DbType.Int32;
+                case "Boolean":
+                    return DbType.Boolean;
+                case "Float":
+                    return DbType.Single;
+                case "Decimal":
+                    return DbType.Decimal;
+                case "DateTime":
+                    return DbType.DateTime;
+                default:
+                    return DbType.Int32;
             }
         }
 

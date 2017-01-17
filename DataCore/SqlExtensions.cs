@@ -64,5 +64,10 @@
         {
             return property;
         }
+
+        public static TTo Cast<TFrom, TTo>(this TFrom property)
+        {
+            return default(TTo);
+        }
     }
 }

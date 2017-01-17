@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace DataCore
 {
@@ -15,6 +17,9 @@ namespace DataCore
         string GetDeleteQuery(string tableName, string whereQuery);
 
         string GetFormatFor(ExpressionType type);
+        string GetTextFor(Type type);
+        DbType GetTypeForProperty(Type type);
+        DbType GetTypeForProperty(PropertyInfo propertyInfo);
 
         string GetBooleanValue(object constantExpressionValue);
         string GetStringValue(object value);
