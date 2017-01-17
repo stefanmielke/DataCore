@@ -324,7 +324,8 @@ namespace DataCore
             if (methodExpression.Method.Name == "Cast" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
                 concat = string.Concat("CAST(",
-                    GetStringForExpression(translator, methodExpression.Arguments[0]), " AS ", translator.GetTextFor(methodExpression.Method.ReturnType), ")");
+                    GetStringForExpression(translator, methodExpression.Arguments[0]), " AS ",
+                    translator.GetTextFor(methodExpression.Method.ReturnType), ")");
 
                 return true;
             }
