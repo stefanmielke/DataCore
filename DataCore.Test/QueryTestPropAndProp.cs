@@ -172,5 +172,45 @@ namespace DataCore.Test
 
             Assert.That(query.SqlWhere, Is.EqualTo("(LEN(TestClass.Name) > 10)"));
         }
+
+        [Test]
+        public void CanGenerateUpperOnSelect()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Select(t => t.Name.Upper().As("Name"));
+
+            Assert.That(query.SqlColumns, Is.EqualTo("UPPER(TestClass.Name) AS 'Name'"));
+        }
+
+        [Test]
+        public void CanGenerateUpperOnWhere()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Where(t => t.Name.Upper() == "TEST");
+
+            Assert.That(query.SqlWhere, Is.EqualTo("(UPPER(TestClass.Name) = 'TEST')"));
+        }
+
+        [Test]
+        public void CanGenerateLowerOnSelect()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Select(t => t.Name.Lower().As("Name"));
+
+            Assert.That(query.SqlColumns, Is.EqualTo("LOWER(TestClass.Name) AS 'Name'"));
+        }
+
+        [Test]
+        public void CanGenerateLowerOnWhere()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Where(t => t.Name.Lower() == "test");
+
+            Assert.That(query.SqlWhere, Is.EqualTo("(LOWER(TestClass.Name) = 'test')"));
+        }
     }
 }

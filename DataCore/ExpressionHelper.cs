@@ -294,6 +294,22 @@ namespace DataCore
                 return true;
             }
 
+            if (methodExpression.Method.Name == "Upper" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+
+                concat = string.Concat("UPPER(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
+
+                return true;
+            }
+
+            if (methodExpression.Method.Name == "Lower" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+
+                concat = string.Concat("LOWER(", GetStringForExpression(translator, methodExpression.Arguments[0]), ")");
+
+                return true;
+            }
+
             concat = "";
             return false;
         }

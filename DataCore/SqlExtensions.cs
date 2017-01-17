@@ -49,5 +49,15 @@
         {
             return property.Length;
         }
+
+        public static string Upper(this string property)
+        {
+            return property;
+        }
+
+        public static string Lower(this string property)
+        {
+            return property;
+        }
     }
 }
