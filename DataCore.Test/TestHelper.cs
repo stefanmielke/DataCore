@@ -18,7 +18,7 @@ namespace DataCore.Test
             get
             {
                 yield return new TestCaseData(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:");
-                yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;");
+                yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=172.17.50.23\SQLEXPRESS;User Id=sa; Password=TestDataCore123;");
             }
         }
     }

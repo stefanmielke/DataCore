@@ -20,7 +20,7 @@ namespace DataCore
             query.SqlSelectFormat = "COUNT({0})";
         }
 
-        public void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage)
+        public virtual void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage)
         {
             query.SqlEnd = string.Concat("LIMIT ", recordsPerPage, ", ", (currentPage - 1) * recordsPerPage);
         }

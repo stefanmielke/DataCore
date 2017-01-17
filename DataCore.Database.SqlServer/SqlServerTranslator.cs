@@ -7,6 +7,11 @@ namespace DataCore.Database.SqlServer
 {
     public class SqlServerTranslator : Translator
     {
+        public override void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage)
+        {
+            query.SqlEnd = string.Concat("OFFSET ", (currentPage - 1) * recordsPerPage, " ROWS FETCH NEXT ", recordsPerPage, " ROWS ONLY");
+        }
+
         public override string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
         {
             var query = new StringBuilder("IF NOT EXISTS(SELECT * FROM sys.tables WHERE name = '").Append(tableName)
