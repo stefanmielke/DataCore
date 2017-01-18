@@ -16,6 +16,7 @@ namespace DataCore
         string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where, Parameters parameters);
         string GetDeleteQuery(string tableName, string whereQuery, Parameters parameters);
 
+        string GetParameterTag();
         string GetFormatFor(ExpressionType type);
         string GetTextFor(Type type);
         DbType GetTypeForProperty(Type type);

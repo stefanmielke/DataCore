@@ -23,7 +23,7 @@ namespace DataCore.Test
         {
             var query = new Query<TestClass>(new Translator());
 
-            query.Where(t => t.Number > 0);
+            query.Where(t => t.FloatNumber > 0);
 
             Assert.AreEqual("(TestClass.Number > @p0)", query.SqlWhere);
             Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);

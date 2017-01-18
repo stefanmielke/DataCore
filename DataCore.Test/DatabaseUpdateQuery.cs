@@ -22,7 +22,7 @@ namespace DataCore.Test
                 {
                     Id = 1,
                     Name = "test",
-                    Number = 1,
+                    FloatNumber = 1,
                     Done = true,
                     InsertDate = DateTime.Now,
                     TestClass2Id = 1
@@ -57,7 +57,7 @@ namespace DataCore.Test
                 {
                     Id = 1,
                     Name = "test",
-                    Number = 1,
+                    FloatNumber = 1,
                     Done = true,
                     InsertDate = DateTime.Now,
                     TestClass2Id = 1
@@ -65,7 +65,7 @@ namespace DataCore.Test
                 database.Insert(testClass);
 
                 testClass.Name = updatedName;
-                testClass.Number = updatedNumber;
+                testClass.FloatNumber = updatedNumber;
 
                 database.UpdateOnly(testClass, t => t.Name, t => t.Id == 1);
 
@@ -73,7 +73,7 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
-                Assert.AreNotEqual(updatedNumber, result.Number);
+                Assert.AreNotEqual(updatedNumber, result.FloatNumber);
 
                 connection.Close();
             }
@@ -95,7 +95,7 @@ namespace DataCore.Test
                 {
                     Id = 1,
                     Name = "test",
-                    Number = 1,
+                    FloatNumber = 1,
                     Done = true,
                     InsertDate = DateTime.Now,
                     TestClass2Id = 1
@@ -103,7 +103,7 @@ namespace DataCore.Test
                 database.Insert(testClass);
 
                 testClass.Name = updatedName;
-                testClass.Number = updatedNumber;
+                testClass.FloatNumber = updatedNumber;
 
                 database.UpdateOnly(testClass, t => new { t.Name }, t => t.Id == 1);
 
@@ -111,7 +111,7 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
-                Assert.AreNotEqual(updatedNumber, result.Number);
+                Assert.AreNotEqual(updatedNumber, result.FloatNumber);
 
                 connection.Close();
             }
@@ -169,7 +169,7 @@ namespace DataCore.Test
                 database.Insert(testClass);
 
                 testClass.Name = updatedName;
-                testClass.Number = updatedNumber;
+                testClass.FloatNumber = updatedNumber;
 
                 database.UpdateOnly(testClass, t => t.Name, t => t.Id == 1);
 
@@ -177,7 +177,7 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
-                Assert.AreNotEqual(updatedNumber, result.Number);
+                Assert.AreNotEqual(updatedNumber, result.FloatNumber);
 
                 connection.Close();
             }
@@ -204,7 +204,7 @@ namespace DataCore.Test
                 database.Insert(testClass);
 
                 testClass.Name = updatedName;
-                testClass.Number = updatedNumber;
+                testClass.FloatNumber = updatedNumber;
 
                 database.UpdateOnly(testClass, t => new { t.Name }, t => t.Id == 1);
 
@@ -212,7 +212,7 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
-                Assert.AreNotEqual(updatedNumber, result.Number);
+                Assert.AreNotEqual(updatedNumber, result.FloatNumber);
 
                 connection.Close();
             }

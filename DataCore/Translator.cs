@@ -99,12 +99,12 @@ namespace DataCore
             return query.ToString();
         }
 
-        public string GetDropTableIfExistsQuery(string tableName)
+        public virtual string GetDropTableIfExistsQuery(string tableName)
         {
             return string.Concat("DROP TABLE IF EXISTS ", tableName);
         }
 
-        protected string GetFormatFor(FieldDefinition field)
+        protected virtual string GetFormatFor(FieldDefinition field)
         {
             switch (field.Type)
             {
@@ -282,6 +282,11 @@ namespace DataCore
         public virtual string GetIsNullFunctionName()
         {
             return "ISNULL";
+        }
+
+        public virtual string GetParameterTag()
+        {
+            return "@";
         }
     }
 }

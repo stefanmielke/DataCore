@@ -41,6 +41,10 @@
       <HintPath>..\packages\NUnit.3.6.0\lib\net40\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.2.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.12.1.24160719\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -83,6 +87,10 @@
     <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataCore.Database.Oracle\DataCore.Database.Oracle.csproj">
+      <Project>{7BBB1C21-A512-4934-86CB-5E08C2918BB2}</Project>
+      <Name>DataCore.Database.Oracle</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DataCore.Database.Sqlite\DataCore.Database.Sqlite.csproj">
       <Project>{4656bb1d-d2e8-4e08-9c35-e5ceaeeb2fd2}</Project>
       <Name>DataCore.Database.Sqlite</Name>
@@ -101,6 +109,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

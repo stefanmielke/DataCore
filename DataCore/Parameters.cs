@@ -11,9 +11,11 @@ namespace DataCore
             _values = new Dictionary<string, object>();
         }
 
-        public string Add(object value)
+        public string Add(ITranslator translator, object value)
         {
-            var key = "@p" + _values.Count;
+            var paramTag = translator.GetParameterTag();
+
+            var key = paramTag + "p" + _values.Count;
             _values.Add(key, value);
 
             return key;

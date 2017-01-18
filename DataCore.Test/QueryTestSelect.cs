@@ -66,7 +66,7 @@ namespace DataCore.Test
                     .Join<TestClass2>((t, t2) => t.Id == t2.Id)
                     .LeftJoin<TestClass2>((t, t2) => t.Id == t2.Id && t2.Id == 1)
                     .RightJoin<TestClass2, TestClass3>((t, t2) => t.Id == t2.Id && t2.Id > 1)
-                    .Where(t => t.Number > 105)
+                    .Where(t => t.FloatNumber > 105)
                     .GroupBy(t => new { t.Id, t.Name })
                     .Having(t => t.Id > 0)
                     .OrderBy(t => t.Id)
@@ -114,7 +114,7 @@ namespace DataCore.Test
         public void CanGenerateSelectColumnsFromMultipleSelects()
         {
             var query = new Query<TestClass>(new Translator());
-            query.Select(t => t.Id).Select(t => new { t.Name, t.Number });
+            query.Select(t => t.Id).Select(t => new { t.Name, Number = t.FloatNumber });
 
             Assert.AreEqual("TestClass.Id, TestClass.Name, TestClass.Number", query.SqlColumns);
         }

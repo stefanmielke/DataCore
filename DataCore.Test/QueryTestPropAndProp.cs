@@ -284,7 +284,7 @@ namespace DataCore.Test
         {
             var query = new Query<TestClass>(new Translator());
 
-            query.Select(t => t.Number.Average().As("Name"));
+            query.Select(t => t.FloatNumber.Average().As("Name"));
 
             Assert.That(query.SqlColumns, Is.EqualTo("AVG(TestClass.Number) AS 'Name'"));
         }
@@ -294,7 +294,7 @@ namespace DataCore.Test
         {
             var query = new Query<TestClass>(new Translator());
 
-            query.Having(t => t.Number.Average() > 10);
+            query.Having(t => t.FloatNumber.Average() > 10);
 
             Assert.That(query.SqlHaving, Is.EqualTo("(AVG(TestClass.Number) > @p0)"));
             Assert.AreEqual(10, query.Parameters.GetValues()["@p0"]);

@@ -40,7 +40,7 @@ namespace DataCore.Database
                 properties.Select(p =>
                 {
                     var value = ExpressionHelper.GetValueFrom(_translator, p.PropertyType, p.GetValue(obj, null));
-                    return parameters.Add(value);
+                    return parameters.Add(_translator, value);
                 })
             );
 
@@ -62,7 +62,7 @@ namespace DataCore.Database
             var parameters = new Parameters();
             foreach (var prop in properties)
             {
-                var key = parameters.Add(ExpressionHelper.GetValueFrom(_translator, prop.PropertyType, prop.GetValue(obj, null)));
+                var key = parameters.Add(_translator, ExpressionHelper.GetValueFrom(_translator, prop.PropertyType, prop.GetValue(obj, null)));
                 nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
             }
 
@@ -90,7 +90,7 @@ namespace DataCore.Database
             var parameters = new Parameters();
             foreach (var prop in properties.Where(p => fields.Contains(p.Name)))
             {
-                var key = parameters.Add(ExpressionHelper.GetValueFrom(_translator, prop.PropertyType, prop.GetValue(obj, null)));
+                var key = parameters.Add(_translator, ExpressionHelper.GetValueFrom(_translator, prop.PropertyType, prop.GetValue(obj, null)));
                 nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
             }
 
@@ -296,12 +296,12 @@ namespace DataCore.Database
 
         public int Execute(string query)
         {
-            return _connection.Execute(query);
+            return _connection.Execute(query + ";");
         }
 
         public int Execute(string query, Parameters parameters)
         {
-            return _connection.Execute(query, parameters.GetValues());
+            return _connection.Execute(query + ";", parameters.GetValues());
         }
 
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)

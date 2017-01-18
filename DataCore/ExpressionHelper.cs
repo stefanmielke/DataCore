@@ -99,7 +99,7 @@ namespace DataCore
                 return stringWithParameter.Value;
             }
 
-            return parameters.Add(value);
+            return parameters.Add(translator, value);
         }
 
         public static object GetValueFrom(ITranslator translator, Type type, object value)
@@ -228,7 +228,7 @@ namespace DataCore
             if (constExpr != null)
             {
                 var value = GetValueFrom(translator, constExpr.Type, constExpr.Value);
-                var key = parameters.Add(value);
+                var key = parameters.Add(translator, value);
                 return key;
             }
 

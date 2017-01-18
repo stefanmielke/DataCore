@@ -21,7 +21,7 @@ namespace DataCore.Test
                 {
                     Id = 1,
                     Name = "test",
-                    Number = 1,
+                    FloatNumber = 1,
                     Done = true,
                     InsertDate = DateTime.Now,
                     TestClass2Id = 1

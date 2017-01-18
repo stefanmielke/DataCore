@@ -32,7 +32,7 @@ namespace DataCore.Test
             var query = new Query<TestClass>(new Translator());
 
             query.GroupBy(t => t.Id);
-            query.GroupBy(t => new { t.Number, t.Name });
+            query.GroupBy(t => new { Number = t.FloatNumber, t.Name });
 
             Assert.AreEqual("TestClass.Id, TestClass.Number, TestClass.Name", query.SqlGroupBy);
         }

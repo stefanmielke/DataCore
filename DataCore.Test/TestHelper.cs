@@ -4,10 +4,12 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.SQLite;
 using DataCore.Database;
+using DataCore.Database.Oracle;
 using DataCore.Database.Sqlite;
 using DataCore.Database.SqlServer;
 using DataCore.Test.Models;
 using NUnit.Framework;
+using Oracle.ManagedDataAccess.Client;
 
 namespace DataCore.Test
 {
@@ -18,7 +20,8 @@ namespace DataCore.Test
             get
             {
                 yield return new TestCaseData(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:");
-                yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=172.17.50.23\SQLEXPRESS;User Id=sa; Password=TestDataCore123;");
+                //yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=172.17.50.23\SQLEXPRESS;User Id=sa; Password=TestDataCore123;");
+                yield return new TestCaseData(TestHelper.DatabaseType.Oracle, @"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=xe)));User Id=system;Password=oracle;");
             }
         }
     }
@@ -47,6 +50,8 @@ namespace DataCore.Test
             {
                 case DatabaseType.Sqlite:
                     return new SQLiteConnection(connectionString);
+                case DatabaseType.Oracle:
+                    return new OracleConnection(connectionString);
                 default:
                     return new SqlConnection(connectionString);
             }
@@ -58,6 +63,8 @@ namespace DataCore.Test
             {
                 case DatabaseType.Sqlite:
                     return new SqliteDatabase(connection);
+                case DatabaseType.Oracle:
+                    return new OracleDatabase(connection);
                 default:
                     return new SqlServerDatabase(connection);
             }
@@ -68,7 +75,7 @@ namespace DataCore.Test
             return new TestClass
             {
                 Id = id,
-                Number = number,
+                FloatNumber = number,
                 Name = name,
                 Done = done,
                 InsertDate = DateTime.Now,
@@ -79,7 +86,8 @@ namespace DataCore.Test
         public enum DatabaseType
         {
             Sqlite,
-            SqlServer
+            SqlServer,
+            Oracle
         }
     }
 }
