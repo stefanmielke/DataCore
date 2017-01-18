@@ -50,6 +50,7 @@
     <Compile Include="QueryVisitor.cs" />
     <Compile Include="SqlExtensions.cs" />
     <Compile Include="StringAsIs.cs" />
+    <Compile Include="StringAsIsWithParameter.cs" />
     <Compile Include="Translator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

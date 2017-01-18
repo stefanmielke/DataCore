@@ -107,8 +107,10 @@ namespace DataCore.Test
 
             query.Where(t => t.Id.In(1, 2, 3));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Id IN @p0)"));
-            Assert.AreEqual(new[] { 1, 2, 3 }, query.Parameters.GetValues()["@p0"]);
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Id IN (@p0,@p1,@p2))"));
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(2, query.Parameters.GetValues()["@p1"]);
+            Assert.AreEqual(3, query.Parameters.GetValues()["@p2"]);
         }
 
         [Test]
@@ -118,8 +120,9 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.In("test", "test2"));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name IN @p0)"));
-            Assert.AreEqual(new[] { "test", "test2" }, query.Parameters.GetValues()["@p0"]);
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name IN (@p0,@p1))"));
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual("test2", query.Parameters.GetValues()["@p1"]);
         }
 
         [Test]
@@ -132,8 +135,9 @@ namespace DataCore.Test
 
             query.Where(t => t.InsertDate.In(dateOne, dateTwo));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.InsertDate IN @p0)"));
-            Assert.AreEqual(new[] { dateOne, dateTwo }, query.Parameters.GetValues()["@p0"]);
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.InsertDate IN (@p0,@p1))"));
+            Assert.AreEqual(dateOne, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(dateTwo, query.Parameters.GetValues()["@p1"]);
         }
 
         [Test]
@@ -143,7 +147,8 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.Like("%test%"));
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name LIKE '%test%')"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(TestClass.Name LIKE @p0)"));
+            Assert.AreEqual("%test%", query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -237,7 +242,8 @@ namespace DataCore.Test
 
             query.Select(t => t.Name.IsNull("test").As("Name"));
 
-            Assert.That(query.SqlColumns, Is.EqualTo("ISNULL(TestClass.Name,'test') AS 'Name'"));
+            Assert.That(query.SqlColumns, Is.EqualTo("ISNULL(TestClass.Name,@p0) AS 'Name'"));
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p0"]);
         }
 
         [Test]
@@ -245,10 +251,11 @@ namespace DataCore.Test
         {
             var query = new Query<TestClass>(new Translator());
 
-            query.Where(t => t.Name.IsNull("test") == "test");
+            query.Where(t => t.Name.IsNull("test1") == "test");
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(ISNULL(TestClass.Name,'test') = @p0)"));
-            Assert.AreEqual("test", query.Parameters.GetValues()["@p0"]);
+            Assert.That(query.SqlWhere, Is.EqualTo("(ISNULL(TestClass.Name,@p0) = @p1)"));
+            Assert.AreEqual("test1", query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p1"]);
         }
 
         [Test]
