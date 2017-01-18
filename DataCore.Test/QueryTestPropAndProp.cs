@@ -286,7 +286,7 @@ namespace DataCore.Test
 
             query.Select(t => t.FloatNumber.Average().As("Name"));
 
-            Assert.That(query.SqlColumns, Is.EqualTo("AVG(TestClass.Number) AS 'Name'"));
+            Assert.That(query.SqlColumns, Is.EqualTo("AVG(TestClass.FloatNumber) AS 'Name'"));
         }
 
         [Test]
@@ -296,7 +296,7 @@ namespace DataCore.Test
 
             query.Having(t => t.FloatNumber.Average() > 10);
 
-            Assert.That(query.SqlHaving, Is.EqualTo("(AVG(TestClass.Number) > @p0)"));
+            Assert.That(query.SqlHaving, Is.EqualTo("(AVG(TestClass.FloatNumber) > @p0)"));
             Assert.AreEqual(10, query.Parameters.GetValues()["@p0"]);
         }
     }

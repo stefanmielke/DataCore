@@ -34,7 +34,7 @@ namespace DataCore.Test
             query.GroupBy(t => t.Id);
             query.GroupBy(t => new { Number = t.FloatNumber, t.Name });
 
-            Assert.AreEqual("TestClass.Id, TestClass.Number, TestClass.Name", query.SqlGroupBy);
+            Assert.AreEqual("TestClass.Id, TestClass.FloatNumber, TestClass.Name", query.SqlGroupBy);
         }
     }
 }

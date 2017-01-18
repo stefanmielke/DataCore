@@ -25,7 +25,7 @@ namespace DataCore.Test
 
             query.Where(t => t.FloatNumber > 0);
 
-            Assert.AreEqual("(TestClass.Number > @p0)", query.SqlWhere);
+            Assert.AreEqual("(TestClass.FloatNumber > @p0)", query.SqlWhere);
             Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
         }
 

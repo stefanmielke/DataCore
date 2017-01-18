@@ -20,7 +20,7 @@ namespace DataCore.Test
             get
             {
                 yield return new TestCaseData(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:");
-                //yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=172.17.50.23\SQLEXPRESS;User Id=sa; Password=TestDataCore123;");
+                yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=localhost;User Id=sa; Password=YourStrong!Passw0rd;");
                 yield return new TestCaseData(TestHelper.DatabaseType.Oracle, @"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=xe)));User Id=system;Password=oracle;");
             }
         }

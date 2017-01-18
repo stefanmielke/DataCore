@@ -79,7 +79,7 @@ namespace DataCore.Test
                             + " INNER JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id)"
                             + " LEFT JOIN TestClass2 WITH(NOLOCK) ON ((TestClass.Id = TestClass2.Id) AND (TestClass2.Id = @p0))"
                             + " RIGHT JOIN TestClass3 WITH(NOLOCK) ON ((TestClass2.Id = TestClass3.Id) AND (TestClass3.Id > @p1))"
-                            + " WHERE (TestClass.Number > @p2)"
+                            + " WHERE (TestClass.FloatNumber > @p2)"
                             + " GROUP BY TestClass.Id, TestClass.Name"
                             + " HAVING (TestClass.Id > @p3)"
                             + " ORDER BY TestClass.Id"
@@ -116,7 +116,7 @@ namespace DataCore.Test
             var query = new Query<TestClass>(new Translator());
             query.Select(t => t.Id).Select(t => new { t.Name, Number = t.FloatNumber });
 
-            Assert.AreEqual("TestClass.Id, TestClass.Name, TestClass.Number", query.SqlColumns);
+            Assert.AreEqual("TestClass.Id, TestClass.Name, TestClass.FloatNumber", query.SqlColumns);
         }
 
         [Test]

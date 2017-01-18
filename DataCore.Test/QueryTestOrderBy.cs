@@ -34,7 +34,7 @@ namespace DataCore.Test
             query.OrderBy(t => t.Id);
             query.OrderBy(t => new { Number = t.FloatNumber, t.Name });
 
-            Assert.AreEqual("TestClass.Id, TestClass.Number, TestClass.Name", query.SqlOrderBy);
+            Assert.AreEqual("TestClass.Id, TestClass.FloatNumber, TestClass.Name", query.SqlOrderBy);
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace DataCore.Test
             query.OrderByDescending(t => t.Id);
             query.OrderByDescending(t => new { Number = t.FloatNumber, t.Name });
 
-            Assert.AreEqual("TestClass.Id DESC, TestClass.Number DESC, TestClass.Name DESC", query.SqlOrderBy);
+            Assert.AreEqual("TestClass.Id DESC, TestClass.FloatNumber DESC, TestClass.Name DESC", query.SqlOrderBy);
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace DataCore.Test
             query.OrderByDescending(t => t.Id);
             query.OrderBy(t => new { Number = t.FloatNumber, t.Name });
 
-            Assert.AreEqual("TestClass.Id DESC, TestClass.Number, TestClass.Name", query.SqlOrderBy);
+            Assert.AreEqual("TestClass.Id DESC, TestClass.FloatNumber, TestClass.Name", query.SqlOrderBy);
         }
     }
 }

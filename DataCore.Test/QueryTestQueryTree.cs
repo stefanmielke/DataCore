@@ -13,7 +13,7 @@ namespace DataCore.Test
 
             query.Where(t => t.Id == 0 && t.FloatNumber == 1);
 
-            Assert.AreEqual("((TestClass.Id = @p0) AND (TestClass.Number = @p1))", query.SqlWhere);
+            Assert.AreEqual("((TestClass.Id = @p0) AND (TestClass.FloatNumber = @p1))", query.SqlWhere);
             Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
             Assert.AreEqual(1, query.Parameters.GetValues()["@p1"]);
         }
@@ -25,7 +25,7 @@ namespace DataCore.Test
 
             query.Where(t => t.Id == 0 || t.FloatNumber == 1);
 
-            Assert.AreEqual("((TestClass.Id = @p0) OR (TestClass.Number = @p1))", query.SqlWhere);
+            Assert.AreEqual("((TestClass.Id = @p0) OR (TestClass.FloatNumber = @p1))", query.SqlWhere);
             Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
             Assert.AreEqual(1, query.Parameters.GetValues()["@p1"]);
         }
@@ -37,7 +37,7 @@ namespace DataCore.Test
 
             query.Where(t => (t.Id == 0 && t.FloatNumber == 1) && t.Id == 1);
 
-            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.Number = @p1)) AND (TestClass.Id = @p2))", query.SqlWhere);
+            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.FloatNumber = @p1)) AND (TestClass.Id = @p2))", query.SqlWhere);
             Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
             Assert.AreEqual(1, query.Parameters.GetValues()["@p1"]);
             Assert.AreEqual(1, query.Parameters.GetValues()["@p2"]);
@@ -50,7 +50,7 @@ namespace DataCore.Test
 
             query.Where(t => (t.Id == 0 && t.FloatNumber == 1) || (t.Id == 1 && t.FloatNumber == 0));
 
-            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.Number = @p1)) OR ((TestClass.Id = @p2) AND (TestClass.Number = @p3)))", query.SqlWhere);
+            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.FloatNumber = @p1)) OR ((TestClass.Id = @p2) AND (TestClass.FloatNumber = @p3)))", query.SqlWhere);
             Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
             Assert.AreEqual(1, query.Parameters.GetValues()["@p1"]);
             Assert.AreEqual(1, query.Parameters.GetValues()["@p2"]);
@@ -65,7 +65,7 @@ namespace DataCore.Test
             query.Where(t => t.Id == 1 && t.FloatNumber == 0);
             query.Where(t => t.Name == "test");
 
-            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.Number = @p1))) AND ((TestClass.Name = @p2))", query.SqlWhere);
+            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.FloatNumber = @p1))) AND ((TestClass.Name = @p2))", query.SqlWhere);
             Assert.AreEqual(1, query.Parameters.GetValues()["@p0"]);
             Assert.AreEqual(0, query.Parameters.GetValues()["@p1"]);
             Assert.AreEqual("test", query.Parameters.GetValues()["@p2"]);
@@ -79,7 +79,7 @@ namespace DataCore.Test
             query.Where(t => t.Id == 1 && t.FloatNumber == 0);
             query.Or(t => t.Name == "test");
 
-            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.Number = @p1))) OR ((TestClass.Name = @p2))", query.SqlWhere);
+            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.FloatNumber = @p1))) OR ((TestClass.Name = @p2))", query.SqlWhere);
             Assert.AreEqual(1, query.Parameters.GetValues()["@p0"]);
             Assert.AreEqual(0, query.Parameters.GetValues()["@p1"]);
             Assert.AreEqual("test", query.Parameters.GetValues()["@p2"]);
