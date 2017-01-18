@@ -222,5 +222,27 @@ namespace DataCore.Test
 
             Assert.That(query.SqlColumns, Is.EqualTo("SUM(TestClass.Id) AS 'ID TEST SUM', TestClass.Name AS 'NewName'"));
         }
+
+        [Test]
+        public void CanGenerateUnion()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Union(new Query<TestClass>(new Translator()).OrderBy(t => t.Id)).Build();
+
+            Assert.That(query.SqlCommand.ToString(),
+                Is.EqualTo(
+                    "SELECT * FROM TestClass WITH(NOLOCK) UNION SELECT * FROM TestClass WITH(NOLOCK) ORDER BY TestClass.Id"));
+        }
+
+        [Test]
+        public void CanGenerateUnionAll()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.UnionAll(new Query<TestClass>(new Translator()).OrderBy(t => t.Id)).Build();
+
+            Assert.That(query.SqlCommand.ToString(),
+                Is.EqualTo(
+                    "SELECT * FROM TestClass WITH(NOLOCK) UNION ALL SELECT * FROM TestClass WITH(NOLOCK) ORDER BY TestClass.Id"));
+        }
     }
 }

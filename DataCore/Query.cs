@@ -6,7 +6,15 @@ using System.Text;
 
 namespace DataCore
 {
-    public class Query<T>
+    public interface IQuery
+    {
+        IQuery Build();
+
+        StringBuilder SqlCommand { get; }
+        Parameters Parameters { get; }
+    }
+
+    public class Query<T> : IQuery
     {
         private readonly ITranslator _translator;
 
@@ -23,6 +31,9 @@ namespace DataCore
         public string SqlGroupBy { get; set; }
         public string SqlEnd { get; set; }
         public StringBuilder SqlCommand { get; private set; }
+
+        private List<IQuery> _unionQueries;
+        private List<IQuery> _unionAllQueries;
 
         public Parameters Parameters { get; private set; }
 
@@ -42,9 +53,12 @@ namespace DataCore
             SqlFrom = _translator.GetTableName(TableName);
 
             Parameters = new Parameters();
+
+            _unionQueries = new List<IQuery>();
+            _unionAllQueries = new List<IQuery>();
         }
 
-        public Query<T> Build()
+        public IQuery Build()
         {
             // run the query
             SqlCommand.Append("SELECT ");
@@ -66,6 +80,15 @@ namespace DataCore
 
             if (!string.IsNullOrWhiteSpace(SqlEnd))
                 SqlCommand.Append(" ").Append(SqlEnd);
+            
+            foreach (var unionQuery in _unionQueries)
+            {
+                SqlCommand.Append(" UNION ").Append(unionQuery.Build().SqlCommand);
+            }
+            foreach (var unionQuery in _unionAllQueries)
+            {
+                SqlCommand.Append(" UNION ALL ").Append(unionQuery.Build().SqlCommand);
+            }
 
             Built = true;
 
@@ -180,6 +203,20 @@ namespace DataCore
 
             var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
+
+            return this;
+        }
+
+        public Query<T> Union<TOther>(Query<TOther> other)
+        {
+            _unionQueries.Add(other);
+
+            return this;
+        }
+
+        public Query<T> UnionAll<TOther>(Query<TOther> other)
+        {
+            _unionAllQueries.Add(other);
 
             return this;
         }
