@@ -12,17 +12,17 @@ namespace DataCore.Database
     public abstract class Database : IDatabase
     {
         private readonly IDbConnection _connection;
-        private readonly ITranslator _translator;
+        public ITranslator Translator { get; private set; }
 
         protected Database(IDbConnection connection, ITranslator translator)
         {
             _connection = connection;
-            _translator = translator;
+            Translator = translator;
         }
 
         public Query<T> From<T>()
         {
-            return new Query<T>(_translator);
+            return new Query<T>(Translator);
         }
 
         public void Insert<T>(T obj)
@@ -39,12 +39,12 @@ namespace DataCore.Database
             var values = string.Join(", ",
                 properties.Select(p =>
                 {
-                    var value = ExpressionHelper.GetValueFrom(_translator, p.PropertyType, p.GetValue(obj, null));
-                    return parameters.Add(_translator, value);
+                    var value = ExpressionHelper.GetValueFrom(Translator, p.PropertyType, p.GetValue(obj, null));
+                    return parameters.Add(Translator, value);
                 })
             );
 
-            var query = _translator.GetInsertQuery(tableName, names, values, parameters);
+            var query = Translator.GetInsertQuery(tableName, names, values, parameters);
 
             Execute(query, parameters);
         }
@@ -62,15 +62,15 @@ namespace DataCore.Database
             var parameters = new Parameters();
             foreach (var prop in properties)
             {
-                var key = parameters.Add(_translator, ExpressionHelper.GetValueFrom(_translator, prop.PropertyType, prop.GetValue(obj, null)));
+                var key = parameters.Add(Translator, ExpressionHelper.GetValueFrom(Translator, prop.PropertyType, prop.GetValue(obj, null)));
                 nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
             }
 
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
 
-            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, parameters);
+            var whereQuery = ExpressionHelper.GetQueryFromExpression(Translator, newExpression.Body, parameters);
 
-            var query = _translator.GetUpdateQuery(tableName, nameValues, whereQuery, parameters);
+            var query = Translator.GetUpdateQuery(tableName, nameValues, whereQuery, parameters);
 
             Execute(query, parameters);
         }
@@ -90,14 +90,14 @@ namespace DataCore.Database
             var parameters = new Parameters();
             foreach (var prop in properties.Where(p => fields.Contains(p.Name)))
             {
-                var key = parameters.Add(_translator, ExpressionHelper.GetValueFrom(_translator, prop.PropertyType, prop.GetValue(obj, null)));
+                var key = parameters.Add(Translator, ExpressionHelper.GetValueFrom(Translator, prop.PropertyType, prop.GetValue(obj, null)));
                 nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
             }
 
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
-            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, parameters);
+            var whereQuery = ExpressionHelper.GetQueryFromExpression(Translator, newExpression.Body, parameters);
 
-            var query = _translator.GetUpdateQuery(tableName, nameValues, whereQuery, parameters);
+            var query = Translator.GetUpdateQuery(tableName, nameValues, whereQuery, parameters);
 
             Execute(query, parameters);
         }
@@ -111,9 +111,9 @@ namespace DataCore.Database
             var parameters = new Parameters();
 
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
-            var whereQuery = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, parameters);
+            var whereQuery = ExpressionHelper.GetQueryFromExpression(Translator, newExpression.Body, parameters);
 
-            var query = _translator.GetDeleteQuery(tableName, whereQuery, parameters);
+            var query = Translator.GetDeleteQuery(tableName, whereQuery, parameters);
 
             Execute(query, parameters);
         }
@@ -132,18 +132,18 @@ namespace DataCore.Database
                                 Name = p.Name,
                                 Nullable = false,
                                 Size = 255,
-                                Type = _translator.GetTypeForProperty(p),
+                                Type = Translator.GetTypeForProperty(p),
                                 IsPrimaryKey = p.GetCustomAttributes(typeof(PrimaryKeyAttribute), true).Length > 0
                             });
 
-            var query = _translator.GetCreateTableIfNotExistsQuery(tableName, fields);
+            var query = Translator.GetCreateTableIfNotExistsQuery(tableName, fields);
 
             return Execute(query);
         }
 
         public int DropTableIfExists<T>()
         {
-            var query = _translator.GetDropTableIfExistsQuery(typeof(T).Name);
+            var query = Translator.GetDropTableIfExistsQuery(typeof(T).Name);
 
             return Execute(query);
         }
@@ -158,14 +158,14 @@ namespace DataCore.Database
                 var query = string.Join(";",
                     arguments.Select(
                         f =>
-                            _translator.GetCreateColumnIfNotExistsQuery(
+                            Translator.GetCreateColumnIfNotExistsQuery(
                                 tableName,
                                 new FieldDefinition
                                 {
                                     Name = ((MemberExpression)f).Member.Name,
                                     Nullable = true,
                                     Size = 255,
-                                    Type = _translator.GetTypeForProperty(((MemberExpression)f).Member as PropertyInfo)
+                                    Type = Translator.GetTypeForProperty(((MemberExpression)f).Member as PropertyInfo)
                                 }
                             )
                     )
@@ -187,7 +187,7 @@ namespace DataCore.Database
                 var query = string.Join(";",
                     arguments.Select(
                         f =>
-                            _translator.GetDropColumnIfExistsQuery(tableName, ((MemberExpression)f).Member.Name)
+                            Translator.GetDropColumnIfExistsQuery(tableName, ((MemberExpression)f).Member.Name)
                     )
                 );
 
@@ -207,7 +207,7 @@ namespace DataCore.Database
                 if (string.IsNullOrEmpty(indexName))
                     indexName = string.Concat("IX_", tableName, "_", columns.Replace(", ", "_"));
 
-                var query = _translator.GetCreateIndexIfNotExistsQuery(indexName, tableName, columns, unique);
+                var query = Translator.GetCreateIndexIfNotExistsQuery(indexName, tableName, columns, unique);
 
                 return Execute(query);
             }
@@ -219,7 +219,7 @@ namespace DataCore.Database
         {
             var tableName = typeof(T).Name;
 
-            var query = _translator.GetDropIndexIfExistsQuery(tableName, indexName);
+            var query = Translator.GetDropIndexIfExistsQuery(tableName, indexName);
 
             return Execute(query);
         }
@@ -241,7 +241,9 @@ namespace DataCore.Database
                 if (string.IsNullOrEmpty(indexName))
                     indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
 
-                var query = _translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
+                indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
+
+                var query = Translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
 
                 return Execute(query);
             }
@@ -253,7 +255,7 @@ namespace DataCore.Database
         {
             var tableName = typeof(T).Name;
 
-            var query = _translator.GetDropForeignKeyIfExistsQuery(tableName, indexName);
+            var query = Translator.GetDropForeignKeyIfExistsQuery(tableName, indexName);
 
             return Execute(query);
         }
@@ -279,7 +281,7 @@ namespace DataCore.Database
             if (!query.Built)
                 query.Build();
 
-            var queryWithExists = _translator.GetExistsQuery(query.SqlCommand.ToString());
+            var queryWithExists = Translator.GetExistsQuery(query.SqlCommand.ToString());
 
             return Execute<int>(queryWithExists, query.Parameters).FirstOrDefault() == 1;
         }
@@ -296,12 +298,12 @@ namespace DataCore.Database
 
         public int Execute(string query)
         {
-            return _connection.Execute(query + ";");
+            return _connection.Execute(query);
         }
 
         public int Execute(string query, Parameters parameters)
         {
-            return _connection.Execute(query + ";", parameters.GetValues());
+            return _connection.Execute(query, parameters.GetValues());
         }
 
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)

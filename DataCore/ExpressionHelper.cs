@@ -350,7 +350,14 @@ namespace DataCore
 
             if (methodExpression.Method.Name == "Average" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat("AVG(", GetStringForExpression(translator, methodExpression.Arguments[0], null), ")");
+                concat = string.Concat("AVG(", GetStringForExpression(translator, methodExpression.Arguments[0], parameters), ")");
+
+                return true;
+            }
+
+            if (methodExpression.Method.Name == "RowName" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = GetStringForExpression(translator, methodExpression.Arguments[0], parameters);
 
                 return true;
             }

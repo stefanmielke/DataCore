@@ -22,9 +22,9 @@ namespace DataCore
         DbType GetTypeForProperty(Type type);
         DbType GetTypeForProperty(PropertyInfo propertyInfo);
 
-        bool GetBooleanValue(object constantExpressionValue);
-        string GetStringValue(object value);
-        DateTime GetDateTimeValue(object date);
+        object GetBooleanValue(object constantExpressionValue);
+        object GetStringValue(object value);
+        object GetDateTimeValue(object date);
 
         string GetTableName(string tableName);
         string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields);

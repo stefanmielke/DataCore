@@ -10,7 +10,7 @@ namespace DataCore
 {
     public class Translator : ITranslator
     {
-        public void Top<T>(Query<T> query, int count)
+        public virtual void Top<T>(Query<T> query, int count)
         {
             query.SqlEnd = string.Concat("LIMIT ", count);
         }
@@ -71,17 +71,17 @@ namespace DataCore
             }
         }
 
-        public bool GetBooleanValue(object value)
+        public virtual object GetBooleanValue(object value)
         {
             return (bool)value;
         }
 
-        public string GetStringValue(object value)
+        public object GetStringValue(object value)
         {
             return (string)value;
         }
 
-        public DateTime GetDateTimeValue(object date)
+        public object GetDateTimeValue(object date)
         {
             return Convert.ToDateTime(date);
         }

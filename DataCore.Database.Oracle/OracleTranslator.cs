@@ -7,6 +7,29 @@ namespace DataCore.Database.Oracle
 {
     public class OracleTranslator : Translator
     {
+        public override void Top<T>(Query<T> query, int count)
+        {
+            query.Where("ROWNUM <= " + count);
+        }
+
+        public override void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage)
+        {
+            var min = recordsPerPage * (currentPage - 1);
+            var max = recordsPerPage * currentPage;
+
+            query.Where(string.Concat("ROWNUM > ", min, " AND ROWNUM <= ", max));
+        }
+
+        public override string GetExistsQuery(string query)
+        {
+            return string.Concat("SELECT 1 FROM DUAL WHERE EXISTS (", query, ")");
+        }
+
+        public override string GetIsNullFunctionName()
+        {
+            return "NVL";
+        }
+
         public override string GetDropTableIfExistsQuery(string tableName)
         {
             return CatchException(string.Concat("DROP TABLE ", tableName), -942);
@@ -22,7 +45,35 @@ namespace DataCore.Database.Oracle
 
             query.Append(")");
 
-            return CatchException(query.ToString(), 955);
+            return CatchException(query.ToString(), -955);
+        }
+
+        public override string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " ADD ", GetStringForColumn(field));
+        }
+
+        public override string GetCreateIndexIfNotExistsQuery(string indexName, string tableName, string columns, bool unique)
+        {
+            return
+                CatchException(
+                    string.Concat("CREATE", unique ? " UNIQUE" : "", " INDEX ", indexName, " ON ", tableName, "(",
+                        columns, ")"), -955);
+        }
+
+        public override string GetDropIndexIfExistsQuery(string tableName, string indexName)
+        {
+            return CatchException(string.Concat("DROP INDEX ", indexName), -1418);
+        }
+
+        protected override string GetStringForColumn(FieldDefinition field)
+        {
+            var nullable = field.Nullable ? "NULL" : "NOT NULL";
+            var primaryKey = field.IsPrimaryKey ? " PRIMARY KEY" : "";
+
+            var extra = string.Concat(nullable, primaryKey);
+
+            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, extra);
         }
 
         protected override string GetFormatFor(FieldDefinition field)
@@ -117,10 +168,15 @@ namespace DataCore.Database.Oracle
             return tableName;
         }
 
+        public override object GetBooleanValue(object value)
+        {
+            return (bool)value ? 1 : 0;
+        }
+
         private string CatchException(string sql, int exceptionCode)
         {
             return string.Concat("BEGIN EXECUTE IMMEDIATE '", sql, "' ; EXCEPTION WHEN OTHERS THEN IF SQLCODE != ",
-                exceptionCode, " THEN RAISE; END IF; END");
+                exceptionCode, " THEN RAISE; END IF; END;");
         }
     }
 }

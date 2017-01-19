@@ -7,6 +7,11 @@ namespace DataCore.Database.SqlServer
 {
     public class SqlServerTranslator : Translator
     {
+        public override void Top<T>(Query<T> query, int count)
+        {
+            query.SqlSelectFormat = string.Concat("TOP (", count, ") {0}");
+        }
+
         public override void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage)
         {
             query.SqlEnd = string.Concat("OFFSET ", (currentPage - 1) * recordsPerPage, " ROWS FETCH NEXT ", recordsPerPage, " ROWS ONLY");

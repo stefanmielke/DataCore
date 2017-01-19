@@ -130,6 +130,13 @@ namespace DataCore
             return this;
         }
 
+        public Query<T> Where(string clause)
+        {
+            SqlWhere = string.IsNullOrEmpty(SqlWhere) ? clause : string.Concat("(", SqlWhere, ") AND (", clause, ")");
+
+            return this;
+        }
+
         public Query<T> Or(Expression<Func<T, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));

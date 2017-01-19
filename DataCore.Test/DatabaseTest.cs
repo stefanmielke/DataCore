@@ -66,10 +66,10 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTableIfNotExists<TestClass>();
-                database.Insert(TestHelper.GetNewTestClass());
+                database.CreateTableIfNotExists<TestIgnore>();
+                database.Insert(new TestIgnore { Id = 1, FloatNumber = 1, Name = "test"});
 
-                var query = database.From<TestClass>().Where(t => t.Id == 1);
+                var query = database.From<TestIgnore>().Where(t => t.Id == 1);
 
                 Assert.IsTrue(database.Exists(query));
 
@@ -169,9 +169,12 @@ namespace DataCore.Test
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
+                var translator = database.Translator;
 
-                database.DropTableIfExists<TestClass4>();
-                database.Execute("CREATE TABLE TestClass4 ( Id INT not null, Number INT not null, Name VARCHAR(250) not null )");
+                var textInt = translator.GetTextFor(typeof(int));
+                var textString = translator.GetTextFor(typeof(string));
+
+                database.Execute("CREATE TABLE TestClass4 ( Id " + textInt + " not null, FormatNumber " + textInt + " not null, Name " + textString + "(250) not null )");
 
                 database.CreateColumnIfNotExists<TestClass4>(t => t.InsertDate);
 
@@ -181,7 +184,7 @@ namespace DataCore.Test
 
                 database.Select(query);
 
-                database.Execute("DROP TABLE TestClass4");
+                database.DropTableIfExists<TestClass4>();
 
                 connection.Close();
             }
@@ -220,7 +223,7 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDropIndex(TestHelper.DatabaseType dbType, string connectionString)
         {
-            string indexName = "IX_TestClass" + Guid.NewGuid().ToString().Replace("-", "");
+            string indexName = "IX_TestClass_Id_Name";
 
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
@@ -254,7 +257,7 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDropForeignKey(TestHelper.DatabaseType dbType, string connectionString)
         {
-            string indexName = "FK_TestClass" + Guid.NewGuid().ToString().Replace("-", "");
+            string indexName = "FK_TestClass_Id";
 
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
