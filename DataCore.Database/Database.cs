@@ -29,7 +29,7 @@ namespace DataCore.Database
         {
             var type = typeof(T);
 
-            var tableName = type.Name;
+            var tableName = GetTableName(type);
 
             var properties = GetPropertiesForType(type).ToList();
 
@@ -53,7 +53,7 @@ namespace DataCore.Database
         {
             var type = typeof(T);
 
-            var tableName = type.Name;
+            var tableName = GetTableName(type);
 
             var properties = GetPropertiesForType(type);
 
@@ -79,7 +79,7 @@ namespace DataCore.Database
         {
             var type = typeof(T);
 
-            var tableName = type.Name;
+            var tableName = GetTableName(type);
 
             var properties = GetPropertiesForType(type);
 
@@ -106,7 +106,7 @@ namespace DataCore.Database
         {
             var type = typeof(T);
 
-            var tableName = type.Name;
+            var tableName = GetTableName(type);
 
             var parameters = new Parameters();
 
@@ -121,7 +121,7 @@ namespace DataCore.Database
         public void DeleteById<T>(object id)
         {
             var type = typeof(T);
-            var tableName = type.Name;
+            var tableName = GetTableName(type);
 
             var idProperty = GetIdPropertyForType(typeof(T));
 
@@ -138,8 +138,8 @@ namespace DataCore.Database
         public int CreateTableIfNotExists<T>()
         {
             var type = typeof(T);
+            var tableName = GetTableName(type);
 
-            var tableName = type.Name;
             var fields =
                 GetPropertiesForType(type)
                     .Select(
@@ -170,7 +170,7 @@ namespace DataCore.Database
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
             if (arguments != null && arguments.Length > 0)
             {
-                var tableName = typeof(T).Name;
+                var tableName = GetTableName(typeof(T));
 
                 var query = string.Join(";",
                     arguments.Select(
@@ -199,7 +199,7 @@ namespace DataCore.Database
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
             if (arguments != null && arguments.Length > 0)
             {
-                var tableName = typeof(T).Name;
+                var tableName = GetTableName(typeof(T));
 
                 var query = string.Join(";",
                     arguments.Select(
@@ -219,7 +219,7 @@ namespace DataCore.Database
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
             if (arguments != null && arguments.Length > 0)
             {
-                var tableName = typeof(T).Name;
+                var tableName = GetTableName(typeof(T));
                 var columns = string.Join(", ", arguments.Select(f => ((MemberExpression)f).Member.Name));
                 if (string.IsNullOrEmpty(indexName))
                     indexName = string.Concat("IX_", tableName, "_", columns.Replace(", ", "_"));
@@ -234,7 +234,7 @@ namespace DataCore.Database
 
         public int DropIndexIfExists<T>(string indexName)
         {
-            var tableName = typeof(T).Name;
+            var tableName = GetTableName(typeof(T));
 
             var query = Translator.GetDropIndexIfExistsQuery(tableName, indexName);
 
@@ -249,8 +249,8 @@ namespace DataCore.Database
             if (argumentsFrom != null && argumentsFrom.Length > 0
                && argumentsTo != null && argumentsTo.Length > 0)
             {
-                var tableNameFrom = typeof(TFrom).Name;
-                var tableNameTo = typeof(TTo).Name;
+                var tableNameFrom = GetTableName(typeof(TFrom));
+                var tableNameTo = GetTableName(typeof(TTo));
 
                 var columnNameFrom = ((MemberExpression)argumentsFrom.First()).Member.Name;
                 var columnNameTo = ((MemberExpression)argumentsTo.First()).Member.Name;
@@ -270,7 +270,7 @@ namespace DataCore.Database
 
         public int DropForeignKeyIfExists<T>(string indexName)
         {
-            var tableName = typeof(T).Name;
+            var tableName = GetTableName(typeof(T));
 
             var query = Translator.GetDropForeignKeyIfExistsQuery(tableName, indexName);
 
@@ -287,9 +287,7 @@ namespace DataCore.Database
 
         public IEnumerable<T> Select<T>(Expression<Func<T, bool>> clause)
         {
-            var query = From<T>().Where(clause);
-            if (!query.Built)
-                query.Build();
+            var query = From<T>().Where(clause).Build();
 
             return Execute<T>(query.SqlCommand.ToString(), query.Parameters);
         }
@@ -304,9 +302,7 @@ namespace DataCore.Database
 
         public T SelectSingle<T>(Expression<Func<T, bool>> clause)
         {
-            var query = From<T>().Where(clause).Top(1);
-            if (!query.Built)
-                query.Build();
+            var query = From<T>().Where(clause).Top(1).Build();
 
             return Execute<T>(query.SqlCommand.ToString(), query.Parameters).FirstOrDefault();
         }
@@ -351,6 +347,11 @@ namespace DataCore.Database
         public int Execute(string query, Parameters parameters)
         {
             return _connection.Execute(query, parameters.GetValues());
+        }
+
+        private string GetTableName(Type type)
+        {
+            return type.Name;
         }
 
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
