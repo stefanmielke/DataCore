@@ -74,10 +74,5 @@
         {
             return default(int);
         }
-
-        public static T RowName<T>(this string name)
-        {
-            return default(T);
-        }
     }
 }

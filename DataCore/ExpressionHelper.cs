@@ -355,13 +355,6 @@ namespace DataCore
                 return true;
             }
 
-            if (methodExpression.Method.Name == "RowName" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
-            {
-                concat = GetStringForExpression(translator, methodExpression.Arguments[0], parameters);
-
-                return true;
-            }
-
             concat = "";
             return false;
         }
