@@ -137,6 +137,16 @@ namespace DataCore
             return this;
         }
 
+        public Query<T> And(Expression<Func<T, bool>> clause)
+        {
+            return Where(clause);
+        }
+
+        public Query<T> And(string clause)
+        {
+            return Where(clause);
+        }
+
         public Query<T> Or(Expression<Func<T, bool>> clause)
         {
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
@@ -144,6 +154,13 @@ namespace DataCore
             var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
 
             SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") OR (", query, ")");
+
+            return this;
+        }
+
+        public Query<T> Or(string clause)
+        {
+            SqlWhere = string.IsNullOrEmpty(SqlWhere) ? clause : string.Concat("(", SqlWhere, ") OR (", clause, ")");
 
             return this;
         }
