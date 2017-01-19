@@ -268,8 +268,26 @@ namespace DataCore.Database
             return Execute<T>(query.SqlCommand.ToString(), query.Parameters);
         }
 
+        public IEnumerable<T> Select<T>(Expression<Func<T, bool>> clause)
+        {
+            var query = From<T>().Where(clause);
+            if (!query.Built)
+                query.Build();
+
+            return Execute<T>(query.SqlCommand.ToString(), query.Parameters);
+        }
+
         public T SelectSingle<T>(Query<T> query)
         {
+            if (!query.Built)
+                query.Build();
+
+            return Execute<T>(query.SqlCommand.ToString(), query.Parameters).FirstOrDefault();
+        }
+
+        public T SelectSingle<T>(Expression<Func<T, bool>> clause)
+        {
+            var query = From<T>().Where(clause).Top(1);
             if (!query.Built)
                 query.Build();
 
