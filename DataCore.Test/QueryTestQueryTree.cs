@@ -72,6 +72,20 @@ namespace DataCore.Test
         }
 
         [Test]
+        public void CanGenerateClauseDoubleWhereWithAnd()
+        {
+            var query = new Query<TestClass>(new Translator());
+
+            query.Where(t => t.Id == 1 && t.FloatNumber == 0);
+            query.And(t => t.Name == "test");
+
+            Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.FloatNumber = @p1))) AND ((TestClass.Name = @p2))", query.SqlWhere);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p0"]);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p1"]);
+            Assert.AreEqual("test", query.Parameters.GetValues()["@p2"]);
+        }
+
+        [Test]
         public void CanGenerateClauseDoubleWhereWithOr()
         {
             var query = new Query<TestClass>(new Translator());
