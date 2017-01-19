@@ -118,6 +118,23 @@ namespace DataCore.Database
             Execute(query, parameters);
         }
 
+        public void DeleteById<T>(object id)
+        {
+            var type = typeof(T);
+            var tableName = type.Name;
+
+            var idProperty = GetIdPropertyForType(typeof(T));
+
+            var parameters = new Parameters();
+            var paramName = parameters.Add(Translator, id);
+
+            var whereQuery = string.Concat(idProperty.Name, " = ", paramName);
+
+            var query = Translator.GetDeleteQuery(tableName, whereQuery, parameters);
+
+            Execute(query, parameters);
+        }
+
         public int CreateTableIfNotExists<T>()
         {
             var type = typeof(T);
@@ -303,7 +320,7 @@ namespace DataCore.Database
 
             var query = From<T>().Where(idProperty.Name + " = " + paramName).Build();
 
-            return Execute<T>(query.SqlCommand.ToString(), query.Parameters).FirstOrDefault();
+            return Execute<T>(query.SqlCommand.ToString(), parameters).FirstOrDefault();
         }
 
         public bool Exists<T>(Query<T> query)
