@@ -121,9 +121,34 @@ namespace DataCore
 
         public Query<T> Where(Expression<Func<T, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
+            var query = GetQueryFromClause(clause);
 
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") AND (", query, ")");
+
+            return this;
+        }
+
+        public Query<T> Where<TJoined>(Expression<Func<TJoined, bool>> clause)
+        {
+            var query = GetQueryFromClause(clause);
+
+            SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") AND (", query, ")");
+
+            return this;
+        }
+
+        public Query<T> Where<TJoined>(Expression<Func<T, TJoined, bool>> clause)
+        {
+            var query = GetQueryFromClause(clause);
+
+            SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") AND (", query, ")");
+
+            return this;
+        }
+
+        public Query<T> Where<TLeft, TRight>(Expression<Func<TLeft, TRight, bool>> clause)
+        {
+            var query = GetQueryFromClause(clause);
 
             SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") AND (", query, ")");
 
@@ -142,6 +167,21 @@ namespace DataCore
             return Where(clause);
         }
 
+        public Query<T> And<TJoined>(Expression<Func<TJoined, bool>> clause)
+        {
+            return Where(clause);
+        }
+
+        public Query<T> And<TJoined>(Expression<Func<T, TJoined, bool>> clause)
+        {
+            return Where<T, TJoined>(clause);
+        }
+
+        public Query<T> And<TLeft, TRight>(Expression<Func<TLeft, TRight, bool>> clause)
+        {
+            return Where(clause);
+        }
+
         public Query<T> And(string clause)
         {
             return Where(clause);
@@ -149,9 +189,34 @@ namespace DataCore
 
         public Query<T> Or(Expression<Func<T, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
+            var query = GetQueryFromClause(clause);
 
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") OR (", query, ")");
+
+            return this;
+        }
+
+        public Query<T> Or<TJoined>(Expression<Func<TJoined, bool>> clause)
+        {
+            var query = GetQueryFromClause(clause);
+
+            SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") OR (", query, ")");
+
+            return this;
+        }
+
+        public Query<T> Or<TJoined>(Expression<Func<T, TJoined, bool>> clause)
+        {
+            var query = GetQueryFromClause(clause);
+
+            SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") OR (", query, ")");
+
+            return this;
+        }
+
+        public Query<T> Or<TLeft, TRight>(Expression<Func<TLeft, TRight, bool>> clause)
+        {
+            var query = GetQueryFromClause(clause);
 
             SqlWhere = string.IsNullOrEmpty(SqlWhere) ? query : string.Concat("(", SqlWhere, ") OR (", query, ")");
 
@@ -167,8 +232,7 @@ namespace DataCore
 
         public Query<T> Join<TJoined>(Expression<Func<T, TJoined, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            var query = GetQueryFromClause(clause);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoined).Name);
             SqlFrom = string.Concat(SqlFrom, " INNER JOIN ", joinedTableName, " ON ", query);
@@ -178,8 +242,7 @@ namespace DataCore
 
         public Query<T> Join<TJoinedLeft, TJoinedRight>(Expression<Func<TJoinedLeft, TJoinedRight, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            var query = GetQueryFromClause(clause);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " INNER JOIN ", joinedTableName, " ON ", query);
@@ -189,8 +252,7 @@ namespace DataCore
 
         public Query<T> LeftJoin<TJoined>(Expression<Func<T, TJoined, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            var query = GetQueryFromClause(clause);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoined).Name);
             SqlFrom = string.Concat(SqlFrom, " LEFT JOIN ", joinedTableName, " ON ", query);
@@ -200,8 +262,7 @@ namespace DataCore
 
         public Query<T> LeftJoin<TJoinedLeft, TJoinedRight>(Expression<Func<TJoinedLeft, TJoinedRight, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            var query = GetQueryFromClause(clause);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " LEFT JOIN ", joinedTableName, " ON ", query);
@@ -211,8 +272,7 @@ namespace DataCore
 
         public Query<T> RightJoin<TJoined>(Expression<Func<T, TJoined, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            var query = GetQueryFromClause(clause);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoined).Name);
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
@@ -222,8 +282,7 @@ namespace DataCore
 
         public Query<T> RightJoin<TJoinedLeft, TJoinedRight>(Expression<Func<TJoinedLeft, TJoinedRight, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            var query = GetQueryFromClause(clause);
 
             var joinedTableName = _translator.GetTableName(typeof(TJoinedRight).Name);
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
@@ -261,9 +320,7 @@ namespace DataCore
 
         public Query<T> Having(Expression<Func<T, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
-
-            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            var query = GetQueryFromClause(clause);
 
             SqlHaving = string.IsNullOrEmpty(SqlHaving) ? query : string.Concat("(", SqlHaving, ") AND (", query, ")");
 
@@ -282,6 +339,20 @@ namespace DataCore
             _translator.Paginate(this, recordsPerPage, currentPage);
 
             return this;
+        }
+
+        private string GetQueryFromClause<T2, T3>(Expression<Func<T2, T3, bool>> clause)
+        {
+            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            return query;
+        }
+
+        private string GetQueryFromClause<T2>(Expression<Func<T2, bool>> clause)
+        {
+            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
+            var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
+            return query;
         }
     }
 }
