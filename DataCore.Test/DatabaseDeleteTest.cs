@@ -72,5 +72,27 @@ namespace DataCore.Test
                 connection.Close();
             }
         }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        public void CanDeleteById(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+                
+                database.Insert(TestHelper.GetNewTestClass());
+
+                database.DeleteById<TestClass>(1);
+
+                var query = database.From<TestClass>().Where(t => t.Id == 1);
+
+                var result = database.SelectSingle(query);
+                Assert.IsNull(result);
+
+                connection.Close();
+            }
+        }
     }
 }
