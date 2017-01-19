@@ -107,7 +107,7 @@ namespace DataCore.Database
             var type = typeof(T);
 
             var tableName = type.Name;
-            
+
             var parameters = new Parameters();
 
             var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
@@ -294,6 +294,18 @@ namespace DataCore.Database
             return Execute<T>(query.SqlCommand.ToString(), query.Parameters).FirstOrDefault();
         }
 
+        public T SelectById<T>(object id)
+        {
+            var idProperty = GetIdPropertyForType(typeof(T));
+
+            var parameters = new Parameters();
+            var paramName = parameters.Add(Translator, id);
+
+            var query = From<T>().Where(idProperty.Name + " = " + paramName).Build();
+
+            return Execute<T>(query.SqlCommand.ToString(), query.Parameters).FirstOrDefault();
+        }
+
         public bool Exists<T>(Query<T> query)
         {
             if (!query.Built)
@@ -327,6 +339,11 @@ namespace DataCore.Database
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
         {
             return type.GetProperties().Where(p => p.GetCustomAttributes(typeof(IgnoreAttribute), true).Length == 0);
+        }
+
+        private PropertyInfo GetIdPropertyForType(Type type)
+        {
+            return type.GetProperties().FirstOrDefault(p => p.GetCustomAttributes(typeof(PrimaryKeyAttribute), true).Length > 0);
         }
     }
 }
