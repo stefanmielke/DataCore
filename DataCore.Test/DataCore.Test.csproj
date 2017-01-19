@@ -68,6 +68,7 @@
     <Compile Include="DatabaseInsertTest.cs" />
     <Compile Include="DatabaseTest.cs" />
     <Compile Include="DatabaseUpdateQuery.cs" />
+    <Compile Include="DatabaseWhereTest.cs" />
     <Compile Include="Models\TestClass4.cs" />
     <Compile Include="Models\TestIgnore.cs" />
     <Compile Include="QueryTestGroupBy.cs" />

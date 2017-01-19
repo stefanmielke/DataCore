@@ -13,6 +13,7 @@ namespace DataCore.Database
         int CreateIndexIfNotExists<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null);
         int CreateTableIfNotExists<T>();
         void Delete<T>(Expression<Func<T, bool>> whereClause);
+        void DeleteById<T>(object id);
         int DropColumnIfExists<T>(Expression<Func<T, dynamic>> clause);
         int DropForeignKeyIfExists<T>(string indexName);
         int DropIndexIfExists<T>(string indexName);
@@ -23,7 +24,10 @@ namespace DataCore.Database
         Query<T> From<T>();
         void Insert<T>(T obj);
         IEnumerable<T> Select<T>(Query<T> query);
+        IEnumerable<T> Select<T>(Expression<Func<T, bool>> clause);
         T SelectSingle<T>(Query<T> query);
+        T SelectSingle<T>(Expression<Func<T, bool>> clause);
+        T SelectById<T>(object id);
         void Update<T>(T obj, Expression<Func<T, dynamic>> whereClause);
         void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields, Expression<Func<T, dynamic>> whereClause);
     }
