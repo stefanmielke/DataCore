@@ -26,7 +26,9 @@ namespace DataCore
         object GetStringValue(object value);
         object GetDateTimeValue(object date);
 
-        string GetTableName(string tableName);
+        string GetTableName(Type type);
+        string GetSelectTableName(Type type);
+        string GetSelectTableName(string tableName);
         string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields);
         string GetDropTableIfExistsQuery(string tableName);
         string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field);

@@ -2,7 +2,7 @@
 {
     public class SqliteTranslator : Translator
     {
-        public override string GetTableName(string tableName)
+        public override string GetSelectTableName(string tableName)
         {
             return tableName;
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataCore.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -226,7 +227,24 @@ namespace DataCore
             return string.Concat("ALTER TABLE ", tableName, " ADD COLUMN ", GetStringForColumn(field));
         }
 
-        public virtual string GetTableName(string tableName)
+        public string GetTableName(Type type)
+        {
+            var tableAttributes = type.GetCustomAttributes(typeof(TableAttribute), true);
+            if (tableAttributes.Length > 0)
+            {
+                var tableAttribute = (TableAttribute)tableAttributes[0];
+                return tableAttribute.TableName;
+            }
+
+            return type.Name;
+        }
+
+        public string GetSelectTableName(Type type)
+        {
+            return GetSelectTableName(GetTableName(type));
+        }
+
+        public virtual string GetSelectTableName(string tableName)
         {
             return string.Concat(tableName, " WITH(NOLOCK)");
         }

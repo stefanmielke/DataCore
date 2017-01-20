@@ -351,7 +351,7 @@ namespace DataCore.Database
 
         private string GetTableName(Type type)
         {
-            return type.Name;
+            return Translator.GetTableName(type);
         }
 
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
