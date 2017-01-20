@@ -301,6 +301,22 @@ namespace DataCore.Database
             return Execute<T>(query.SqlCommand.ToString(), parameters).FirstOrDefault();
         }
 
+        public T SelectByIds<T>(params object[] ids)
+        {
+            var idProperty = GetIdPropertyForType(typeof(T));
+
+            var parameters = new Parameters();
+            foreach (var id in ids)
+            {
+                parameters.Add(Translator, id);
+            }
+            var inParams = string.Join(",", parameters.GetValues().Select(kv => kv.Key));
+
+            var query = From<T>().Where(idProperty.Name + " IN (" + inParams + ")").Build();
+
+            return Execute<T>(query.SqlCommand.ToString(), parameters).FirstOrDefault();
+        }
+
         public bool Exists<T>(Query<T> query)
         {
             if (!query.Built)
