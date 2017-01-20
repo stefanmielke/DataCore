@@ -140,18 +140,7 @@ namespace DataCore.Database
             var type = typeof(T);
             var tableName = GetTableName(type);
 
-            var fields =
-                GetPropertiesForType(type)
-                    .Select(
-                        p =>
-                            new FieldDefinition
-                            {
-                                Name = p.Name,
-                                Nullable = false,
-                                Size = 255,
-                                Type = Translator.GetTypeForProperty(p),
-                                IsPrimaryKey = p.GetCustomAttributes(typeof(PrimaryKeyAttribute), true).Length > 0
-                            });
+            var fields = GetPropertiesForType(type).Select(p => GetFieldForProperty(p));
 
             var query = Translator.GetCreateTableIfNotExistsQuery(tableName, fields);
 
@@ -176,14 +165,7 @@ namespace DataCore.Database
                     arguments.Select(
                         f =>
                             Translator.GetCreateColumnIfNotExistsQuery(
-                                tableName,
-                                new FieldDefinition
-                                {
-                                    Name = ((MemberExpression)f).Member.Name,
-                                    Nullable = true,
-                                    Size = 255,
-                                    Type = Translator.GetTypeForProperty(((MemberExpression)f).Member as PropertyInfo)
-                                }
+                                tableName, GetFieldForProperty(((MemberExpression)f).Member as PropertyInfo)
                             )
                     )
                 );
@@ -354,6 +336,28 @@ namespace DataCore.Database
             return Translator.GetTableName(type);
         }
 
+        private FieldDefinition GetFieldForProperty(PropertyInfo p)
+        {
+            var columnName = p.Name;
+            var isPrimaryKey = false;
+
+            var columnAttributes = p.GetCustomAttributes(typeof(ColumnAttribute), true);
+            if (columnAttributes.Length > 0)
+            {
+                var columnAttribute = (ColumnAttribute)columnAttributes[0];
+                var column = columnAttribute.ColumnName;
+            }
+
+            return new FieldDefinition
+            {
+                Name = columnName,
+                Nullable = false,
+                Size = 255,
+                Type = Translator.GetTypeForProperty(p),
+                IsPrimaryKey = isPrimaryKey
+            };
+        }
+
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
         {
             return type.GetProperties().Where(p => p.GetCustomAttributes(typeof(IgnoreAttribute), true).Length == 0);
@@ -361,7 +365,14 @@ namespace DataCore.Database
 
         private PropertyInfo GetIdPropertyForType(Type type)
         {
-            return type.GetProperties().FirstOrDefault(p => p.GetCustomAttributes(typeof(PrimaryKeyAttribute), true).Length > 0);
+            return type.GetProperties()
+                .FirstOrDefault(p =>
+                    {
+                        var columnAttributes = p.GetCustomAttributes(typeof(ColumnAttribute), true);
+
+                        return columnAttributes.Length > 0 && ((ColumnAttribute)columnAttributes[0]).IsPrimaryKey;
+                    }
+                );
         }
     }
 }
