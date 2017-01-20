@@ -10,6 +10,8 @@ namespace DataCore.Test.Models
 
         public float Number { get; set; }
         public string Name { get; set; }
+
+        [Column(isRequired: false)]
         public DateTime InsertDate { get; set; }
     }
 }

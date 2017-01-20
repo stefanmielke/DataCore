@@ -32,8 +32,8 @@ namespace DataCore
         public string SqlEnd { get; set; }
         public StringBuilder SqlCommand { get; private set; }
 
-        private List<IQuery> _unionQueries;
-        private List<IQuery> _unionAllQueries;
+        private readonly List<IQuery> _unionQueries;
+        private readonly List<IQuery> _unionAllQueries;
 
         public Parameters Parameters { get; private set; }
 

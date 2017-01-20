@@ -54,7 +54,7 @@ namespace DataCore
 
             var memberExpression = expression as MemberExpression;
             if (memberExpression != null)
-                return MemberExpressionString(memberExpression, parameters);
+                return MemberExpressionString(translator, memberExpression, parameters);
 
             var constantExpression = expression as ConstantExpression;
             if (constantExpression != null)
@@ -63,9 +63,9 @@ namespace DataCore
             return string.Empty;
         }
 
-        public static string MemberExpressionString(MemberExpression memberExpression, Parameters parameters)
+        public static string MemberExpressionString(ITranslator translator, MemberExpression memberExpression, Parameters parameters)
         {
-            return string.Concat(memberExpression.Member.DeclaringType.Name, ".", memberExpression.Member.Name);
+            return string.Concat(translator.GetTableName(memberExpression.Member.DeclaringType), ".", memberExpression.Member.Name);
         }
 
         public static string BinaryExpressionString(ITranslator translator, IEnumerator<Expression> iterator, BinaryExpression binaryExpression, Parameters parameters)
@@ -221,7 +221,7 @@ namespace DataCore
                     }
                 }
 
-                return string.Concat(memberExpression.Member.DeclaringType.Name, ".", memberExpression.Member.Name);
+                return string.Concat(translator.GetTableName(memberExpression.Member.DeclaringType), ".", memberExpression.Member.Name);
             }
 
             var constExpr = expression as ConstantExpression;

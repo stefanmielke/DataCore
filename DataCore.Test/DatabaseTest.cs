@@ -25,6 +25,23 @@ namespace DataCore.Test
         }
 
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanCreateTableWithOverridedName(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestOverride>();
+
+                var query = database.From<TestOverride>().Where(t => t.Id == 1);
+
+                database.Select(query);
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanCreateTableWithoutIgnoredAttributes(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))

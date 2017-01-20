@@ -384,10 +384,10 @@ namespace DataCore.Database
             if (columnAttributes.Length > 0)
             {
                 var columnAttribute = (ColumnAttribute)columnAttributes[0];
-                columnName = columnAttribute.ColumnName;
+                columnName = columnAttribute.ColumnName ?? columnName;
                 isPrimaryKey = columnAttribute.IsPrimaryKey;
                 length = columnAttribute.Length;
-                nullable = !columnAttribute.IsRequired;
+                nullable = !columnAttribute.IsRequired && !isPrimaryKey;
             }
 
             return new FieldDefinition
