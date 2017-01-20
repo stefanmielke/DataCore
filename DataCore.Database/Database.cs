@@ -340,19 +340,24 @@ namespace DataCore.Database
         {
             var columnName = p.Name;
             var isPrimaryKey = false;
+            var length = 255;
+            var nullable = false;
 
             var columnAttributes = p.GetCustomAttributes(typeof(ColumnAttribute), true);
             if (columnAttributes.Length > 0)
             {
                 var columnAttribute = (ColumnAttribute)columnAttributes[0];
-                var column = columnAttribute.ColumnName;
+                columnName = columnAttribute.ColumnName;
+                isPrimaryKey = columnAttribute.IsPrimaryKey;
+                length = columnAttribute.Length;
+                nullable = !columnAttribute.IsRequired;
             }
 
             return new FieldDefinition
             {
                 Name = columnName,
-                Nullable = false,
-                Size = 255,
+                Nullable = nullable,
+                Size = length,
                 Type = Translator.GetTypeForProperty(p),
                 IsPrimaryKey = isPrimaryKey
             };
