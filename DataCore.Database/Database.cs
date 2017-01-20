@@ -135,6 +135,27 @@ namespace DataCore.Database
             Execute(query, parameters);
         }
 
+        public void DeleteById<T>(params object[] ids)
+        {
+            var type = typeof(T);
+            var tableName = GetTableName(type);
+
+            var idProperty = GetIdPropertyForType(typeof(T));
+
+            var parameters = new Parameters();
+            foreach (var id in ids)
+            {
+                parameters.Add(Translator, id);
+            }
+            var inParams = string.Join(",", parameters.GetValues().Select(kv => kv.Key));
+
+            var whereQuery = string.Concat(idProperty.Name, " IN (", inParams, ")");
+
+            var query = Translator.GetDeleteQuery(tableName, whereQuery, parameters);
+
+            Execute(query, parameters);
+        }
+
         public int CreateTableIfNotExists<T>()
         {
             var type = typeof(T);
