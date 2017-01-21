@@ -65,7 +65,7 @@ namespace DataCore
 
         public static string MemberExpressionString(ITranslator translator, MemberExpression memberExpression, Parameters parameters)
         {
-            return string.Concat(translator.GetTableName(memberExpression.Member.DeclaringType), ".", memberExpression.Member.Name);
+            return string.Concat(translator.GetTableName(memberExpression.Member.DeclaringType), ".", translator.GetPropertyName(memberExpression.Member as PropertyInfo));
         }
 
         public static string BinaryExpressionString(ITranslator translator, IEnumerator<Expression> iterator, BinaryExpression binaryExpression, Parameters parameters)

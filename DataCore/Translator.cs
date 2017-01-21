@@ -227,6 +227,19 @@ namespace DataCore
             return string.Concat("ALTER TABLE ", tableName, " ADD COLUMN ", GetStringForColumn(field));
         }
 
+        public string GetPropertyName(PropertyInfo type)
+        {
+            var columnAttributes = type.GetCustomAttributes(typeof(ColumnAttribute), true);
+            if (columnAttributes.Length > 0)
+            {
+                var columnAttribute = (ColumnAttribute)columnAttributes[0];
+                if (!string.IsNullOrEmpty(columnAttribute.ColumnName))
+                    return columnAttribute.ColumnName;
+            }
+
+            return type.Name;
+        }
+
         public string GetTableName(Type type)
         {
             var tableAttributes = type.GetCustomAttributes(typeof(TableAttribute), true);

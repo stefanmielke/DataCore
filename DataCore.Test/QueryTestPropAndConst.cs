@@ -116,6 +116,17 @@ namespace queryCore.Test
             Assert.AreEqual("test", query.Parameters.GetValues()["@p0"]);
         }
 
+        [Test]
+        public void CanTransformWhereClauseFromCustomNamedColumn()
+        {
+            var query = new Query<TestOverride>(new Translator());
+
+            query.Where(t => t.Id == 1);
+
+            Assert.AreEqual("(TB_Testing.ID_Testing = @p0)", query.SqlWhere);
+            Assert.AreEqual(1, query.Parameters.GetValues()["@p0"]);
+        }
+
         private static string GetNameString(TestClass test)
         {
             return test.Name;

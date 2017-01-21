@@ -26,6 +26,7 @@ namespace DataCore
         object GetStringValue(object value);
         object GetDateTimeValue(object date);
 
+        string GetPropertyName(PropertyInfo type);
         string GetTableName(Type type);
         string GetSelectTableName(Type type);
         string GetSelectTableName(string tableName);

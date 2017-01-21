@@ -161,7 +161,7 @@ namespace DataCore.Database
             var type = typeof(T);
             var tableName = GetTableName(type);
 
-            var fields = GetPropertiesForType(type).Select(p => GetFieldForProperty(p));
+            var fields = GetPropertiesForType(type).Select(GetFieldForProperty);
 
             var query = Translator.GetCreateTableIfNotExistsQuery(tableName, fields);
 
@@ -170,7 +170,7 @@ namespace DataCore.Database
 
         public int DropTableIfExists<T>()
         {
-            var query = Translator.GetDropTableIfExistsQuery(typeof(T).Name);
+            var query = Translator.GetDropTableIfExistsQuery(Translator.GetTableName(typeof(T)));
 
             return Execute(query);
         }
