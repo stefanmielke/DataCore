@@ -14,6 +14,7 @@ namespace DataCore.Database
         int CreateTableIfNotExists<T>();
         void Delete<T>(Expression<Func<T, bool>> whereClause);
         void DeleteById<T>(object id);
+        void DeleteById<T>(params object[] ids);
         int DropColumnIfExists<T>(Expression<Func<T, dynamic>> clause);
         int DropForeignKeyIfExists<T>(string indexName);
         int DropIndexIfExists<T>(string indexName);
