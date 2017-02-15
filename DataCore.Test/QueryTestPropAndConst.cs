@@ -1,9 +1,8 @@
 ﻿using System;
-using DataCore;
 using DataCore.Test.Models;
 using NUnit.Framework;
 
-namespace queryCore.Test
+namespace DataCore.Test
 {
     [TestFixture]
     public class QueryTestPropAndProp
