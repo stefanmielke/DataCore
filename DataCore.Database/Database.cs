@@ -322,7 +322,7 @@ namespace DataCore.Database
             return Execute<T>(query.SqlCommand.ToString(), parameters).FirstOrDefault();
         }
 
-        public T SelectByIds<T>(params object[] ids)
+        public IEnumerable<T> SelectById<T>(params object[] ids)
         {
             var idProperty = GetIdPropertyForType(typeof(T));
 
@@ -335,7 +335,7 @@ namespace DataCore.Database
 
             var query = From<T>().Where(idProperty.Name + " IN (" + inParams + ")").Build();
 
-            return Execute<T>(query.SqlCommand.ToString(), parameters).FirstOrDefault();
+            return Execute<T>(query.SqlCommand.ToString(), parameters);
         }
 
         public bool Exists<T>(Query<T> query)

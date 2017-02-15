@@ -29,6 +29,7 @@ namespace DataCore.Database
         T SelectSingle<T>(Query<T> query);
         T SelectSingle<T>(Expression<Func<T, bool>> clause);
         T SelectById<T>(object id);
+        IEnumerable<T> SelectById<T>(params object[] ids);
         void Update<T>(T obj, Expression<Func<T, dynamic>> whereClause);
         void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields, Expression<Func<T, dynamic>> whereClause);
     }

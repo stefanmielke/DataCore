@@ -1,4 +1,5 @@
-﻿using DataCore.Test.Models;
+﻿using System.Linq;
+using DataCore.Test.Models;
 using NUnit.Framework;
 
 namespace DataCore.Test
@@ -106,6 +107,30 @@ namespace DataCore.Test
                 var obj = database.SelectById<TestClass>(1);
 
                 Assert.IsNotNull(obj);
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanSelectByIds(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+
+                var test1 = TestHelper.GetNewTestClass();
+                var test2 = TestHelper.GetNewTestClass();
+                test2.Id = 2;
+
+                database.Insert(test1);
+                database.Insert(test2);
+
+                var result = database.SelectById<TestClass>(1, 2);
+                
+                Assert.AreEqual(2, result.Count());
 
                 connection.Close();
             }
