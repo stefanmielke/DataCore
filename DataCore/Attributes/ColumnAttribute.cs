@@ -14,7 +14,7 @@ namespace DataCore.Attributes
         {
             ColumnName = columnName;
             IsPrimaryKey = isPrimaryKey;
-            IsRequired = IsRequired;
+            IsRequired = isRequired;
             Length = length;
             Precision = precision;
         }
