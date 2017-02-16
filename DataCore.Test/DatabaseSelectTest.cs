@@ -129,8 +129,36 @@ namespace DataCore.Test
                 database.Insert(test2);
 
                 var result = database.SelectById<TestClass>(1, 2);
-                
+
                 Assert.AreEqual(2, result.Count());
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanSelectComplex(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+                database.CreateTableIfNotExists<TestClass2>();
+                database.CreateTableIfNotExists<TestClass3>();
+
+                var query =
+                    database.From<TestClass>()
+                        .Join<TestClass2>((t, t2) => t.Id == t2.Id && t2.Id == 1)
+                        .LeftJoin<TestClass2, TestClass3>((t, t2) => t.Id == t2.Id && t2.Id > 1)
+                        .Where(t => t.FloatNumber > 105)
+                        .GroupBy(t => new { t.Id, t.Name })
+                        .Having(t => t.Id > 0)
+                        .OrderBy(t => t.Id)
+                        .Select(t => new { t.Id, t.Name })
+                        .Top(103);
+
+                database.Select(query);
 
                 connection.Close();
             }
