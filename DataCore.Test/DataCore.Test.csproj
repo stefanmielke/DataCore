@@ -71,6 +71,8 @@
     <Compile Include="DatabaseUpdateQuery.cs" />
     <Compile Include="DatabaseWhereTest.cs" />
     <Compile Include="Models\TestClass4.cs" />
+    <Compile Include="Models\TestClassRef1.cs" />
+    <Compile Include="Models\TestClassRef2.cs" />
     <Compile Include="Models\TestIgnore.cs" />
     <Compile Include="Models\TestOverride.cs" />
     <Compile Include="QueryTestGroupBy.cs" />

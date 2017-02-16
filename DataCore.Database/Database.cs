@@ -55,7 +55,7 @@ namespace DataCore.Database
 
             var tableName = GetTableName(type);
 
-            var properties = GetPropertiesForType(type);
+            var properties = GetPropertiesForType(type).Where(p => !GetFieldForProperty(p).IsIdentity);
 
             var nameValues = new List<KeyValuePair<string, string>>();
 
@@ -156,18 +156,27 @@ namespace DataCore.Database
             Execute(query, parameters);
         }
 
-        public int CreateTableIfNotExists<T>()
+        public int CreateTableIfNotExists<T>(bool createReferences = false)
         {
             var type = typeof(T);
             var tableName = GetTableName(type);
 
-            var fields = GetPropertiesForType(type).Select(GetFieldForProperty);
+            var fields = GetPropertiesForType(type).Select(GetFieldForProperty).ToList();
 
             var queries = Translator.GetCreateTableIfNotExistsQuery(tableName, fields);
-
             foreach (var query in queries)
             {
                 Execute(query); 
+            }
+
+            if (createReferences)
+            {
+                foreach (var field in fields.Where(f => f.IsReference))
+                {
+                    var idColumnTo = GetIdFieldForType(field.ReferenceTable);
+
+                    GenerateForeignKey(field.ReferenceName, tableName, GetTableName(field.ReferenceTable), field.Name, idColumnTo.Name);
+                } 
             }
 
             return 0;
@@ -268,17 +277,22 @@ namespace DataCore.Database
                 var columnNameFrom = ((MemberExpression)argumentsFrom.First()).Member.Name;
                 var columnNameTo = ((MemberExpression)argumentsTo.First()).Member.Name;
 
-                if (string.IsNullOrEmpty(indexName))
-                    indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
-
-                indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
-
-                var query = Translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
-
-                return Execute(query);
+                return GenerateForeignKey(indexName, tableNameFrom, tableNameTo, columnNameFrom, columnNameTo);
             }
 
             return 0;
+        }
+
+        private int GenerateForeignKey(string indexName, string tableNameFrom, string tableNameTo, string columnNameFrom, string columnNameTo)
+        {
+            if (string.IsNullOrEmpty(indexName))
+                indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
+
+            indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
+
+            var query = Translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
+
+            return Execute(query);
         }
 
         public int DropForeignKeyIfExists<T>(string indexName)
@@ -392,6 +406,9 @@ namespace DataCore.Database
             var isIdentity = false;
             var identityStart = 1;
             var identityIncrement = 1;
+            var isReference = false;
+            string referenceName = null;
+            Type referenceTable = null;
 
             var columnAttributes = p.GetCustomAttributes(typeof(ColumnAttribute), true);
             if (columnAttributes.Length > 0)
@@ -412,6 +429,15 @@ namespace DataCore.Database
                 identityIncrement = identityAttribute.Increment;
             }
 
+            var referenceAttributes = p.GetCustomAttributes(typeof(ReferenceAttribute), true);
+            if (referenceAttributes.Length > 0)
+            {
+                var referenceAttribute = (ReferenceAttribute)referenceAttributes[0];
+                isReference = true;
+                referenceName = referenceAttribute.FkName;
+                referenceTable = referenceAttribute.Table;
+            }
+
             return new FieldDefinition
             {
                 Name = columnName,
@@ -421,7 +447,10 @@ namespace DataCore.Database
                 IsPrimaryKey = isPrimaryKey,
                 IsIdentity = isIdentity,
                 IdentityStart = identityStart,
-                IdentityIncrement = identityIncrement
+                IdentityIncrement = identityIncrement,
+                IsReference = isReference,
+                ReferenceName = referenceName,
+                ReferenceTable = referenceTable
             };
         }
 
@@ -440,6 +469,11 @@ namespace DataCore.Database
                         return columnAttributes.Length > 0 && ((ColumnAttribute)columnAttributes[0]).IsPrimaryKey;
                     }
                 );
+        }
+
+        private FieldDefinition GetIdFieldForType(Type type)
+        {
+            return GetFieldForProperty(GetIdPropertyForType(type));
         }
     }
 }

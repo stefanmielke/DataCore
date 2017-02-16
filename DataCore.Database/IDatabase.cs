@@ -11,7 +11,7 @@ namespace DataCore.Database
         int CreateColumnIfNotExists<T>(Expression<Func<T, dynamic>> clause);
         int CreateForeignKeyIfNotExists<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo, string indexName = null);
         int CreateIndexIfNotExists<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null);
-        int CreateTableIfNotExists<T>();
+        int CreateTableIfNotExists<T>(bool createReferences = false);
         void Delete<T>(Expression<Func<T, bool>> whereClause);
         void DeleteById<T>(object id);
         void DeleteById<T>(params object[] ids);

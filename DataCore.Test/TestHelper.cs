@@ -41,6 +41,8 @@ namespace DataCore.Test
             database.DropTableIfExists<TestClass4>();
             database.DropTableIfExists<TestIgnore>();
             database.DropTableIfExists<TestOverride>();
+            database.DropTableIfExists<TestClassRef2>();
+            database.DropTableIfExists<TestClassRef1>();
 
             return connection;
         }

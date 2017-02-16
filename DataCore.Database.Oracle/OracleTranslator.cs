@@ -58,7 +58,7 @@ namespace DataCore.Database.Oracle
                 var sequenceName = tableName + "_sequence";
                 var triggerName = tableName + "_on_insert";
 
-                yield return string.Concat("CREATE SEQUENCE ", sequenceName);
+                yield return CatchException(string.Concat("CREATE SEQUENCE ", sequenceName));
 
                 query.Clear();
                 query.Append("CREATE OR REPLACE TRIGGER ");
@@ -71,7 +71,7 @@ namespace DataCore.Database.Oracle
                 query.Append(identity.Name);
                 query.Append(" FROM dual; END;");
 
-                yield return query.ToString();
+                yield return CatchException(query.ToString());
             }
         }
 

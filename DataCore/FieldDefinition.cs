@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 
 namespace DataCore
 {
@@ -12,5 +13,8 @@ namespace DataCore
         public bool IsIdentity { get; set; }
         public int IdentityStart { get; set; }
         public int IdentityIncrement { get; set; }
+        public bool IsReference { get; set; }
+        public string ReferenceName { get; set; }
+        public Type ReferenceTable { get; set; }
     }
 }
