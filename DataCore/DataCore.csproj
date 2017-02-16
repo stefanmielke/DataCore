@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\ColumnAttribute.cs" />
+    <Compile Include="Attributes\IdentityAttribute.cs" />
     <Compile Include="Attributes\IgnoreAttribute.cs" />
     <Compile Include="Attributes\TableAttribute.cs" />
     <Compile Include="ExpressionHelper.cs" />

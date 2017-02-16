@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -30,22 +31,48 @@ namespace DataCore.Database.Oracle
             return "NVL";
         }
 
-        public override string GetDropTableIfExistsQuery(string tableName)
+        public override IEnumerable<string> GetDropTableIfExistsQuery(string tableName)
         {
-            return CatchException(string.Concat("DROP TABLE ", tableName), -942);
+            yield return CatchException(string.Concat("DROP TABLE ", tableName), -942);
+
+            yield return CatchException(string.Concat("DROP SEQUENCE ", tableName, "_sequence"));
+            yield return CatchException(string.Concat("DROP TRIGGER ", tableName, "_on_insert"));
         }
 
-        public override string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
+        public override IEnumerable<string> GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
         {
+            var fieldList = fields.ToList();
+
             var query = new StringBuilder("CREATE TABLE ");
             query.Append(tableName)
                 .Append(" (");
 
-            query.Append(string.Join(",", fields.Select(GetStringForColumn)));
-
+            query.Append(string.Join(",", fieldList.Select(GetStringForColumn)));
             query.Append(")");
 
-            return CatchException(query.ToString(), -955);
+            yield return CatchException(query.ToString(), -955);
+
+            var identity = fieldList.FirstOrDefault(f => f.IsIdentity);
+            if (identity != null)
+            {
+                var sequenceName = tableName + "_sequence";
+                var triggerName = tableName + "_on_insert";
+
+                yield return string.Concat("CREATE SEQUENCE ", sequenceName);
+
+                query.Clear();
+                query.Append("CREATE OR REPLACE TRIGGER ");
+                query.Append(triggerName);
+                query.Append(" BEFORE INSERT ON ");
+                query.Append(tableName);
+                query.Append(" FOR EACH ROW BEGIN SELECT ");
+                query.Append(sequenceName);
+                query.Append(".nextval INTO :new.");
+                query.Append(identity.Name);
+                query.Append(" FROM dual; END;");
+
+                yield return query.ToString();
+            }
         }
 
         public override string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field)
@@ -177,6 +204,11 @@ namespace DataCore.Database.Oracle
         {
             return string.Concat("BEGIN EXECUTE IMMEDIATE '", sql, "' ; EXCEPTION WHEN OTHERS THEN IF SQLCODE != ",
                 exceptionCode, " THEN RAISE; END IF; END;");
+        }
+
+        private string CatchException(string sql)
+        {
+            return string.Concat("BEGIN EXECUTE IMMEDIATE '", sql, "' ; EXCEPTION WHEN OTHERS THEN NULL; END;");
         }
     }
 }

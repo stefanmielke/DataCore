@@ -31,7 +31,7 @@ namespace DataCore.Database
 
             var tableName = GetTableName(type);
 
-            var properties = GetPropertiesForType(type).ToList();
+            var properties = GetPropertiesForType(type).Where(p => !GetFieldForProperty(p).IsIdentity).ToList();
 
             var parameters = new Parameters();
 
@@ -163,16 +163,26 @@ namespace DataCore.Database
 
             var fields = GetPropertiesForType(type).Select(GetFieldForProperty);
 
-            var query = Translator.GetCreateTableIfNotExistsQuery(tableName, fields);
+            var queries = Translator.GetCreateTableIfNotExistsQuery(tableName, fields);
 
-            return Execute(query);
+            foreach (var query in queries)
+            {
+                Execute(query); 
+            }
+
+            return 0;
         }
 
         public int DropTableIfExists<T>()
         {
-            var query = Translator.GetDropTableIfExistsQuery(Translator.GetTableName(typeof(T)));
+            var queries = Translator.GetDropTableIfExistsQuery(Translator.GetTableName(typeof(T)));
 
-            return Execute(query);
+            foreach (var query in queries)
+            {
+                Execute(query);
+            }
+
+            return 0;
         }
 
         public int CreateColumnIfNotExists<T>(Expression<Func<T, dynamic>> clause)
@@ -379,6 +389,9 @@ namespace DataCore.Database
             var isPrimaryKey = false;
             var length = 255;
             var nullable = false;
+            var isIdentity = false;
+            var identityStart = 1;
+            var identityIncrement = 1;
 
             var columnAttributes = p.GetCustomAttributes(typeof(ColumnAttribute), true);
             if (columnAttributes.Length > 0)
@@ -390,13 +403,25 @@ namespace DataCore.Database
                 nullable = !columnAttribute.IsRequired && !isPrimaryKey;
             }
 
+            var identityAttributes = p.GetCustomAttributes(typeof(IdentityAttribute), true);
+            if (identityAttributes.Length > 0)
+            {
+                var identityAttribute = (IdentityAttribute)identityAttributes[0];
+                isIdentity = true;
+                identityStart = identityAttribute.Start;
+                identityIncrement = identityAttribute.Increment;
+            }
+
             return new FieldDefinition
             {
                 Name = columnName,
                 Nullable = nullable,
                 Size = length,
                 Type = Translator.GetTypeForProperty(p),
-                IsPrimaryKey = isPrimaryKey
+                IsPrimaryKey = isPrimaryKey,
+                IsIdentity = isIdentity,
+                IdentityStart = identityStart,
+                IdentityIncrement = identityIncrement
             };
         }
 

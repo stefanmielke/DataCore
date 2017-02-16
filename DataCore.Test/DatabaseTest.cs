@@ -1,5 +1,6 @@
 ﻿using DataCore.Test.Models;
 using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace DataCore.Test
@@ -53,6 +54,26 @@ namespace DataCore.Test
                 var query = database.From<TestIgnore>().Where(t => t.Ignored == "exception!");
 
                 Assert.Throws(Is.InstanceOf<Exception>(), () => database.Select(query));
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanCreateTableWithIdentity(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+                
+                database.Insert(TestHelper.GetNewTestClass(0));
+                database.Insert(TestHelper.GetNewTestClass(0));
+
+                var result = database.SelectById<TestClass>(1, 2);
+
+                Assert.AreEqual(2, result.Count());
 
                 connection.Close();
             }

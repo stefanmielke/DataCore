@@ -87,7 +87,7 @@ namespace DataCore
             return Convert.ToDateTime(date);
         }
 
-        public virtual string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
+        public virtual IEnumerable<string> GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
         {
             var query = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
             query.Append(tableName)
@@ -97,12 +97,12 @@ namespace DataCore
 
             query.Append(")");
 
-            return query.ToString();
+            yield return query.ToString();
         }
 
-        public virtual string GetDropTableIfExistsQuery(string tableName)
+        public virtual IEnumerable<string> GetDropTableIfExistsQuery(string tableName)
         {
-            return string.Concat("DROP TABLE IF EXISTS ", tableName);
+            yield return string.Concat("DROP TABLE IF EXISTS ", tableName);
         }
 
         protected virtual string GetFormatFor(FieldDefinition field)
@@ -126,7 +126,7 @@ namespace DataCore
                 case DbType.UInt16:
                 case DbType.UInt32:
                 case DbType.UInt64:
-                    return "{0} {1} {3}";
+                    return "{0} {1} {3} {4}";
                 case DbType.Currency:
                 case DbType.VarNumeric:
                     return "{0} {1} {3}";
@@ -174,7 +174,7 @@ namespace DataCore
                 case DbType.UInt16:
                 case DbType.UInt32:
                 case DbType.UInt64:
-                    return "INT";
+                    return "INTEGER";
                 case DbType.Currency:
                 case DbType.VarNumeric:
                     return "REAL";
@@ -301,8 +301,13 @@ namespace DataCore
 
         protected virtual string GetStringForColumn(FieldDefinition field)
         {
-            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size,
-                           field.Nullable ? "NULL" : "NOT NULL");
+            var nullable = field.Nullable ? "NULL" : "NOT NULL";
+            var primaryKey = field.IsPrimaryKey ? " PRIMARY KEY" : null;
+
+            var extra = primaryKey ?? nullable;
+
+            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, extra,
+                field.IsIdentity ? "AUTOINCREMENT" : "");
         }
 
         public virtual string GetLengthFunctionName()

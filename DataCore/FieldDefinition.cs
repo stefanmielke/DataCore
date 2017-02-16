@@ -9,5 +9,8 @@ namespace DataCore
         public int Size { get; set; }
         public bool Nullable { get; set; }
         public bool IsPrimaryKey { get; set; }
+        public bool IsIdentity { get; set; }
+        public int IdentityStart { get; set; }
+        public int IdentityIncrement { get; set; }
     }
 }

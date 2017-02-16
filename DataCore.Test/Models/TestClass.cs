@@ -5,7 +5,7 @@ namespace DataCore.Test.Models
 {
     public class TestClass
     {
-        [Column(isPrimaryKey: true)]
+        [Column(isPrimaryKey: true), Identity]
         public int Id { get; set; }
 
         public float FloatNumber { get; set; }

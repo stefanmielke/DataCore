@@ -17,7 +17,7 @@ namespace DataCore.Database.SqlServer
             query.SqlEnd = string.Concat("OFFSET ", (currentPage - 1) * recordsPerPage, " ROWS FETCH NEXT ", recordsPerPage, " ROWS ONLY");
         }
 
-        public override string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
+        public override IEnumerable<string> GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
         {
             var query = new StringBuilder("IF NOT EXISTS(SELECT * FROM sys.tables WHERE name = '").Append(tableName)
                 .Append("') CREATE TABLE ")
@@ -28,7 +28,7 @@ namespace DataCore.Database.SqlServer
 
             query.Append(")");
 
-            return query.ToString();
+            yield return query.ToString();
         }
 
         public override string GetCreateForeignKeyIfNotExistsQuery(string indexName, string tableNameFrom, string columnNameFrom,
@@ -72,10 +72,11 @@ namespace DataCore.Database.SqlServer
         {
             var nullable = field.Nullable ? "NULL" : "NOT NULL";
             var primaryKey = field.IsPrimaryKey ? " PRIMARY KEY" : "";
+            var identity = field.IsIdentity ? string.Concat("IDENTITY(", field.IdentityStart, ",", field.IdentityIncrement, ")") : "";
 
             var extra = string.Concat(nullable, primaryKey);
 
-            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, extra);
+            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, extra, identity);
         }
 
         public override string GetTextFor(DbType type)

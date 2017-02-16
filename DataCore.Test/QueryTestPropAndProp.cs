@@ -265,7 +265,7 @@ namespace DataCore.Test
 
             query.Select(t => t.Name.Cast<string, int>().As("Name"));
 
-            Assert.That(query.SqlColumns, Is.EqualTo("CAST(TestClass.Name AS INT) AS 'Name'"));
+            Assert.That(query.SqlColumns, Is.EqualTo("CAST(TestClass.Name AS INTEGER) AS 'Name'"));
         }
 
         [Test]
@@ -275,7 +275,7 @@ namespace DataCore.Test
 
             query.Where(t => t.Name.Cast<string, int>() == 10);
 
-            Assert.That(query.SqlWhere, Is.EqualTo("(CAST(TestClass.Name AS INT) = @p0)"));
+            Assert.That(query.SqlWhere, Is.EqualTo("(CAST(TestClass.Name AS INTEGER) = @p0)"));
             Assert.AreEqual(10, query.Parameters.GetValues()["@p0"]);
         }
 

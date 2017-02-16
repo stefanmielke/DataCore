@@ -30,8 +30,8 @@ namespace DataCore
         string GetTableName(Type type);
         string GetSelectTableName(Type type);
         string GetSelectTableName(string tableName);
-        string GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields);
-        string GetDropTableIfExistsQuery(string tableName);
+        IEnumerable<string> GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields);
+        IEnumerable<string> GetDropTableIfExistsQuery(string tableName);
         string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field);
         string GetDropColumnIfExistsQuery(string tableName, string memberName);
         string GetCreateIndexIfNotExistsQuery(string indexName, string tableName, string columns, bool unique);
