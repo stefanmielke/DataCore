@@ -16,5 +16,8 @@ namespace DataCore
         public bool IsReference { get; set; }
         public string ReferenceName { get; set; }
         public Type ReferenceTable { get; set; }
+        public bool HasIndex { get; set; }
+        public string IndexName { get; set; }
+        public bool IndexUnique { get; set; }
     }
 }

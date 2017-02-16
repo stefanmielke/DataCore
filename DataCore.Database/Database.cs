@@ -169,13 +169,18 @@ namespace DataCore.Database
                 Execute(query); 
             }
 
+            foreach (var field in fields.Where(f => f.HasIndex))
+            {
+                CreateIndexIfNotExists<T>(field.IndexUnique, field.IndexName, tableName, field.Name);
+            }
+
             if (createReferences)
             {
                 foreach (var field in fields.Where(f => f.IsReference))
                 {
                     var idColumnTo = GetIdFieldForType(field.ReferenceTable);
 
-                    GenerateForeignKey(field.ReferenceName, tableName, GetTableName(field.ReferenceTable), field.Name, idColumnTo.Name);
+                    CreateForeignKeyIfNotExists(field.ReferenceName, tableName, GetTableName(field.ReferenceTable), field.Name, idColumnTo.Name);
                 } 
             }
 
@@ -243,12 +248,8 @@ namespace DataCore.Database
             {
                 var tableName = GetTableName(typeof(T));
                 var columns = string.Join(", ", arguments.Select(f => ((MemberExpression)f).Member.Name));
-                if (string.IsNullOrEmpty(indexName))
-                    indexName = string.Concat("IX_", tableName, "_", columns.Replace(", ", "_"));
 
-                var query = Translator.GetCreateIndexIfNotExistsQuery(indexName, tableName, columns, unique);
-
-                return Execute(query);
+                return CreateIndexIfNotExists<T>(unique, indexName, tableName, columns);
             }
 
             return 0;
@@ -277,22 +278,10 @@ namespace DataCore.Database
                 var columnNameFrom = ((MemberExpression)argumentsFrom.First()).Member.Name;
                 var columnNameTo = ((MemberExpression)argumentsTo.First()).Member.Name;
 
-                return GenerateForeignKey(indexName, tableNameFrom, tableNameTo, columnNameFrom, columnNameTo);
+                return CreateForeignKeyIfNotExists(indexName, tableNameFrom, tableNameTo, columnNameFrom, columnNameTo);
             }
 
             return 0;
-        }
-
-        private int GenerateForeignKey(string indexName, string tableNameFrom, string tableNameTo, string columnNameFrom, string columnNameTo)
-        {
-            if (string.IsNullOrEmpty(indexName))
-                indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
-
-            indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
-
-            var query = Translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
-
-            return Execute(query);
         }
 
         public int DropForeignKeyIfExists<T>(string indexName)
@@ -403,12 +392,6 @@ namespace DataCore.Database
             var isPrimaryKey = false;
             var length = 255;
             var nullable = false;
-            var isIdentity = false;
-            var identityStart = 1;
-            var identityIncrement = 1;
-            var isReference = false;
-            string referenceName = null;
-            Type referenceTable = null;
 
             var columnAttributes = p.GetCustomAttributes(typeof(ColumnAttribute), true);
             if (columnAttributes.Length > 0)
@@ -420,38 +403,43 @@ namespace DataCore.Database
                 nullable = !columnAttribute.IsRequired && !isPrimaryKey;
             }
 
+            var field = new FieldDefinition
+            {
+                Name = columnName,
+                Nullable = nullable,
+                Size = length,
+                Type = Translator.GetTypeForProperty(p),
+                IsPrimaryKey = isPrimaryKey
+            };
+
             var identityAttributes = p.GetCustomAttributes(typeof(IdentityAttribute), true);
             if (identityAttributes.Length > 0)
             {
                 var identityAttribute = (IdentityAttribute)identityAttributes[0];
-                isIdentity = true;
-                identityStart = identityAttribute.Start;
-                identityIncrement = identityAttribute.Increment;
+                field.IsIdentity = true;
+                field.IdentityStart = identityAttribute.Start;
+                field.IdentityIncrement = identityAttribute.Increment;
             }
 
             var referenceAttributes = p.GetCustomAttributes(typeof(ReferenceAttribute), true);
             if (referenceAttributes.Length > 0)
             {
                 var referenceAttribute = (ReferenceAttribute)referenceAttributes[0];
-                isReference = true;
-                referenceName = referenceAttribute.FkName;
-                referenceTable = referenceAttribute.Table;
+                field.IsReference = true;
+                field.ReferenceName = referenceAttribute.FkName;
+                field.ReferenceTable = referenceAttribute.Table;
             }
 
-            return new FieldDefinition
+            var indexAttributes = p.GetCustomAttributes(typeof(IndexAttribute), true);
+            if (indexAttributes.Length > 0)
             {
-                Name = columnName,
-                Nullable = nullable,
-                Size = length,
-                Type = Translator.GetTypeForProperty(p),
-                IsPrimaryKey = isPrimaryKey,
-                IsIdentity = isIdentity,
-                IdentityStart = identityStart,
-                IdentityIncrement = identityIncrement,
-                IsReference = isReference,
-                ReferenceName = referenceName,
-                ReferenceTable = referenceTable
-            };
+                var indexAttribute = (IndexAttribute)indexAttributes[0];
+                field.HasIndex = true;
+                field.IndexName = indexAttribute.Name;
+                field.IndexUnique = indexAttribute.Unique;
+            }
+
+            return field;
         }
 
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
@@ -474,6 +462,28 @@ namespace DataCore.Database
         private FieldDefinition GetIdFieldForType(Type type)
         {
             return GetFieldForProperty(GetIdPropertyForType(type));
+        }
+
+        private int CreateForeignKeyIfNotExists(string indexName, string tableNameFrom, string tableNameTo, string columnNameFrom, string columnNameTo)
+        {
+            if (string.IsNullOrEmpty(indexName))
+                indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
+
+            indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
+
+            var query = Translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
+
+            return Execute(query);
+        }
+
+        private int CreateIndexIfNotExists<T>(bool unique, string indexName, string tableName, string columns)
+        {
+            if (string.IsNullOrEmpty(indexName))
+                indexName = string.Concat("IX_", tableName, "_", columns.Replace(", ", "_"));
+
+            var query = Translator.GetCreateIndexIfNotExistsQuery(indexName, tableName, columns, unique);
+
+            return Execute(query);
         }
     }
 }
