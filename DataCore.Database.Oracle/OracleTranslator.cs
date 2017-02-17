@@ -200,6 +200,16 @@ namespace DataCore.Database.Oracle
             return (bool)value ? 1 : 0;
         }
 
+        public override string GetLengthFunctionName()
+        {
+            return "LENGTH";
+        }
+
+        public override string GetAliasFormat()
+        {
+            return "\"{0}\"";
+        }
+
         private string CatchException(string sql, int exceptionCode)
         {
             return string.Concat("BEGIN EXECUTE IMMEDIATE '", sql, "' ; EXCEPTION WHEN OTHERS THEN IF SQLCODE != ",

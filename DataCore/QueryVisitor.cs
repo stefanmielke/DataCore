@@ -6,6 +6,13 @@ namespace DataCore
 {
     public class QueryVisitor : ExpressionVisitor
     {
+        public Parameters Parameters { get; }
+
+        public QueryVisitor(Parameters parameters)
+        {
+            Parameters = parameters;
+        }
+
         protected override Expression VisitMember(MemberExpression memberExpression)
         {
             var expression = Visit(memberExpression.Expression);
@@ -19,13 +26,6 @@ namespace DataCore
                 if (fieldInfo != null)
                 {
                     var value = fieldInfo.GetValue(container);
-                    return Expression.Constant(value);
-                }
-
-                var propertyInfo = member as PropertyInfo;
-                if (propertyInfo != null)
-                {
-                    var value = propertyInfo.GetValue(container, null);
                     return Expression.Constant(value);
                 }
             }
@@ -51,7 +51,7 @@ namespace DataCore
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             string constantValue;
-            if (ExpressionHelper.GetSqlExtensionMethodCallConstant(new Translator(), node, new Parameters(), out constantValue))
+            if (ExpressionHelper.GetSqlExtensionMethodCallConstant(new Translator(), node, Parameters, out constantValue))
                 return node;
 
             var obj = node.Object == null ? null : ((ConstantExpression)node.Object).Value;

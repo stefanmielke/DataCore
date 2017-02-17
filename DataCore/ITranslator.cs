@@ -42,5 +42,7 @@ namespace DataCore
         string GetOrderByDescendingFormat();
         string GetLengthFunctionName();
         string GetIsNullFunctionName();
+
+        string GetAliasFormat();
     }
 }

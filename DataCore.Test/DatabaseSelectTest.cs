@@ -163,5 +163,36 @@ namespace DataCore.Test
                 connection.Close();
             }
         }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanSelectWithSqlExtensions(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+
+                var query =
+                    database.From<TestClass>()
+                        .Where(t => t.Name.Upper().Length() > 10 && t.Name.Lower().Like("%abcd%") && t.FloatNumber.IsNull(0f) > 0)
+                        .GroupBy(t => t.Name)
+                        .Having(t => t.Id.Min() > 1 && t.Id.Max() < 10 && t.Id.Sum() < 100)
+                        .Select(t => new
+                        {
+                            Name = t.Name.TrimSql().As("Name"),
+                            MinId = t.Id.Min().As("MinId"),
+                            MaxId = t.Id.Max().As("MaxId"),
+                            Sum = t.Id.Sum().As("Sum"),
+                            NotNull1 = t.Name.IsNull("null").As("NotNullName"),
+                            Cast = t.Name.Cast<string, int>().As("Casted"),
+                            Avg = t.FloatNumber.Average().As("Avg")
+                        });
+
+                database.Select(query);
+
+                connection.Close();
+            }
+        }
     }
 }

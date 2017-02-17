@@ -66,7 +66,7 @@ namespace DataCore.Database
                 nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
             }
 
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
+            var newExpression = Expression.Lambda(new QueryVisitor(parameters).Visit(whereClause));
 
             var whereQuery = ExpressionHelper.GetQueryFromExpression(Translator, newExpression.Body, parameters);
 
@@ -94,7 +94,7 @@ namespace DataCore.Database
                 nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
             }
 
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
+            var newExpression = Expression.Lambda(new QueryVisitor(parameters).Visit(whereClause));
             var whereQuery = ExpressionHelper.GetQueryFromExpression(Translator, newExpression.Body, parameters);
 
             var query = Translator.GetUpdateQuery(tableName, nameValues, whereQuery, parameters);
@@ -110,7 +110,7 @@ namespace DataCore.Database
 
             var parameters = new Parameters();
 
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(whereClause));
+            var newExpression = Expression.Lambda(new QueryVisitor(parameters).Visit(whereClause));
             var whereQuery = ExpressionHelper.GetQueryFromExpression(Translator, newExpression.Body, parameters);
 
             var query = Translator.GetDeleteQuery(tableName, whereQuery, parameters);

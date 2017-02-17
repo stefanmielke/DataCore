@@ -18,8 +18,6 @@ namespace DataCore
     {
         private readonly ITranslator _translator;
 
-        public string TableName { get; private set; }
-
         public bool Built { get; private set; }
 
         public string SqlSelectFormat { get; set; }
@@ -49,7 +47,6 @@ namespace DataCore
             SqlGroupBy = "";
             SqlOrderBy = "";
             SqlEnd = "";
-            TableName = _translator.GetTableName(typeof(T));
             SqlFrom = _translator.GetSelectTableName(typeof(T));
 
             Parameters = new Parameters();
@@ -343,14 +340,14 @@ namespace DataCore
 
         private string GetQueryFromClause<T2, T3>(Expression<Func<T2, T3, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
+            var newExpression = Expression.Lambda(new QueryVisitor(new Parameters()).Visit(clause));
             var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
             return query;
         }
 
         private string GetQueryFromClause<T2>(Expression<Func<T2, bool>> clause)
         {
-            var newExpression = Expression.Lambda(new QueryVisitor().Visit(clause));
+            var newExpression = Expression.Lambda(new QueryVisitor(new Parameters()).Visit(clause));
             var query = ExpressionHelper.GetQueryFromExpression(_translator, newExpression.Body, Parameters);
             return query;
         }

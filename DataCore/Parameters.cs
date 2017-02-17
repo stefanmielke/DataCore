@@ -21,14 +21,6 @@ namespace DataCore
             return key;
         }
 
-        public void Add(Parameters parameters)
-        {
-            foreach (var parameter in parameters.GetValues())
-            {
-                _values.Add(parameter.Key, parameter.Value);
-            }
-        }
-
         public IDictionary<string, object> GetValues()
         {
             return _values;

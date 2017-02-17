@@ -162,19 +162,6 @@ namespace DataCore
                 case DbType.Double:
                 case DbType.Decimal:
                 case DbType.Single:
-                    return "REAL";
-                case DbType.Time:
-                    return "DATETIME";
-                case DbType.Binary:
-                case DbType.Byte:
-                case DbType.SByte:
-                case DbType.Int16:
-                case DbType.Int32:
-                case DbType.Int64:
-                case DbType.UInt16:
-                case DbType.UInt32:
-                case DbType.UInt64:
-                    return "INTEGER";
                 case DbType.Currency:
                 case DbType.VarNumeric:
                     return "REAL";
@@ -186,13 +173,14 @@ namespace DataCore
                 case DbType.Object:
                 case DbType.Xml:
                     return "VARCHAR";
+                case DbType.Time:
                 case DbType.Date:
                 case DbType.DateTime:
                 case DbType.DateTime2:
                 case DbType.DateTimeOffset:
                     return "DATETIME";
                 default:
-                    return "INT";
+                    return "INTEGER";
             }
         }
 
@@ -323,6 +311,11 @@ namespace DataCore
         public virtual string GetParameterTag()
         {
             return "@";
+        }
+
+        public virtual string GetAliasFormat()
+        {
+            return "'{0}'";
         }
     }
 }

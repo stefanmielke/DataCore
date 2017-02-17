@@ -60,6 +60,14 @@ namespace DataCore
             if (constantExpression != null)
                 return ConstantExpressionString(translator, constantExpression, parameters);
 
+            var methodCallExpression = expression as MethodCallExpression;
+            if (methodCallExpression != null)
+            {
+                string constantValue;
+                if (GetSqlExtensionMethodCallConstant(translator, methodCallExpression, parameters, out constantValue))
+                    return constantValue;
+            }
+
             return string.Empty;
         }
 
@@ -87,18 +95,6 @@ namespace DataCore
         public static string ConstantExpressionString(ITranslator translator, ConstantExpression constantExpression, Parameters parameters)
         {
             var value = GetValueFrom(translator, constantExpression.Type, constantExpression.Value);
-
-            if (value.GetType().Name == "StringAsIs")
-                return value.ToString();
-
-            if (value.GetType().Name == "StringAsIsWithParameter")
-            {
-                var stringWithParameter = (StringAsIsWithParameter)value;
-                parameters.Add(stringWithParameter.Parameter);
-
-                return stringWithParameter.Value;
-            }
-
             return parameters.Add(translator, value);
         }
 
@@ -168,10 +164,7 @@ namespace DataCore
                 }
                 else if (expr is MethodCallExpression)
                 {
-                    var parameters = new Parameters();
-                    string constantValue;
-                    if (GetSqlExtensionMethodCallConstant(translator, (MethodCallExpression)expr, parameters, out constantValue))
-                        yield return Expression.Constant(new StringAsIsWithParameter(constantValue, parameters));
+                    yield return expr;
                 }
             }
         }
@@ -269,8 +262,11 @@ namespace DataCore
 
             if (methodExpression.Method.Name == "As" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
-                concat = string.Concat(GetStringForExpression(translator, methodExpression.Arguments[0], parameters), " AS '",
-                    Convert.ToString(methodExpression.Arguments[1]).Replace("\"", ""), "'");
+                var aliasFormat = translator.GetAliasFormat();
+                var alias = string.Format(aliasFormat,
+                    Convert.ToString(methodExpression.Arguments[1]).Replace("\"", "").Replace("'", ""));
+
+                concat = string.Concat(GetStringForExpression(translator, methodExpression.Arguments[0], parameters), " AS ", alias);
                 return true;
             }
 
