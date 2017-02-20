@@ -3,6 +3,7 @@
     /// <summary>
     /// Class holding methods used in Expression (methods are not called)
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public static class SqlExtensions
     {
         public static T Min<T>(this T property)
