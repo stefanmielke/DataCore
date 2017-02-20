@@ -25,6 +25,7 @@ namespace DataCore.Database
         Query<T> From<T>();
         void Insert<T>(T obj);
         IEnumerable<T> Select<T>(Query<T> query);
+        IEnumerable<TOther> Select<TOther>(IQuery query);
         IEnumerable<T> Select<T>(Expression<Func<T, bool>> clause);
         T SelectSingle<T>(Query<T> query);
         T SelectSingle<T>(Expression<Func<T, bool>> clause);

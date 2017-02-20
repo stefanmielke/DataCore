@@ -301,6 +301,14 @@ namespace DataCore.Database
             return Execute<T>(query.SqlCommand.ToString(), query.Parameters);
         }
 
+        public IEnumerable<TOther> Select<TOther>(IQuery query)
+        {
+            if (!query.Built)
+                query.Build();
+
+            return Execute<TOther>(query.SqlCommand.ToString(), query.Parameters);
+        }
+
         public IEnumerable<T> Select<T>(Expression<Func<T, bool>> clause)
         {
             var query = From<T>().Where(clause).Build();

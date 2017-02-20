@@ -10,6 +10,7 @@ namespace DataCore
     {
         IQuery Build();
 
+        bool Built { get; }
         StringBuilder SqlCommand { get; }
         Parameters Parameters { get; }
     }

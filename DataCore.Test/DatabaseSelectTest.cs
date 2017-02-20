@@ -25,6 +25,31 @@ namespace DataCore.Test
         }
 
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanSelectOtherClass(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+                database.Insert(TestHelper.GetNewTestClass());
+
+                var query = database.From<TestClass>().Select(t => new { Min = t.Id.Min().As("MinId"), Max = t.Id.Max().As("MaxId") });
+
+                var results = database.Select<TestOther>(query).ToList();
+
+                Assert.That(results.Count, Is.GreaterThan(0));
+                foreach (var result in results)
+                {
+                    Assert.That(result.MinId, Is.GreaterThan(0));
+                    Assert.That(result.MaxId, Is.GreaterThan(0));
+                }
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanSelectSingle(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
