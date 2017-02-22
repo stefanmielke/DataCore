@@ -10,7 +10,7 @@ namespace DataCore.Attributes
         public int Length { get; private set; }
         public int Precision { get; private set; }
 
-        public ColumnAttribute(string columnName = null, bool isPrimaryKey = false, bool isRequired = true, int length = 255, int precision = 0)
+        public ColumnAttribute(string columnName = null, bool isPrimaryKey = false, bool isRequired = true, int length = 255, int precision = 3)
         {
             ColumnName = columnName;
             IsPrimaryKey = isPrimaryKey;

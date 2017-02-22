@@ -100,7 +100,7 @@ namespace DataCore.Database.Oracle
 
             var extra = string.Concat(nullable, primaryKey);
 
-            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, extra);
+            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, field.Precision, extra);
         }
 
         protected override string GetFormatFor(FieldDefinition field)
@@ -108,9 +108,9 @@ namespace DataCore.Database.Oracle
             switch (field.Type)
             {
                 case DbType.Boolean:
-                    return "{0} {1}(1) {3}";
+                    return "{0} {1}(1) {4}";
                 case DbType.Time:
-                    return "{0} {1} {3}";
+                    return "{0} {1} {4}";
                 case DbType.Double:
                 case DbType.Decimal:
                 case DbType.Single:
@@ -125,7 +125,7 @@ namespace DataCore.Database.Oracle
                 case DbType.UInt64:
                 case DbType.Currency:
                 case DbType.VarNumeric:
-                    return "{0} {1}(3) {3}";
+                    return "{0} {1}({3}) {4}";
                 case DbType.Guid:
                 case DbType.AnsiString:
                 case DbType.AnsiStringFixedLength:
@@ -133,14 +133,14 @@ namespace DataCore.Database.Oracle
                 case DbType.StringFixedLength:
                 case DbType.Object:
                 case DbType.Xml:
-                    return "{0} {1}({2}) {3}";
+                    return "{0} {1}({2}) {4}";
                 case DbType.Date:
                 case DbType.DateTime:
                 case DbType.DateTime2:
                 case DbType.DateTimeOffset:
-                    return "{0} {1} {3}";
+                    return "{0} {1} {4}";
                 default:
-                    return "{0} {1}(3) {3}";
+                    return "{0} {1}({3}) {4}";
             }
         }
 

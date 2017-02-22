@@ -76,7 +76,7 @@ namespace DataCore.Database.SqlServer
 
             var extra = string.Concat(nullable, primaryKey);
 
-            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, extra, identity);
+            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, field.Precision, extra, identity);
         }
 
         public override string GetTextFor(DbType type)

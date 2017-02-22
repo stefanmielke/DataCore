@@ -110,13 +110,13 @@ namespace DataCore
             switch (field.Type)
             {
                 case DbType.Boolean:
-                    return "{0} {1} {3}";
+                    return "{0} {1} {4}";
                 case DbType.Double:
                 case DbType.Decimal:
                 case DbType.Single:
-                    return "{0} {1} {3}";
+                    return "{0} {1} {4}";
                 case DbType.Time:
-                    return "{0} {1} {3}";
+                    return "{0} {1} {4}";
                 case DbType.Binary:
                 case DbType.Byte:
                 case DbType.SByte:
@@ -126,10 +126,10 @@ namespace DataCore
                 case DbType.UInt16:
                 case DbType.UInt32:
                 case DbType.UInt64:
-                    return "{0} {1} {3} {4}";
+                    return "{0} {1} {4} {5}";
                 case DbType.Currency:
                 case DbType.VarNumeric:
-                    return "{0} {1} {3}";
+                    return "{0} {1} {4}";
                 case DbType.Guid:
                 case DbType.AnsiString:
                 case DbType.AnsiStringFixedLength:
@@ -137,14 +137,14 @@ namespace DataCore
                 case DbType.StringFixedLength:
                 case DbType.Object:
                 case DbType.Xml:
-                    return "{0} {1}({2}) {3}";
+                    return "{0} {1}({2}) {4}";
                 case DbType.Date:
                 case DbType.DateTime:
                 case DbType.DateTime2:
                 case DbType.DateTimeOffset:
-                    return "{0} {1} {3}";
+                    return "{0} {1} {4}";
                 default:
-                    return "{0} {1} {3}";
+                    return "{0} {1} {4}";
             }
         }
 
@@ -294,7 +294,7 @@ namespace DataCore
 
             var extra = primaryKey ?? nullable;
 
-            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, extra,
+            return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, field.Precision, extra,
                 field.IsIdentity ? "AUTOINCREMENT" : "");
         }
 

@@ -8,6 +8,7 @@ namespace DataCore
         public string Name { get; set; }
         public DbType Type { get; set; }
         public int Size { get; set; }
+        public int Precision { get; set; }
         public bool Nullable { get; set; }
         public bool IsPrimaryKey { get; set; }
         public bool IsIdentity { get; set; }

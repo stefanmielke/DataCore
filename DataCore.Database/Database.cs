@@ -400,6 +400,7 @@ namespace DataCore.Database
             var isPrimaryKey = false;
             var length = 255;
             var nullable = false;
+            var precision = 3;
 
             var columnAttributes = p.GetCustomAttributes(typeof(ColumnAttribute), true);
             if (columnAttributes.Length > 0)
@@ -409,6 +410,7 @@ namespace DataCore.Database
                 isPrimaryKey = columnAttribute.IsPrimaryKey;
                 length = columnAttribute.Length;
                 nullable = !columnAttribute.IsRequired && !isPrimaryKey;
+                precision = columnAttribute.Precision;
             }
 
             var field = new FieldDefinition
@@ -416,6 +418,7 @@ namespace DataCore.Database
                 Name = columnName,
                 Nullable = nullable,
                 Size = length,
+                Precision = precision,
                 Type = Translator.GetTypeForProperty(p),
                 IsPrimaryKey = isPrimaryKey
             };
