@@ -100,6 +100,9 @@ namespace DataCore
 
         public static object GetValueFrom(ITranslator translator, Type type, object value)
         {
+            if (value == null)
+                return null;
+
             switch (type.Name)
             {
                 case "Boolean":
@@ -108,10 +111,6 @@ namespace DataCore
                     return translator.GetStringValue(value);
                 case "DateTime":
                     return translator.GetDateTimeValue(value);
-                case "StringAsIs":
-                    return value;
-                case "StringAsIsWithParameter":
-                    return value;
                 default:
                     return Convert.ToInt32(value);
             }

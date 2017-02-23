@@ -289,5 +289,26 @@ namespace DataCore.Test
                 connection.Close();
             }
         }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanCreateTableWithNullProperty(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestNullableProperty>();
+
+                database.Insert(new TestNullableProperty { Id = 1 });
+
+                var result = database.SelectById<TestNullableProperty>(1);
+
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Id, Is.EqualTo(1));
+                Assert.That(result.IdMaybe, Is.Null);
+
+                connection.Close();
+            }
+        }
     }
 }

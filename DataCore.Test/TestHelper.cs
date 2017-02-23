@@ -54,6 +54,7 @@ namespace DataCore.Test
             database.DropTableIfExists<TestClassRef1>();
             database.DropTableIfExists<TestClassNoReference>();
             database.DropTableIfExists<TestClassOnlyIdentity>();
+            database.DropTableIfExists<TestNullableProperty>();
             
             return connection;
         }

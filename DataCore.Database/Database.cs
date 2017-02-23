@@ -403,7 +403,7 @@ namespace DataCore.Database
             var columnName = p.Name;
             var isPrimaryKey = false;
             var length = 255;
-            var nullable = false;
+            var nullable = p.PropertyType.IsGenericType && p.PropertyType.Name.StartsWith("Nullable");
             var precision = 3;
 
             var columnAttributes = p.GetCustomAttributes(typeof(ColumnAttribute), true);

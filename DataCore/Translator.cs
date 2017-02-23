@@ -194,11 +194,14 @@ namespace DataCore
 
         public DbType GetTypeForProperty(Type type)
         {
+            if (type.Name.StartsWith("Nullable"))
+                type = type.GetGenericArguments()[0];
+
             switch (type.Name)
             {
                 case "String":
                     return DbType.String;
-                case "Int":
+                case "Int32":
                     return DbType.Int32;
                 case "Boolean":
                     return DbType.Boolean;
