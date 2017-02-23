@@ -144,7 +144,7 @@ namespace DataCore.Database.Oracle
             }
         }
 
-        public override string GetTextFor(DbType type)
+        protected override string GetTextFor(DbType type)
         {
             switch (type)
             {
@@ -190,7 +190,7 @@ namespace DataCore.Database.Oracle
             return ":";
         }
 
-        public override string GetSelectTableName(string tableName)
+        protected override string GetSelectTableName(string tableName)
         {
             return tableName;
         }

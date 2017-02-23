@@ -73,7 +73,14 @@ namespace DataCore
 
         public static string MemberExpressionString(ITranslator translator, MemberExpression memberExpression, Parameters parameters)
         {
-            return string.Concat(translator.GetTableName(memberExpression.Member.DeclaringType), ".", translator.GetPropertyName(memberExpression.Member as PropertyInfo));
+            var tableDefinition = new TableDefinition(memberExpression.Member.DeclaringType);
+
+            var member = (PropertyInfo)memberExpression.Member;
+            var field = tableDefinition.Fields.FirstOrDefault(f => f.PropertyInfo.Name == member.Name);
+            if (field == null)
+                return string.Concat(tableDefinition.Name, ".", member.Name);
+
+            return string.Concat(tableDefinition.Name, ".", field);
         }
 
         public static string BinaryExpressionString(ITranslator translator, IEnumerator<Expression> iterator, BinaryExpression binaryExpression, Parameters parameters)
@@ -213,7 +220,9 @@ namespace DataCore
                     }
                 }
 
-                return string.Concat(translator.GetTableName(memberExpression.Member.DeclaringType), ".", memberExpression.Member.Name);
+                var tableDefinition = new TableDefinition(memberExpression.Member.DeclaringType);
+
+                return string.Concat(tableDefinition.Name, ".", memberExpression.Member.Name);
             }
 
             var constExpr = expression as ConstantExpression;
@@ -336,9 +345,11 @@ namespace DataCore
 
             if (methodExpression.Method.Name == "Cast" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
+                var returnDbType = TableDefinition.GetTypeForProperty(methodExpression.Method.ReturnType);
+
                 concat = string.Concat("CAST(",
                     GetStringForExpression(translator, methodExpression.Arguments[0], parameters), " AS ",
-                    translator.GetTextFor(methodExpression.Method.ReturnType), ")");
+                    translator.GetTextFor(new FieldDefinition { Type = returnDbType }), ")");
 
                 return true;
             }
@@ -359,7 +370,7 @@ namespace DataCore
             var arguments = GetExpressionsFromDynamic(clause);
             if (arguments != null && arguments.Length > 0)
             {
-                return arguments.Select(f => ((MemberExpression) f).Member.Name);
+                return arguments.Select(f => ((MemberExpression)f).Member.Name);
             }
 
             return new string[0];

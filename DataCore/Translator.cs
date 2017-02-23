@@ -151,12 +151,12 @@ namespace DataCore
             }
         }
 
-        public string GetTextFor(Type type)
+        public string GetTextFor(FieldDefinition field)
         {
-            return GetTextFor(GetTypeForProperty(type));
+            return GetTextFor(field.Type);
         }
 
-        public virtual string GetTextFor(DbType type)
+        protected virtual string GetTextFor(DbType type)
         {
             switch (type)
             {
@@ -187,71 +187,17 @@ namespace DataCore
             }
         }
 
-        public DbType GetTypeForProperty(PropertyInfo propertyInfo)
-        {
-            return GetTypeForProperty(propertyInfo.PropertyType);
-        }
-
-        public DbType GetTypeForProperty(Type type)
-        {
-            if (type.Name.StartsWith("Nullable"))
-                type = type.GetGenericArguments()[0];
-
-            switch (type.Name)
-            {
-                case "String":
-                    return DbType.String;
-                case "Int32":
-                    return DbType.Int32;
-                case "Boolean":
-                    return DbType.Boolean;
-                case "Float":
-                    return DbType.Single;
-                case "Decimal":
-                    return DbType.Decimal;
-                case "DateTime":
-                    return DbType.DateTime;
-                default:
-                    return DbType.Int32;
-            }
-        }
-
         public virtual string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field)
         {
             return string.Concat("ALTER TABLE ", tableName, " ADD COLUMN ", GetStringForColumn(field));
         }
 
-        public string GetPropertyName(PropertyInfo type)
+        public string GetSelectTableName(TableDefinition table)
         {
-            var columnAttributes = type.GetCustomAttributes(typeof(ColumnAttribute), true);
-            if (columnAttributes.Length > 0)
-            {
-                var columnAttribute = (ColumnAttribute)columnAttributes[0];
-                if (!string.IsNullOrEmpty(columnAttribute.ColumnName))
-                    return columnAttribute.ColumnName;
-            }
-
-            return type.Name;
+            return GetSelectTableName(table.Name);
         }
 
-        public string GetTableName(Type type)
-        {
-            var tableAttributes = type.GetCustomAttributes(typeof(TableAttribute), true);
-            if (tableAttributes.Length > 0)
-            {
-                var tableAttribute = (TableAttribute)tableAttributes[0];
-                return tableAttribute.TableName;
-            }
-
-            return type.Name;
-        }
-
-        public string GetSelectTableName(Type type)
-        {
-            return GetSelectTableName(GetTableName(type));
-        }
-
-        public virtual string GetSelectTableName(string tableName)
+        protected virtual string GetSelectTableName(string tableName)
         {
             return string.Concat(tableName, " WITH(NOLOCK)");
         }

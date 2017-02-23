@@ -23,5 +23,10 @@ namespace DataCore
         public bool IndexUnique { get; set; }
 
         public PropertyInfo PropertyInfo { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

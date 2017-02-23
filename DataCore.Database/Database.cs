@@ -54,16 +54,16 @@ namespace DataCore.Database
         {
             var type = typeof(T);
 
-            var tableName = GetTableName(type);
+            var tableDefinition = GetTableDefinition(type);
 
-            var properties = GetPropertiesForType(type).Where(p => !GetFieldForProperty(p).IsIdentity);
+            var properties = tableDefinition.Fields.Where(p => !p.IsIdentity).ToList();
 
             var nameValues = new List<KeyValuePair<string, string>>();
 
             var parameters = new Parameters();
             foreach (var prop in properties)
             {
-                var key = parameters.Add(Translator, ExpressionHelper.GetValueFrom(Translator, prop.PropertyType, prop.GetValue(obj, null)));
+                var key = parameters.Add(Translator, ExpressionHelper.GetValueFrom(Translator, prop.PropertyInfo.PropertyType, prop.PropertyInfo.GetValue(obj, null)));
                 nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
             }
 
@@ -71,7 +71,7 @@ namespace DataCore.Database
 
             var whereQuery = ExpressionHelper.GetQueryFromExpression(Translator, newExpression.Body, parameters);
 
-            var query = Translator.GetUpdateQuery(tableName, nameValues, whereQuery, parameters);
+            var query = Translator.GetUpdateQuery(tableDefinition.Name, nameValues, whereQuery, parameters);
 
             Execute(query, parameters);
         }
@@ -80,9 +80,9 @@ namespace DataCore.Database
         {
             var type = typeof(T);
 
-            var tableName = GetTableName(type);
+            var tableDefinition = GetTableDefinition(type);
 
-            var properties = GetPropertiesForType(type);
+            var properties = tableDefinition.Fields;
 
             var fields = ExpressionHelper.GetStringsFromArguments(onlyFields);
 
@@ -91,14 +91,14 @@ namespace DataCore.Database
             var parameters = new Parameters();
             foreach (var prop in properties.Where(p => fields.Contains(p.Name)))
             {
-                var key = parameters.Add(Translator, ExpressionHelper.GetValueFrom(Translator, prop.PropertyType, prop.GetValue(obj, null)));
+                var key = parameters.Add(Translator, ExpressionHelper.GetValueFrom(Translator, prop.PropertyInfo.PropertyType, prop.PropertyInfo.GetValue(obj, null)));
                 nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
             }
 
             var newExpression = Expression.Lambda(new QueryVisitor(parameters).Visit(whereClause));
             var whereQuery = ExpressionHelper.GetQueryFromExpression(Translator, newExpression.Body, parameters);
 
-            var query = Translator.GetUpdateQuery(tableName, nameValues, whereQuery, parameters);
+            var query = Translator.GetUpdateQuery(tableDefinition.Name, nameValues, whereQuery, parameters);
 
             Execute(query, parameters);
         }
@@ -107,14 +107,14 @@ namespace DataCore.Database
         {
             var type = typeof(T);
 
-            var tableName = GetTableName(type);
+            var tableDefinition = GetTableDefinition(type);
 
             var parameters = new Parameters();
 
             var newExpression = Expression.Lambda(new QueryVisitor(parameters).Visit(whereClause));
             var whereQuery = ExpressionHelper.GetQueryFromExpression(Translator, newExpression.Body, parameters);
 
-            var query = Translator.GetDeleteQuery(tableName, whereQuery, parameters);
+            var query = Translator.GetDeleteQuery(tableDefinition.Name, whereQuery, parameters);
 
             Execute(query, parameters);
         }
@@ -122,16 +122,15 @@ namespace DataCore.Database
         public void DeleteById<T>(object id)
         {
             var type = typeof(T);
-            var tableName = GetTableName(type);
 
-            var idProperty = GetIdPropertyForType(typeof(T));
+            var tableDefinition = GetTableDefinition(type);
 
             var parameters = new Parameters();
             var paramName = parameters.Add(Translator, id);
 
-            var whereQuery = string.Concat(idProperty.Name, " = ", paramName);
+            var whereQuery = string.Concat(tableDefinition.IdField.Name, " = ", paramName);
 
-            var query = Translator.GetDeleteQuery(tableName, whereQuery, parameters);
+            var query = Translator.GetDeleteQuery(tableDefinition.Name, whereQuery, parameters);
 
             Execute(query, parameters);
         }
@@ -139,9 +138,8 @@ namespace DataCore.Database
         public void DeleteById<T>(params object[] ids)
         {
             var type = typeof(T);
-            var tableName = GetTableName(type);
 
-            var idProperty = GetIdPropertyForType(typeof(T));
+            var tableDefinition = GetTableDefinition(type);
 
             var parameters = new Parameters();
             foreach (var id in ids)
@@ -150,9 +148,9 @@ namespace DataCore.Database
             }
             var inParams = string.Join(",", parameters.GetValues().Select(kv => kv.Key));
 
-            var whereQuery = string.Concat(idProperty.Name, " IN (", inParams, ")");
+            var whereQuery = string.Concat(tableDefinition.IdField.Name, " IN (", inParams, ")");
 
-            var query = Translator.GetDeleteQuery(tableName, whereQuery, parameters);
+            var query = Translator.GetDeleteQuery(tableDefinition.Name, whereQuery, parameters);
 
             Execute(query, parameters);
         }
@@ -160,11 +158,12 @@ namespace DataCore.Database
         public int CreateTableIfNotExists<T>(bool createReferences = false)
         {
             var type = typeof(T);
-            var tableName = GetTableName(type);
 
-            var fields = GetPropertiesForType(type).Select(GetFieldForProperty).ToList();
+            var tableDefinition = GetTableDefinition(type);
 
-            var queries = Translator.GetCreateTableIfNotExistsQuery(tableName, fields);
+            var fields = tableDefinition.Fields;
+
+            var queries = Translator.GetCreateTableIfNotExistsQuery(tableDefinition.Name, fields);
             foreach (var query in queries)
             {
                 Execute(query); 
@@ -172,16 +171,17 @@ namespace DataCore.Database
 
             foreach (var field in fields.Where(f => f.HasIndex))
             {
-                CreateIndexIfNotExists<T>(field.IndexUnique, field.IndexName, tableName, field.Name);
+                CreateIndexIfNotExists<T>(field.IndexUnique, field.IndexName, tableDefinition.Name, field.Name);
             }
 
             if (createReferences)
             {
                 foreach (var field in fields.Where(f => f.IsReference))
                 {
-                    var idColumnTo = GetIdFieldForType(field.ReferenceTable);
+                    var referencedTable = GetTableDefinition(type);
+                    var idColumnTo = referencedTable.IdField;
 
-                    CreateForeignKeyIfNotExists(field.ReferenceName, tableName, GetTableName(field.ReferenceTable), field.Name, idColumnTo.Name);
+                    CreateForeignKeyIfNotExists(field.ReferenceName, tableDefinition.Name, referencedTable.Name, field.Name, idColumnTo.Name);
                 } 
             }
 
@@ -190,7 +190,9 @@ namespace DataCore.Database
 
         public int DropTableIfExists<T>()
         {
-            var queries = Translator.GetDropTableIfExistsQuery(Translator.GetTableName(typeof(T)));
+            var tableDefinition = GetTableDefinition(typeof(T));
+
+            var queries = Translator.GetDropTableIfExistsQuery(tableDefinition.Name);
 
             foreach (var query in queries)
             {
@@ -205,13 +207,13 @@ namespace DataCore.Database
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
             if (arguments != null && arguments.Length > 0)
             {
-                var tableName = GetTableName(typeof(T));
+                var tableDefinition = GetTableDefinition(typeof(T));
 
                 var query = string.Join(";",
                     arguments.Select(
                         f =>
                             Translator.GetCreateColumnIfNotExistsQuery(
-                                tableName, GetFieldForProperty(((MemberExpression)f).Member as PropertyInfo)
+                                tableDefinition.Name, tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)
                             )
                     )
                 );
@@ -227,12 +229,14 @@ namespace DataCore.Database
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
             if (arguments != null && arguments.Length > 0)
             {
-                var tableName = GetTableName(typeof(T));
+                var tableDefinition = GetTableDefinition(typeof(T));
 
                 var query = string.Join(";",
                     arguments.Select(
                         f =>
-                            Translator.GetDropColumnIfExistsQuery(tableName, ((MemberExpression)f).Member.Name)
+                            Translator.GetDropColumnIfExistsQuery(tableDefinition.Name,
+                                tableDefinition.Fields.First(
+                                        fld => fld.PropertyInfo.Name == ((PropertyInfo) ((MemberExpression) f).Member).Name).Name)
                     )
                 );
 
@@ -247,10 +251,11 @@ namespace DataCore.Database
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
             if (arguments != null && arguments.Length > 0)
             {
-                var tableName = GetTableName(typeof(T));
-                var columns = string.Join(", ", arguments.Select(f => ((MemberExpression)f).Member.Name));
+                var tableDefinition = GetTableDefinition(typeof(T));
 
-                return CreateIndexIfNotExists<T>(unique, indexName, tableName, columns);
+                var columns = string.Join(", ", arguments.Select(f => tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)));
+
+                return CreateIndexIfNotExists<T>(unique, indexName, tableDefinition.Name, columns);
             }
 
             return 0;
@@ -258,9 +263,9 @@ namespace DataCore.Database
 
         public int DropIndexIfExists<T>(string indexName)
         {
-            var tableName = GetTableName(typeof(T));
+            var tableDefinition = GetTableDefinition(typeof(T));
 
-            var query = Translator.GetDropIndexIfExistsQuery(tableName, indexName);
+            var query = Translator.GetDropIndexIfExistsQuery(tableDefinition.Name, indexName);
 
             return Execute(query);
         }
@@ -273,13 +278,18 @@ namespace DataCore.Database
             if (argumentsFrom != null && argumentsFrom.Length > 0
                && argumentsTo != null && argumentsTo.Length > 0)
             {
-                var tableNameFrom = GetTableName(typeof(TFrom));
-                var tableNameTo = GetTableName(typeof(TTo));
+                var tableFrom = GetTableDefinition(typeof(TFrom));
+                var tableTo = GetTableDefinition(typeof(TTo));
 
-                var columnNameFrom = ((MemberExpression)argumentsFrom.First()).Member.Name;
-                var columnNameTo = ((MemberExpression)argumentsTo.First()).Member.Name;
+                var columnNameFrom = tableFrom.Fields.First(
+                    fld =>
+                        fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)argumentsFrom.First()).Member).Name).Name;
 
-                return CreateForeignKeyIfNotExists(indexName, tableNameFrom, tableNameTo, columnNameFrom, columnNameTo);
+                var columnNameTo = tableTo.Fields.First(
+                    fld =>
+                        fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)argumentsTo.First()).Member).Name).Name;
+
+                return CreateForeignKeyIfNotExists(indexName, tableFrom.Name, tableTo.Name, columnNameFrom, columnNameTo);
             }
 
             return 0;
@@ -287,9 +297,9 @@ namespace DataCore.Database
 
         public int DropForeignKeyIfExists<T>(string indexName)
         {
-            var tableName = GetTableName(typeof(T));
+            var tableDefinition = GetTableDefinition(typeof(T));
 
-            var query = Translator.GetDropForeignKeyIfExistsQuery(tableName, indexName);
+            var query = Translator.GetDropForeignKeyIfExistsQuery(tableDefinition.Name, indexName);
 
             return Execute(query);
         }
@@ -334,7 +344,8 @@ namespace DataCore.Database
 
         public T SelectById<T>(object id)
         {
-            var idProperty = GetIdPropertyForType(typeof(T));
+            var tableDefinition = GetTableDefinition(typeof(T));
+            var idProperty = tableDefinition.IdField;
 
             var parameters = new Parameters();
             var paramName = parameters.Add(Translator, id);
@@ -346,7 +357,8 @@ namespace DataCore.Database
 
         public IEnumerable<T> SelectById<T>(params object[] ids)
         {
-            var idProperty = GetIdPropertyForType(typeof(T));
+            var tableDefinition = GetTableDefinition(typeof(T));
+            var idProperty = tableDefinition.IdField;
 
             var parameters = new Parameters();
             foreach (var id in ids)
@@ -390,101 +402,6 @@ namespace DataCore.Database
             return _connection.Execute(query, parameters.GetValues());
         }
 
-        private string GetTableName(Type type)
-        {
-            return Translator.GetTableName(type);
-        }
-
-        private FieldDefinition GetFieldForProperty(PropertyInfo p)
-        {
-            if (p == null)
-                return null;
-
-            var columnName = p.Name;
-            var isPrimaryKey = false;
-            var length = 255;
-            var nullable = p.PropertyType.IsGenericType && p.PropertyType.Name.StartsWith("Nullable");
-            var precision = 3;
-
-            var columnAttributes = p.GetCustomAttributes(typeof(ColumnAttribute), true);
-            if (columnAttributes.Length > 0)
-            {
-                var columnAttribute = (ColumnAttribute)columnAttributes[0];
-                columnName = columnAttribute.ColumnName ?? columnName;
-                isPrimaryKey = columnAttribute.IsPrimaryKey;
-                length = columnAttribute.Length;
-                nullable = !columnAttribute.IsRequired && !isPrimaryKey;
-                precision = columnAttribute.Precision;
-            }
-
-            var field = new FieldDefinition
-            {
-                Name = columnName,
-                Nullable = nullable,
-                Size = length,
-                Precision = precision,
-                Type = Translator.GetTypeForProperty(p),
-                IsPrimaryKey = isPrimaryKey,
-                PropertyInfo = p
-            };
-
-            var identityAttributes = p.GetCustomAttributes(typeof(IdentityAttribute), true);
-            if (identityAttributes.Length > 0)
-            {
-                var identityAttribute = (IdentityAttribute)identityAttributes[0];
-                field.IsIdentity = true;
-                field.IdentityStart = identityAttribute.Start;
-                field.IdentityIncrement = identityAttribute.Increment;
-            }
-
-            var referenceAttributes = p.GetCustomAttributes(typeof(ReferenceAttribute), true);
-            if (referenceAttributes.Length > 0)
-            {
-                var referenceAttribute = (ReferenceAttribute)referenceAttributes[0];
-                field.IsReference = true;
-                field.ReferenceName = referenceAttribute.FkName;
-                field.ReferenceTable = referenceAttribute.Table;
-            }
-
-            var indexAttributes = p.GetCustomAttributes(typeof(IndexAttribute), true);
-            if (indexAttributes.Length > 0)
-            {
-                var indexAttribute = (IndexAttribute)indexAttributes[0];
-                field.HasIndex = true;
-                field.IndexName = indexAttribute.Name;
-                field.IndexUnique = indexAttribute.Unique;
-            }
-
-            return field;
-        }
-
-        private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
-        {
-            return type.GetProperties().Where(p => CanUseType(p.PropertyType) && p.GetCustomAttributes(typeof(IgnoreAttribute), true).Length == 0);
-        }
-
-        private bool CanUseType(Type propertyType)
-        {
-            return !propertyType.IsClass || propertyType == typeof(string);
-        }
-
-        private PropertyInfo GetIdPropertyForType(Type type)
-        {
-            return type.GetProperties()
-                .FirstOrDefault(p =>
-                    {
-                        var columnAttributes = p.GetCustomAttributes(typeof(ColumnAttribute), true);
-
-                        return columnAttributes.Length > 0 && ((ColumnAttribute)columnAttributes[0]).IsPrimaryKey;
-                    }
-                );
-        }
-
-        private FieldDefinition GetIdFieldForType(Type type)
-        {
-            return GetFieldForProperty(GetIdPropertyForType(type));
-        }
-
         private int CreateForeignKeyIfNotExists(string indexName, string tableNameFrom, string tableNameTo, string columnNameFrom, string columnNameTo)
         {
             if (string.IsNullOrEmpty(indexName))
@@ -509,12 +426,7 @@ namespace DataCore.Database
 
         private TableDefinition GetTableDefinition(Type type)
         {
-            return new TableDefinition
-            {
-                Name = GetTableName(type),
-                IdField = GetIdFieldForType(type),
-                Fields = GetPropertiesForType(type).Select(GetFieldForProperty).ToList()
-            };
+            return new TableDefinition(type);
         }
     }
 }

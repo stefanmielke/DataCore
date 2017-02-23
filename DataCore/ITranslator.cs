@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace DataCore
 {
@@ -18,18 +15,13 @@ namespace DataCore
 
         string GetParameterTag();
         string GetFormatFor(ExpressionType type);
-        string GetTextFor(Type type);
-        DbType GetTypeForProperty(Type type);
-        DbType GetTypeForProperty(PropertyInfo propertyInfo);
+        string GetTextFor(FieldDefinition field);
 
         object GetBooleanValue(object constantExpressionValue);
         object GetStringValue(object value);
         object GetDateTimeValue(object date);
-
-        string GetPropertyName(PropertyInfo type);
-        string GetTableName(Type type);
-        string GetSelectTableName(Type type);
-        string GetSelectTableName(string tableName);
+        
+        string GetSelectTableName(TableDefinition table);
         IEnumerable<string> GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields);
         IEnumerable<string> GetDropTableIfExistsQuery(string tableName);
         string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field);

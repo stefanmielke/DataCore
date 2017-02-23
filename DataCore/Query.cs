@@ -18,6 +18,7 @@ namespace DataCore
     public class Query<T> : IQuery
     {
         private readonly ITranslator _translator;
+        private TableDefinition _tableDefinition;
 
         public bool Built { get; private set; }
 
@@ -39,8 +40,10 @@ namespace DataCore
         public Query(ITranslator translator)
         {
             Built = false;
-
+            
             _translator = translator;
+            _tableDefinition = new TableDefinition(typeof(T));
+
             SqlSelectFormat = "{0}";
             SqlWhere = string.Empty;
             SqlCommand = new StringBuilder();
@@ -48,7 +51,7 @@ namespace DataCore
             SqlGroupBy = "";
             SqlOrderBy = "";
             SqlEnd = "";
-            SqlFrom = _translator.GetSelectTableName(typeof(T));
+            SqlFrom = _translator.GetSelectTableName(_tableDefinition);
 
             Parameters = new Parameters();
 
@@ -232,7 +235,9 @@ namespace DataCore
         {
             var query = GetQueryFromClause(clause);
 
-            var joinedTableName = _translator.GetSelectTableName(typeof(TJoined));
+            var tableDefinition = new TableDefinition(typeof(TJoined));
+
+            var joinedTableName = _translator.GetSelectTableName(tableDefinition);
             SqlFrom = string.Concat(SqlFrom, " INNER JOIN ", joinedTableName, " ON ", query);
 
             return this;
@@ -242,7 +247,9 @@ namespace DataCore
         {
             var query = GetQueryFromClause(clause);
 
-            var joinedTableName = _translator.GetSelectTableName(typeof(TJoinedRight));
+            var tableDefinition = new TableDefinition(typeof(TJoinedRight));
+
+            var joinedTableName = _translator.GetSelectTableName(tableDefinition);
             SqlFrom = string.Concat(SqlFrom, " INNER JOIN ", joinedTableName, " ON ", query);
 
             return this;
@@ -252,7 +259,9 @@ namespace DataCore
         {
             var query = GetQueryFromClause(clause);
 
-            var joinedTableName = _translator.GetSelectTableName(typeof(TJoined));
+            var tableDefinition = new TableDefinition(typeof(TJoined));
+
+            var joinedTableName = _translator.GetSelectTableName(tableDefinition);
             SqlFrom = string.Concat(SqlFrom, " LEFT JOIN ", joinedTableName, " ON ", query);
 
             return this;
@@ -262,7 +271,9 @@ namespace DataCore
         {
             var query = GetQueryFromClause(clause);
 
-            var joinedTableName = _translator.GetSelectTableName(typeof(TJoinedRight));
+            var tableDefinition = new TableDefinition(typeof(TJoinedRight));
+
+            var joinedTableName = _translator.GetSelectTableName(tableDefinition);
             SqlFrom = string.Concat(SqlFrom, " LEFT JOIN ", joinedTableName, " ON ", query);
 
             return this;
@@ -272,7 +283,9 @@ namespace DataCore
         {
             var query = GetQueryFromClause(clause);
 
-            var joinedTableName = _translator.GetSelectTableName(typeof(TJoined));
+            var tableDefinition = new TableDefinition(typeof(TJoined));
+
+            var joinedTableName = _translator.GetSelectTableName(tableDefinition);
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
 
             return this;
@@ -282,7 +295,9 @@ namespace DataCore
         {
             var query = GetQueryFromClause(clause);
 
-            var joinedTableName = _translator.GetSelectTableName(typeof(TJoinedRight));
+            var tableDefinition = new TableDefinition(typeof(TJoinedRight));
+
+            var joinedTableName = _translator.GetSelectTableName(tableDefinition);
             SqlFrom = string.Concat(SqlFrom, " RIGHT JOIN ", joinedTableName, " ON ", query);
 
             return this;

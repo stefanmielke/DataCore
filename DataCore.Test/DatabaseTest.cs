@@ -154,8 +154,10 @@ namespace DataCore.Test
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
                 var translator = database.Translator;
 
-                var textInt = translator.GetTextFor(typeof(int));
-                var textString = translator.GetTextFor(typeof(string));
+                var tableDefinition = new TableDefinition(typeof(TestClass4));
+
+                var textInt = translator.GetTextFor(tableDefinition.Fields.First(f => f.Name == "Id"));
+                var textString = translator.GetTextFor(tableDefinition.Fields.First(f => f.Name == "Name"));
 
                 database.Execute("CREATE TABLE TestClass4 ( Id " + textInt + " not null, FormatNumber " + textInt + " not null, Name " + textString + "(250) not null )");
 
