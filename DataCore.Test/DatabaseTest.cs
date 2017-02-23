@@ -255,5 +255,24 @@ namespace DataCore.Test
                 connection.Close();
             }
         }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanCreateTableNoReference(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestClassNoReference>();
+                database.Insert(new TestClassNoReference { Id = 1 });
+
+                var result = database.SelectById<TestClassNoReference>(1);
+
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Ref, Is.Null);
+
+                connection.Close();
+            }
+        }
     }
 }

@@ -12,6 +12,7 @@ namespace DataCore.Database
     public abstract class Database : IDatabase
     {
         private readonly IDbConnection _connection;
+
         public ITranslator Translator { get; private set; }
 
         protected Database(IDbConnection connection, ITranslator translator)
@@ -455,7 +456,12 @@ namespace DataCore.Database
 
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
         {
-            return type.GetProperties().Where(p => p.GetCustomAttributes(typeof(IgnoreAttribute), true).Length == 0);
+            return type.GetProperties().Where(p => CanUseType(p.PropertyType) && p.GetCustomAttributes(typeof(IgnoreAttribute), true).Length == 0);
+        }
+
+        private bool CanUseType(Type propertyType)
+        {
+            return !propertyType.IsClass || propertyType == typeof(string);
         }
 
         private PropertyInfo GetIdPropertyForType(Type type)
