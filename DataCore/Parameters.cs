@@ -6,6 +6,11 @@ namespace DataCore
     {
         private readonly Dictionary<string, object> _values;
 
+        public bool IsEmpty
+        {
+            get { return _values.Count == 0; }
+        }
+
         public Parameters()
         {
             _values = new Dictionary<string, object>();

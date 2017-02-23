@@ -30,9 +30,9 @@ namespace DataCore.Database
         {
             var type = typeof(T);
 
-            var tableName = GetTableName(type);
+            var tableDefinition = GetTableDefinition(type);
 
-            var properties = GetPropertiesForType(type).Where(p => !GetFieldForProperty(p).IsIdentity).ToList();
+            var properties = tableDefinition.Fields.Where(p => !p.IsIdentity).ToList();
 
             var parameters = new Parameters();
 
@@ -40,12 +40,12 @@ namespace DataCore.Database
             var values = string.Join(", ",
                 properties.Select(p =>
                 {
-                    var value = ExpressionHelper.GetValueFrom(Translator, p.PropertyType, p.GetValue(obj, null));
+                    var value = ExpressionHelper.GetValueFrom(Translator, p.PropertyInfo.PropertyType, p.PropertyInfo.GetValue(obj, null));
                     return parameters.Add(Translator, value);
                 })
             );
 
-            var query = Translator.GetInsertQuery(tableName, names, values, parameters);
+            var query = Translator.GetInsertQuery(tableDefinition, names, values);
 
             Execute(query, parameters);
         }
@@ -397,6 +397,9 @@ namespace DataCore.Database
 
         private FieldDefinition GetFieldForProperty(PropertyInfo p)
         {
+            if (p == null)
+                return null;
+
             var columnName = p.Name;
             var isPrimaryKey = false;
             var length = 255;
@@ -421,7 +424,8 @@ namespace DataCore.Database
                 Size = length,
                 Precision = precision,
                 Type = Translator.GetTypeForProperty(p),
-                IsPrimaryKey = isPrimaryKey
+                IsPrimaryKey = isPrimaryKey,
+                PropertyInfo = p
             };
 
             var identityAttributes = p.GetCustomAttributes(typeof(IdentityAttribute), true);
@@ -501,6 +505,16 @@ namespace DataCore.Database
             var query = Translator.GetCreateIndexIfNotExistsQuery(indexName, tableName, columns, unique);
 
             return Execute(query);
+        }
+
+        private TableDefinition GetTableDefinition(Type type)
+        {
+            return new TableDefinition
+            {
+                Name = GetTableName(type),
+                IdField = GetIdFieldForType(type),
+                Fields = GetPropertiesForType(type).Select(GetFieldForProperty).ToList()
+            };
         }
     }
 }

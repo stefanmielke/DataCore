@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Reflection;
 
 namespace DataCore
 {
@@ -20,5 +21,7 @@ namespace DataCore
         public bool HasIndex { get; set; }
         public string IndexName { get; set; }
         public bool IndexUnique { get; set; }
+
+        public PropertyInfo PropertyInfo { get; set; }
     }
 }

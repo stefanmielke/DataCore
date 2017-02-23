@@ -67,7 +67,7 @@ namespace DataCore.Test
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
                 database.CreateTableIfNotExists<TestClass>();
-                
+
                 database.Insert(TestHelper.GetNewTestClass(0));
                 database.Insert(TestHelper.GetNewTestClass(0));
 
@@ -270,6 +270,27 @@ namespace DataCore.Test
 
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Ref, Is.Null);
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanCreateTableOnlyIdentityColumn(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestClassOnlyIdentity>();
+                database.Insert(new TestClassOnlyIdentity());
+
+                var results = database.Select(database.From<TestClassOnlyIdentity>());
+
+                var result = database.SelectById<TestClassOnlyIdentity>(1);
+
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Id, Is.EqualTo(1));
 
                 connection.Close();
             }

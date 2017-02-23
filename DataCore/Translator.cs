@@ -26,9 +26,12 @@ namespace DataCore
             query.SqlEnd = string.Concat("LIMIT ", recordsPerPage, ", ", (currentPage - 1) * recordsPerPage);
         }
 
-        public string GetInsertQuery(string tableName, string names, string values, Parameters parameters)
+        public string GetInsertQuery(TableDefinition table, string names, string values)
         {
-            return string.Concat("INSERT INTO ", tableName, "(", names, ") VALUES (", values, ")");
+            if (string.IsNullOrWhiteSpace(names))
+                return string.Concat("INSERT INTO ", table.Name, " DEFAULT VALUES");
+
+            return string.Concat("INSERT INTO ", table.Name, "(", names, ") VALUES (", values, ")");
         }
 
         public string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where, Parameters parameters)

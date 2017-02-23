@@ -12,7 +12,7 @@ namespace DataCore
         void Count<T>(Query<T> query);
         void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage);
 
-        string GetInsertQuery(string tableName, string names, string values, Parameters parameters);
+        string GetInsertQuery(TableDefinition table, string names, string values);
         string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where, Parameters parameters);
         string GetDeleteQuery(string tableName, string whereQuery, Parameters parameters);
 

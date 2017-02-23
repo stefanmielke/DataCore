@@ -95,7 +95,7 @@ namespace DataCore.Database.Oracle
 
         protected override string GetStringForColumn(FieldDefinition field)
         {
-            var nullable = field.Nullable ? "NULL" : "NOT NULL";
+            var nullable = field.Nullable || field.IsIdentity ? "NULL" : "NOT NULL";
             var primaryKey = field.IsPrimaryKey ? " PRIMARY KEY" : "";
 
             var extra = string.Concat(nullable, primaryKey);
