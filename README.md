@@ -79,6 +79,7 @@ var query = db.From<User>(); // creates query object
 // create query using object
 
 var result = db.Select(query); // executes the query
+var result = db.Select<MaxUser>(query); // returning other class (when changing field names)
 ```
 
 ### Joins
