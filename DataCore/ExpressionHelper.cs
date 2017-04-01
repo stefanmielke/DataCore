@@ -73,6 +73,9 @@ namespace DataCore
 
         public static string MemberExpressionString(ITranslator translator, MemberExpression memberExpression, Parameters parameters)
         {
+            if (memberExpression.Expression is ConstantExpression)
+                return GetStringForExpression(translator, memberExpression, parameters);
+
             var tableDefinition = new TableDefinition(memberExpression.Member.DeclaringType);
 
             var member = (PropertyInfo)memberExpression.Member;
