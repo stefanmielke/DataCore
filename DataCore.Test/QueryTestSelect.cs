@@ -132,7 +132,7 @@ namespace DataCore.Test
         public void CanGenerateSelectWithMin()
         {
             var query = new Query<TestClass>(new Translator());
-            query.Select(t => t.Id.Min() );
+            query.Select(t => t.Id.Min());
 
             Assert.That(query.SqlColumns, Is.EqualTo("MIN(TestClass.Id)"));
         }
@@ -243,6 +243,17 @@ namespace DataCore.Test
             Assert.That(query.SqlCommand.ToString(),
                 Is.EqualTo(
                     "SELECT * FROM TestClass WITH(NOLOCK) UNION ALL SELECT * FROM TestClass WITH(NOLOCK) ORDER BY TestClass.Id"));
+        }
+
+        [Test]
+        public void CanGenerateSelectWithMultipleTables()
+        {
+            var data = new Query<TestClass>(new Translator());
+            data.Join<TestClass2>((a, b) => a.TestClass2Id == b.Id);
+            data.Select(a => new { a.Id, a.Done }).Select<TestClass2>(b => new { b.Id });
+            data.Top(10).Build();
+
+            Assert.AreEqual(data.SqlCommand.ToString(), "SELECT TestClass.Id, TestClass.Done, TestClass2.Id FROM TestClass WITH(NOLOCK) INNER JOIN TestClass2 WITH(NOLOCK) ON (TestClass.TestClass2Id = TestClass2.Id) LIMIT 10");
         }
     }
 }

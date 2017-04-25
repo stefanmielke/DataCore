@@ -130,6 +130,11 @@ var result = db.Select(query);
 var query = db.From<User>().Select(u => new { u.Id, u.Name.Lower().As("Name") });
 var result = db.Select(query);
 ```
+```csharp
+var query = db.From<User>().Join<Address>((u, a) => u.Id == a.UserId)
+              .Select(u => u.Id).Select<Address>(a => a.Street);
+var result = db.Select(query);
+```
 
 ### Extensions
 

@@ -106,6 +106,16 @@ namespace DataCore
             return this;
         }
 
+        public Query<T> Select<TJoined>(Expression<Func<TJoined, dynamic>> clause)
+        {
+            if (SqlColumns == "*")
+                SqlColumns = string.Empty;
+
+            SqlColumns = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlColumns, Parameters);
+
+            return this;
+        }
+
         public Query<T> Top(int count)
         {
             _translator.Top(this, count);
