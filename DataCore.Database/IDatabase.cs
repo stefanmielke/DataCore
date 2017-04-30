@@ -22,6 +22,7 @@ namespace DataCore.Database
         int Execute(string query);
         IEnumerable<T> Execute<T>(string query);
         bool Exists<T>(Query<T> query);
+        bool Exists<T>(Expression<Func<T, bool>> clause);
         Query<T> From<T>();
         void Insert<T>(T obj);
         IEnumerable<T> Select<T>(Query<T> query);

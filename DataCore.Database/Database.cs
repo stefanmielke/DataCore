@@ -382,6 +382,15 @@ namespace DataCore.Database
             return Execute<int>(queryWithExists, query.Parameters).FirstOrDefault() == 1;
         }
 
+        public bool Exists<T>(Expression<Func<T, bool>> clause)
+        {
+            var query = From<T>().Where(clause).Build();
+
+            var queryWithExists = Translator.GetExistsQuery(query.SqlCommand.ToString());
+
+            return Execute<int>(queryWithExists, query.Parameters).FirstOrDefault() == 1;
+        }
+
         public IEnumerable<T> Execute<T>(string query)
         {
             return _connection.Query<T>(query);
