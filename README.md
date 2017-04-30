@@ -136,6 +136,16 @@ var query = db.From<User>().Join<Address>((u, a) => u.Id == a.UserId)
 var result = db.Select(query);
 ```
 
+### Select Exists Columns
+
+```csharp
+var query = database.From<User>().Where(u => u.Id == 1);
+bool exists = database.Exists(query);
+```
+```csharp
+bool exists = database.Exists<User>(u => u.Id == 1);
+```
+
 ### Extensions
 
 You can use these extensions to use some SQL methods on your queries.
