@@ -136,7 +136,7 @@ var query = db.From<User>().Join<Address>((u, a) => u.Id == a.UserId)
 var result = db.Select(query);
 ```
 
-### Select Exists Columns
+### Select Exists
 
 ```csharp
 var query = database.From<User>().Where(u => u.Id == 1);
