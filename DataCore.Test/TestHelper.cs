@@ -5,9 +5,11 @@ using System.Data.SqlClient;
 using System.Data.SQLite;
 using DataCore.Database;
 using DataCore.Database.Oracle;
+using DataCore.Database.Postgres;
 using DataCore.Database.Sqlite;
 using DataCore.Database.SqlServer;
 using DataCore.Test.Models;
+using Npgsql;
 using NUnit.Framework;
 using Oracle.ManagedDataAccess.Client;
 
@@ -21,6 +23,7 @@ namespace DataCore.Test
             {
                 yield return new TestCaseData(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:");
                 yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=localhost;User Id=sa; Password=YourStrong!Passw0rd;");
+                yield return new TestCaseData(TestHelper.DatabaseType.Postgres, @"Server=localhost;User Id=postgres; Password=postgres;");
                 yield return new TestCaseData(TestHelper.DatabaseType.Oracle, @"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=xe)));User Id=system;Password=oracle;");
             }
         }
@@ -30,6 +33,7 @@ namespace DataCore.Test
             get
             {
                 yield return new TestCaseData(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:");
+                yield return new TestCaseData(TestHelper.DatabaseType.Postgres, @"Server=localhost;User Id=postgres; Password=postgres;");
                 yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=localhost;User Id=sa; Password=YourStrong!Passw0rd;");
             }
         }
@@ -67,6 +71,8 @@ namespace DataCore.Test
                     return new SQLiteConnection(connectionString);
                 case DatabaseType.Oracle:
                     return new OracleConnection(connectionString);
+                case DatabaseType.Postgres:
+                    return new NpgsqlConnection(connectionString);
                 default:
                     return new SqlConnection(connectionString);
             }
@@ -80,6 +86,8 @@ namespace DataCore.Test
                     return new SqliteDatabase(connection);
                 case DatabaseType.Oracle:
                     return new OracleDatabase(connection);
+                case DatabaseType.Postgres:
+                    return new PostgresDatabase(connection);
                 default:
                     return new SqlServerDatabase(connection);
             }
@@ -102,7 +110,8 @@ namespace DataCore.Test
         {
             Sqlite,
             SqlServer,
-            Oracle
+            Oracle,
+            Postgres
         }
     }
 }

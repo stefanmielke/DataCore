@@ -37,6 +37,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>..\packages\Npgsql.2.2.7\lib\net40\Mono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Npgsql, Version=2.2.7.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Npgsql.2.2.7\lib\net40\Npgsql.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.6.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.6.0\lib\net40\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -99,6 +105,10 @@
     <ProjectReference Include="..\DataCore.Database.Oracle\DataCore.Database.Oracle.csproj">
       <Project>{7BBB1C21-A512-4934-86CB-5E08C2918BB2}</Project>
       <Name>DataCore.Database.Oracle</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataCore.Database.Postgres\DataCore.Database.Postgres.csproj">
+      <Project>{5da03581-becb-4d1d-9193-69f05a0a434c}</Project>
+      <Name>DataCore.Database.Postgres</Name>
     </ProjectReference>
     <ProjectReference Include="..\DataCore.Database.Sqlite\DataCore.Database.Sqlite.csproj">
       <Project>{4656bb1d-d2e8-4e08-9c35-e5ceaeeb2fd2}</Project>

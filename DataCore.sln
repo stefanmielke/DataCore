@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCore", "DataCore\DataCore.csproj", "{DEDA8EBC-AD0E-492E-85F7-2DBCC1C66C5F}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCore.Database.SqlServer", "DataCore.Database.SqlServer\DataCore.Database.SqlServer.csproj", "{A14390CF-046B-4EBE-AF9B-E5D4C3C9372C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCore.Database.Oracle", "DataCore.Database.Oracle\DataCore.Database.Oracle.csproj", "{7BBB1C21-A512-4934-86CB-5E08C2918BB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCore.Database.Postgres", "DataCore.Database.Postgres\DataCore.Database.Postgres.csproj", "{5DA03581-BECB-4D1D-9193-69F05A0A434C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{7BBB1C21-A512-4934-86CB-5E08C2918BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BBB1C21-A512-4934-86CB-5E08C2918BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BBB1C21-A512-4934-86CB-5E08C2918BB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DA03581-BECB-4D1D-9193-69F05A0A434C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DA03581-BECB-4D1D-9193-69F05A0A434C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DA03581-BECB-4D1D-9193-69F05A0A434C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DA03581-BECB-4D1D-9193-69F05A0A434C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
