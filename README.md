@@ -13,7 +13,7 @@ For now there's no Nuget version, so you can download/clone and build the curren
 * SQLite
 * SQL Server
 * Oracle DB
-* Postgres (planned for Beta)
+* Postgres
 * MySQL (planned for Beta)
 
 Each database has its own project. So you can only add what you'll use.
