@@ -79,7 +79,7 @@ namespace DataCore.Database.SqlServer
             return string.Format(GetFormatFor(field), field.Name, GetTextFor(field.Type), field.Size, field.Precision, extra, identity);
         }
 
-        protected override string GetTextFor(DbType type)
+        protected override string GetTextFor(DbType type, bool isCasting = false)
         {
             switch (type)
             {

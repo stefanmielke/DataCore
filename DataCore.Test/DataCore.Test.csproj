@@ -40,6 +40,9 @@
     <Reference Include="Mono.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.2.2.7\lib\net40\Mono.Security.dll</HintPath>
     </Reference>
+    <Reference Include="MySql.Data, Version=6.9.9.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.9.9\lib\net40\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="Npgsql, Version=2.2.7.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
       <HintPath>..\packages\Npgsql.2.2.7\lib\net40\Npgsql.dll</HintPath>
     </Reference>
@@ -102,6 +105,10 @@
     <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataCore.Database.MySql\DataCore.Database.MySql.csproj">
+      <Project>{b2d692a1-8751-45dd-bab0-8155c79e560e}</Project>
+      <Name>DataCore.Database.MySql</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DataCore.Database.Oracle\DataCore.Database.Oracle.csproj">
       <Project>{7BBB1C21-A512-4934-86CB-5E08C2918BB2}</Project>
       <Name>DataCore.Database.Oracle</Name>

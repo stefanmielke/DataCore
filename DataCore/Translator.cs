@@ -151,12 +151,12 @@ namespace DataCore
             }
         }
 
-        public string GetTextFor(FieldDefinition field)
+        public string GetTextFor(FieldDefinition field, bool isCasting = false)
         {
-            return GetTextFor(field.Type);
+            return GetTextFor(field.Type, isCasting);
         }
 
-        protected virtual string GetTextFor(DbType type)
+        protected virtual string GetTextFor(DbType type, bool isCasting = false)
         {
             switch (type)
             {

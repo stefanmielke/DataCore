@@ -4,11 +4,13 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.SQLite;
 using DataCore.Database;
+using DataCore.Database.MySql;
 using DataCore.Database.Oracle;
 using DataCore.Database.Postgres;
 using DataCore.Database.Sqlite;
 using DataCore.Database.SqlServer;
 using DataCore.Test.Models;
+using MySql.Data.MySqlClient;
 using Npgsql;
 using NUnit.Framework;
 using Oracle.ManagedDataAccess.Client;
@@ -24,6 +26,8 @@ namespace DataCore.Test
                 yield return new TestCaseData(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:");
                 yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=localhost;User Id=sa; Password=YourStrong!Passw0rd;");
                 yield return new TestCaseData(TestHelper.DatabaseType.Postgres, @"Server=localhost;User Id=postgres; Password=postgres;");
+                yield return new TestCaseData(TestHelper.DatabaseType.MariaDb, @"Server=localhost;Database=db;Uid=root;Pwd=mariadb;");
+                //yield return new TestCaseData(TestHelper.DatabaseType.MySql, @"Server=localhost;Port=3307;Database=db;Uid=root;Pwd=mysql;");
                 yield return new TestCaseData(TestHelper.DatabaseType.Oracle, @"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=xe)));User Id=system;Password=oracle;");
             }
         }
@@ -34,6 +38,8 @@ namespace DataCore.Test
             {
                 yield return new TestCaseData(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:");
                 yield return new TestCaseData(TestHelper.DatabaseType.Postgres, @"Server=localhost;User Id=postgres; Password=postgres;");
+                yield return new TestCaseData(TestHelper.DatabaseType.MariaDb, @"Server=localhost;Database=db;Uid=root;Pwd=mariadb;");
+                //yield return new TestCaseData(TestHelper.DatabaseType.MySql, @"Server=localhost;Port=3307;Uid=root;Pwd=mysql;Database:db;");
                 yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=localhost;User Id=sa; Password=YourStrong!Passw0rd;");
             }
         }
@@ -73,6 +79,9 @@ namespace DataCore.Test
                     return new OracleConnection(connectionString);
                 case DatabaseType.Postgres:
                     return new NpgsqlConnection(connectionString);
+                case DatabaseType.MariaDb:
+                case DatabaseType.MySql:
+                    return new MySqlConnection(connectionString);
                 default:
                     return new SqlConnection(connectionString);
             }
@@ -88,6 +97,9 @@ namespace DataCore.Test
                     return new OracleDatabase(connection);
                 case DatabaseType.Postgres:
                     return new PostgresDatabase(connection);
+                case DatabaseType.MariaDb:
+                case DatabaseType.MySql:
+                    return new MySqlDatabase(connection);
                 default:
                     return new SqlServerDatabase(connection);
             }
@@ -111,7 +123,9 @@ namespace DataCore.Test
             Sqlite,
             SqlServer,
             Oracle,
-            Postgres
+            Postgres,
+            MySql,
+            MariaDb
         }
     }
 }

@@ -15,7 +15,7 @@ namespace DataCore
 
         string GetParameterTag();
         string GetFormatFor(ExpressionType type);
-        string GetTextFor(FieldDefinition field);
+        string GetTextFor(FieldDefinition field, bool isCasting = false);
 
         object GetBooleanValue(object constantExpressionValue);
         object GetStringValue(object value);

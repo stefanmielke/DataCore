@@ -352,7 +352,7 @@ namespace DataCore
 
                 concat = string.Concat("CAST(",
                     GetStringForExpression(translator, methodExpression.Arguments[0], parameters), " AS ",
-                    translator.GetTextFor(new FieldDefinition { Type = returnDbType }), ")");
+                    translator.GetTextFor(new FieldDefinition { Type = returnDbType }, true), ")");
 
                 return true;
             }

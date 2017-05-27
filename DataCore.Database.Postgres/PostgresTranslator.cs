@@ -62,7 +62,7 @@ namespace DataCore.Database.Postgres
             }
         }
 
-        protected override string GetTextFor(DbType type)
+        protected override string GetTextFor(DbType type, bool isCasting = false)
         {
             switch (type)
             {

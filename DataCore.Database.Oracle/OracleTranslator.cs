@@ -144,7 +144,7 @@ namespace DataCore.Database.Oracle
             }
         }
 
-        protected override string GetTextFor(DbType type)
+        protected override string GetTextFor(DbType type, bool isCasting = false)
         {
             switch (type)
             {
