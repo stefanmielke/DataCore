@@ -14,7 +14,8 @@ For now there's no Nuget version, so you can download/clone and build the curren
 * SQL Server
 * Oracle DB
 * Postgres
-* MySQL (planned for Beta)
+* MariaDB
+* MySQL (partial - no index support - planned for full release)
 
 Each database has its own project. So you can only add what you'll use.
 
