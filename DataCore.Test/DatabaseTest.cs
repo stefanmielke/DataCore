@@ -331,5 +331,44 @@ namespace DataCore.Test
                 connection.Close();
             }
         }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanDropAndCreateTable(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTable<TestClass>();
+                var query = database.From<TestClass>().Where(t => t.Id == 1);
+                database.Select(query);
+
+                database.DropAndCreateTable<TestClass>();
+                database.Select(query);
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanDropAndCreateTables(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTables(typeof(TestClass), typeof(TestClass2));
+                var query = database.From<TestClass>().Where(t => t.Id == 1);
+                var query2 = database.From<TestClass2>().Where(t => t.Id == 1);
+                database.Select(query);
+                database.Select(query2);
+
+                database.DropAndCreateTables(typeof(TestClass), typeof(TestClass2));
+                database.Select(query);
+                database.Select(query2);
+
+                connection.Close();
+            }
+        }
     }
 }

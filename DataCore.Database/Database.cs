@@ -319,6 +319,36 @@ namespace DataCore.Database
             return 0;
         }
 
+        public int DropAndCreateTable<T>(bool createReferences = false)
+        {
+            DropTable<T>();
+
+            return CreateTable<T>(createReferences);
+        }
+
+        public int DropAndCreateTable(Type table, bool createReferences = false)
+        {
+            DropTable(table);
+
+            return CreateTable(table, createReferences);
+        }
+
+        public int DropAndCreateTables(params Type[] tables)
+        {
+            DropTables(tables);
+
+            return CreateTables(tables);
+        }
+
+        public int DropAndCreateTables(IEnumerable<Type> tables, bool createReferences = false)
+        {
+            var tableArray = tables.ToArray();
+
+            DropTables(tableArray);
+
+            return CreateTables(tableArray, createReferences);
+        }
+
         public int CreateColumn<T>(Expression<Func<T, dynamic>> clause)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);

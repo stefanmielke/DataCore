@@ -11,7 +11,7 @@ namespace DataCore.Database
         void Delete<T>(Expression<Func<T, bool>> whereClause);
         void DeleteById<T>(object id);
         void DeleteById<T>(params object[] ids);
-
+        
         int CreateTable<T>(bool createReferences = false);
         int CreateTable(Type table, bool createReferences = false);
         int CreateTables(params Type[] tables);
@@ -27,6 +27,11 @@ namespace DataCore.Database
         int DropTableIfExists<T>();
         int DropTableIfExists(Type table);
         int DropTablesIfExists(params Type[] tables);
+
+        int DropAndCreateTable<T>(bool createReferences = false);
+        int DropAndCreateTable(Type table, bool createReferences = false);
+        int DropAndCreateTables(params Type[] tables);
+        int DropAndCreateTables(IEnumerable<Type> tables, bool createReferences = false);
 
         int CreateColumn<T>(Expression<Func<T, dynamic>> clause);
         int CreateColumnIfNotExists<T>(Expression<Func<T, dynamic>> clause);
