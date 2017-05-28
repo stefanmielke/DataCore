@@ -157,7 +157,12 @@ namespace DataCore.Database
 
         public int CreateTable<T>(bool createReferences = false)
         {
-            var type = typeof(T);
+            return CreateTable(typeof(T), createReferences);
+        }
+
+        public int CreateTable(Type table, bool createReferences = false)
+        {
+            var type = table;
 
             var tableDefinition = GetTableDefinition(type);
 
@@ -188,9 +193,29 @@ namespace DataCore.Database
             return 0;
         }
 
+        public int CreateTables(params Type[] tables)
+        {
+            return CreateTables(tables, false);
+        }
+
+        public int CreateTables(IEnumerable<Type> tables, bool createReferences = false)
+        {
+            foreach (var type in tables)
+            {
+                CreateTable(type, createReferences);
+            }
+
+            return 0;
+        }
+
         public int CreateTableIfNotExists<T>(bool createReferences = false)
         {
-            var type = typeof(T);
+            return CreateTableIfNotExists(typeof(T), createReferences);
+        }
+
+        public int CreateTableIfNotExists(Type table, bool createReferences = false)
+        {
+            var type = table;
 
             var tableDefinition = GetTableDefinition(type);
 
@@ -199,7 +224,7 @@ namespace DataCore.Database
             var queries = Translator.GetCreateTableIfNotExistsQuery(tableDefinition.Name, fields);
             foreach (var query in queries)
             {
-                Execute(query); 
+                Execute(query);
             }
 
             foreach (var field in fields.Where(f => f.HasIndex))
@@ -215,7 +240,22 @@ namespace DataCore.Database
                     var idColumnTo = referencedTable.IdField;
 
                     CreateForeignKeyIfNotExists(field.ReferenceName, tableDefinition.Name, referencedTable.Name, field.Name, idColumnTo.Name);
-                } 
+                }
+            }
+
+            return 0;
+        }
+
+        public int CreateTablesIfNotExists(params Type[] tables)
+        {
+            return CreateTablesIfNotExists(tables, false);
+        }
+
+        public int CreateTablesIfNotExists(IEnumerable<Type> tables, bool createReferences = false)
+        {
+            foreach (var type in tables)
+            {
+                CreateTableIfNotExists(type, createReferences);
             }
 
             return 0;

@@ -13,7 +13,13 @@ namespace DataCore.Database
         void DeleteById<T>(params object[] ids);
 
         int CreateTable<T>(bool createReferences = false);
+        int CreateTable(Type table, bool createReferences = false);
+        int CreateTables(params Type[] tables);
+        int CreateTables(IEnumerable<Type> tables, bool createReferences = false);
         int CreateTableIfNotExists<T>(bool createReferences = false);
+        int CreateTableIfNotExists(Type table, bool createReferences = false);
+        int CreateTablesIfNotExists(params Type[] tables);
+        int CreateTablesIfNotExists(IEnumerable<Type> tables, bool createReferences = false);
         int DropTable<T>();
         int DropTableIfExists<T>();
 
