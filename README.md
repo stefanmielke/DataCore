@@ -218,6 +218,9 @@ db.DropTables(typeof(User), typeof(Address));
 db.DropTableIfExists<User>();
 db.DropTablesIfExists(typeof(User), typeof(Address));
 
+db.DropAndCreateTable<User>();
+db.DropAndCreateTables(typeof(User), typeof(Address));
+
 // columns
 db.CreateColumn<User>(t => t.NewColumn);
 db.CreateColumnIfNotExists<User>(t => t.NewColumn);
