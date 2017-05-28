@@ -7,17 +7,31 @@ using DataCore.Attributes;
 
 namespace DataCore
 {
-    public class TableDefinition
+    public sealed class TableDefinition
     {
-        public string Name { get; set; }
-        public FieldDefinition IdField { get; set; }
-        public List<FieldDefinition> Fields { get; set; }
+        private static readonly Dictionary<Type, TableDefinition> Definitions = new Dictionary<Type, TableDefinition>();
+
+        public string Name { get; }
+        public FieldDefinition IdField { get; }
+        public List<FieldDefinition> Fields { get; }
 
         public TableDefinition(Type type)
         {
+            if (Definitions.ContainsKey(type))
+            {
+                var definition = Definitions[type];
+                Name = definition.Name;
+                IdField = definition.IdField;
+                Fields = definition.Fields;
+
+                return;
+            }
+
             Name = GetTableName(type);
             IdField = GetIdFieldForType(type);
             Fields = GetPropertiesForType(type).Select(GetFieldForProperty).ToList();
+
+            Definitions.Add(type, this);
         }
 
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)

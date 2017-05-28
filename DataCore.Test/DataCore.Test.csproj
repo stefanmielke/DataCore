@@ -89,6 +89,7 @@
     <Compile Include="Models\TestNullableProperty.cs" />
     <Compile Include="Models\TestOther.cs" />
     <Compile Include="Models\TestOverride.cs" />
+    <Compile Include="PerformanceTest.cs" />
     <Compile Include="QueryTestGroupBy.cs" />
     <Compile Include="QueryTestHaving.cs" />
     <Compile Include="QueryTestJoins.cs" />
