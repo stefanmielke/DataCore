@@ -155,6 +155,39 @@ namespace DataCore.Database
             Execute(query, parameters);
         }
 
+        public int CreateTable<T>(bool createReferences = false)
+        {
+            var type = typeof(T);
+
+            var tableDefinition = GetTableDefinition(type);
+
+            var fields = tableDefinition.Fields;
+
+            var queries = Translator.GetCreateTableQuery(tableDefinition.Name, fields);
+            foreach (var query in queries)
+            {
+                Execute(query);
+            }
+
+            foreach (var field in fields.Where(f => f.HasIndex))
+            {
+                CreateIndex(field.IndexUnique, field.IndexName, tableDefinition.Name, field.Name);
+            }
+
+            if (createReferences)
+            {
+                foreach (var field in fields.Where(f => f.IsReference))
+                {
+                    var referencedTable = GetTableDefinition(type);
+                    var idColumnTo = referencedTable.IdField;
+
+                    CreateForeignKey(field.ReferenceName, tableDefinition.Name, referencedTable.Name, field.Name, idColumnTo.Name);
+                }
+            }
+
+            return 0;
+        }
+
         public int CreateTableIfNotExists<T>(bool createReferences = false)
         {
             var type = typeof(T);
@@ -171,7 +204,7 @@ namespace DataCore.Database
 
             foreach (var field in fields.Where(f => f.HasIndex))
             {
-                CreateIndexIfNotExists<T>(field.IndexUnique, field.IndexName, tableDefinition.Name, field.Name);
+                CreateIndexIfNotExists(field.IndexUnique, field.IndexName, tableDefinition.Name, field.Name);
             }
 
             if (createReferences)
@@ -183,6 +216,20 @@ namespace DataCore.Database
 
                     CreateForeignKeyIfNotExists(field.ReferenceName, tableDefinition.Name, referencedTable.Name, field.Name, idColumnTo.Name);
                 } 
+            }
+
+            return 0;
+        }
+
+        public int DropTable<T>()
+        {
+            var tableDefinition = GetTableDefinition(typeof(T));
+
+            var queries = Translator.GetDropTableQuery(tableDefinition.Name);
+
+            foreach (var query in queries)
+            {
+                Execute(query);
             }
 
             return 0;
@@ -202,6 +249,28 @@ namespace DataCore.Database
             return 0;
         }
 
+        public int CreateColumn<T>(Expression<Func<T, dynamic>> clause)
+        {
+            var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
+            if (arguments != null && arguments.Length > 0)
+            {
+                var tableDefinition = GetTableDefinition(typeof(T));
+
+                var query = string.Join(";",
+                    arguments.Select(
+                        f =>
+                            Translator.GetCreateColumnQuery(
+                                tableDefinition.Name, tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)
+                            )
+                    )
+                );
+
+                return Execute(query);
+            }
+
+            return 0;
+        }
+
         public int CreateColumnIfNotExists<T>(Expression<Func<T, dynamic>> clause)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
@@ -215,6 +284,28 @@ namespace DataCore.Database
                             Translator.GetCreateColumnIfNotExistsQuery(
                                 tableDefinition.Name, tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)
                             )
+                    )
+                );
+
+                return Execute(query);
+            }
+
+            return 0;
+        }
+
+        public int DropColumn<T>(Expression<Func<T, dynamic>> clause)
+        {
+            var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
+            if (arguments != null && arguments.Length > 0)
+            {
+                var tableDefinition = GetTableDefinition(typeof(T));
+
+                var query = string.Join(";",
+                    arguments.Select(
+                        f =>
+                            Translator.GetDropColumnQuery(tableDefinition.Name,
+                                tableDefinition.Fields.First(
+                                    fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name).Name)
                     )
                 );
 
@@ -246,6 +337,31 @@ namespace DataCore.Database
             return 0;
         }
 
+        public int CreateIndex<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null)
+        {
+            var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
+            if (arguments != null && arguments.Length > 0)
+            {
+                var tableDefinition = GetTableDefinition(typeof(T));
+
+                var columns = string.Join(", ", arguments.Select(f => tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)));
+
+                return CreateIndex(unique, indexName, tableDefinition.Name, columns);
+            }
+
+            return 0;
+        }
+
+        private int CreateIndex(bool unique, string indexName, string tableName, string columns)
+        {
+            if (string.IsNullOrEmpty(indexName))
+                indexName = string.Concat("IX_", tableName, "_", columns.Replace(", ", "_"));
+
+            var query = Translator.GetCreateIndexIfNotExistsQuery(indexName, tableName, columns, unique);
+
+            return Execute(query);
+        }
+
         public int CreateIndexIfNotExists<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
@@ -255,10 +371,29 @@ namespace DataCore.Database
 
                 var columns = string.Join(", ", arguments.Select(f => tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)));
 
-                return CreateIndexIfNotExists<T>(unique, indexName, tableDefinition.Name, columns);
+                return CreateIndexIfNotExists(unique, indexName, tableDefinition.Name, columns);
             }
 
             return 0;
+        }
+
+        private int CreateIndexIfNotExists(bool unique, string indexName, string tableName, string columns)
+        {
+            if (string.IsNullOrEmpty(indexName))
+                indexName = string.Concat("IX_", tableName, "_", columns.Replace(", ", "_"));
+
+            var query = Translator.GetCreateIndexIfNotExistsQuery(indexName, tableName, columns, unique);
+
+            return Execute(query);
+        }
+
+        public int DropIndex<T>(string indexName)
+        {
+            var tableDefinition = GetTableDefinition(typeof(T));
+
+            var query = Translator.GetDropIndexQuery(tableDefinition.Name, indexName);
+
+            return Execute(query);
         }
 
         public int DropIndexIfExists<T>(string indexName)
@@ -266,6 +401,43 @@ namespace DataCore.Database
             var tableDefinition = GetTableDefinition(typeof(T));
 
             var query = Translator.GetDropIndexIfExistsQuery(tableDefinition.Name, indexName);
+
+            return Execute(query);
+        }
+
+        public int CreateForeignKey<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo, string indexName = null)
+        {
+            var argumentsFrom = ExpressionHelper.GetExpressionsFromDynamic(columnFrom);
+            var argumentsTo = ExpressionHelper.GetExpressionsFromDynamic(columnTo);
+
+            if (argumentsFrom != null && argumentsFrom.Length > 0
+                && argumentsTo != null && argumentsTo.Length > 0)
+            {
+                var tableFrom = GetTableDefinition(typeof(TFrom));
+                var tableTo = GetTableDefinition(typeof(TTo));
+
+                var columnNameFrom = tableFrom.Fields.First(
+                    fld =>
+                        fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)argumentsFrom.First()).Member).Name).Name;
+
+                var columnNameTo = tableTo.Fields.First(
+                    fld =>
+                        fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)argumentsTo.First()).Member).Name).Name;
+
+                return CreateForeignKey(indexName, tableFrom.Name, tableTo.Name, columnNameFrom, columnNameTo);
+            }
+
+            return 0;
+        }
+
+        private int CreateForeignKey(string indexName, string tableNameFrom, string tableNameTo, string columnNameFrom, string columnNameTo)
+        {
+            if (string.IsNullOrEmpty(indexName))
+                indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
+
+            indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
+
+            var query = Translator.GetCreateForeignKeyQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
 
             return Execute(query);
         }
@@ -293,6 +465,27 @@ namespace DataCore.Database
             }
 
             return 0;
+        }
+
+        private int CreateForeignKeyIfNotExists(string indexName, string tableNameFrom, string tableNameTo, string columnNameFrom, string columnNameTo)
+        {
+            if (string.IsNullOrEmpty(indexName))
+                indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
+
+            indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
+
+            var query = Translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
+
+            return Execute(query);
+        }
+
+        public int DropForeignKey<T>(string indexName)
+        {
+            var tableDefinition = GetTableDefinition(typeof(T));
+
+            var query = Translator.GetDropForeignKeyQuery(tableDefinition.Name, indexName);
+
+            return Execute(query);
         }
 
         public int DropForeignKeyIfExists<T>(string indexName)
@@ -409,28 +602,6 @@ namespace DataCore.Database
         public int Execute(string query, Parameters parameters)
         {
             return _connection.Execute(query, parameters.GetValues());
-        }
-
-        private int CreateForeignKeyIfNotExists(string indexName, string tableNameFrom, string tableNameTo, string columnNameFrom, string columnNameTo)
-        {
-            if (string.IsNullOrEmpty(indexName))
-                indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
-
-            indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
-
-            var query = Translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
-
-            return Execute(query);
-        }
-
-        private int CreateIndexIfNotExists<T>(bool unique, string indexName, string tableName, string columns)
-        {
-            if (string.IsNullOrEmpty(indexName))
-                indexName = string.Concat("IX_", tableName, "_", columns.Replace(", ", "_"));
-
-            var query = Translator.GetCreateIndexIfNotExistsQuery(indexName, tableName, columns, unique);
-
-            return Execute(query);
         }
 
         private TableDefinition GetTableDefinition(Type type)

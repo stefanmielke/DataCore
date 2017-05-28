@@ -8,17 +8,30 @@ namespace DataCore.Database
     {
         ITranslator Translator { get; }
 
-        int CreateColumnIfNotExists<T>(Expression<Func<T, dynamic>> clause);
-        int CreateForeignKeyIfNotExists<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo, string indexName = null);
-        int CreateIndexIfNotExists<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null);
-        int CreateTableIfNotExists<T>(bool createReferences = false);
         void Delete<T>(Expression<Func<T, bool>> whereClause);
         void DeleteById<T>(object id);
         void DeleteById<T>(params object[] ids);
-        int DropColumnIfExists<T>(Expression<Func<T, dynamic>> clause);
-        int DropForeignKeyIfExists<T>(string indexName);
-        int DropIndexIfExists<T>(string indexName);
+
+        int CreateTable<T>(bool createReferences = false);
+        int CreateTableIfNotExists<T>(bool createReferences = false);
+        int DropTable<T>();
         int DropTableIfExists<T>();
+
+        int CreateColumn<T>(Expression<Func<T, dynamic>> clause);
+        int CreateColumnIfNotExists<T>(Expression<Func<T, dynamic>> clause);
+        int DropColumn<T>(Expression<Func<T, dynamic>> clause);
+        int DropColumnIfExists<T>(Expression<Func<T, dynamic>> clause);
+
+        int CreateIndex<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null);
+        int CreateIndexIfNotExists<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null);
+        int DropIndex<T>(string indexName);
+        int DropIndexIfExists<T>(string indexName);
+
+        int CreateForeignKey<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo, string indexName = null);
+        int CreateForeignKeyIfNotExists<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo, string indexName = null);
+        int DropForeignKey<T>(string indexName);
+        int DropForeignKeyIfExists<T>(string indexName);
+
         int Execute(string query);
         IEnumerable<T> Execute<T>(string query);
         bool Exists<T>(Query<T> query);

@@ -10,6 +10,14 @@
         /// <summary>
         /// SQLite does NOT support this method.
         /// </summary>
+        public override string GetDropColumnQuery(string tableName, string memberName)
+        {
+            return "SELECT 1";
+        }
+
+        /// <summary>
+        /// SQLite does NOT support this method.
+        /// </summary>
         public override string GetDropColumnIfExistsQuery(string tableName, string memberName)
         {
             return "SELECT 1";
@@ -20,6 +28,23 @@
         /// </summary>
         public override string GetCreateForeignKeyIfNotExistsQuery(string indexName, string tableNameFrom, string columnNameFrom,
             string tableNameTo, string columnNameTo)
+        {
+            return "SELECT 1";
+        }
+
+        /// <summary>
+        /// SQLite does NOT support this method.
+        /// </summary>
+        public override string GetCreateForeignKeyQuery(string indexName, string tableNameFrom, string columnNameFrom,
+            string tableNameTo, string columnNameTo)
+        {
+            return "SELECT 1";
+        }
+
+        /// <summary>
+        /// SQLite does NOT support this method.
+        /// </summary>
+        public override string GetDropForeignKeyQuery(string tableName, string indexName)
         {
             return "SELECT 1";
         }

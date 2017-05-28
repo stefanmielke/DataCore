@@ -22,14 +22,27 @@ namespace DataCore
         object GetDateTimeValue(object date);
         
         string GetSelectTableName(TableDefinition table);
+
+        IEnumerable<string> GetCreateTableQuery(string tableName, IEnumerable<FieldDefinition> fields);
         IEnumerable<string> GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields);
+        IEnumerable<string> GetDropTableQuery(string tableName);
         IEnumerable<string> GetDropTableIfExistsQuery(string tableName);
+
+        string GetCreateColumnQuery(string tableName, FieldDefinition field);
         string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field);
+        string GetDropColumnQuery(string tableName, string memberName);
         string GetDropColumnIfExistsQuery(string tableName, string memberName);
+
+        string GetCreateIndexQuery(string indexName, string tableName, string columns, bool unique);
         string GetCreateIndexIfNotExistsQuery(string indexName, string tableName, string columns, bool unique);
+        string GetDropIndexQuery(string tableName, string indexName);
         string GetDropIndexIfExistsQuery(string tableName, string indexName);
+
+        string GetCreateForeignKeyQuery(string indexName, string tableNameFrom, string columnNameFrom, string tableNameTo, string columnNameTo);
         string GetCreateForeignKeyIfNotExistsQuery(string indexName, string tableNameFrom, string columnNameFrom, string tableNameTo, string columnNameTo);
+        string GetDropForeignKeyQuery(string tableName, string indexName);
         string GetDropForeignKeyIfExistsQuery(string tableName, string indexName);
+
         string GetExistsQuery(string query);
         string GetOrderByDescendingFormat();
         string GetLengthFunctionName();

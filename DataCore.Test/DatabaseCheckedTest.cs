@@ -1,12 +1,12 @@
-﻿using System;
+﻿using DataCore.Test.Models;
+using System;
 using System.Linq;
-using DataCore.Test.Models;
 using NUnit.Framework;
 
 namespace DataCore.Test
 {
     [TestFixture]
-    public class DatabaseTest
+    public class DatabaseCheckedTest
     {
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanCreateTable(TestHelper.DatabaseType dbType, string connectionString)
@@ -15,7 +15,7 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClass>();
+                database.CreateTableIfNotExists<TestClass>();
 
                 var query = database.From<TestClass>().Where(t => t.Id == 1);
 
@@ -32,7 +32,7 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestOverride>();
+                database.CreateTableIfNotExists<TestOverride>();
 
                 var query = database.From<TestOverride>().Where(t => t.Id == 1);
 
@@ -49,7 +49,7 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestIgnore>();
+                database.CreateTableIfNotExists<TestIgnore>();
 
                 var query = database.From<TestIgnore>().Where(t => t.Ignored == "exception!");
 
@@ -66,7 +66,7 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClass>();
+                database.CreateTableIfNotExists<TestClass>();
 
                 database.Insert(TestHelper.GetNewTestClass(0));
                 database.Insert(TestHelper.GetNewTestClass(0));
@@ -80,16 +80,34 @@ namespace DataCore.Test
         }
 
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void DoNotErrorOnDoubleCreateTable(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTableIfNotExists<TestClass>();
+                database.CreateTableIfNotExists<TestClass>();
+
+                var query = database.From<TestClass>().Where(t => t.Id == 1);
+
+                database.Select(query);
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanCreateTableWithReferences(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClassRef1>();
-                database.CreateTable<TestClassRef2>(true);
+                database.CreateTableIfNotExists<TestClassRef1>();
+                database.CreateTableIfNotExists<TestClassRef2>(true);
 
-                database.DropForeignKey<TestClassRef2>("FK_TestClassRef2");
+                database.DropForeignKeyIfExists<TestClassRef2>("FK_TestClassRef2");
 
                 connection.Close();
             }
@@ -102,10 +120,10 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClassRef1>();
+                database.CreateTableIfNotExists<TestClassRef1>();
 
-                database.DropIndex<TestClassRef1>("IX_TestClassRef1_Id2");
-                database.DropIndex<TestClassRef1>("IX_TestTest");
+                database.DropIndexIfExists<TestClassRef1>("IX_TestClassRef1_Id2");
+                database.DropIndexIfExists<TestClassRef1>("IX_TestTest");
 
                 connection.Close();
             }
@@ -118,11 +136,11 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClass>();
+                database.CreateTableIfNotExists<TestClass>();
 
                 database.Select(database.From<TestClass>().Where(t => t.Id == 1));
 
-                database.DropTable<TestClass>();
+                database.DropTableIfExists<TestClass>();
 
                 connection.Close();
             }
@@ -143,7 +161,7 @@ namespace DataCore.Test
 
                 database.Execute("CREATE TABLE TestClass4 ( Id " + textInt + " not null, FormatNumber " + textInt + " not null, Name " + textString + "(250) not null )");
 
-                database.CreateColumn<TestClass4>(t => t.InsertDate);
+                database.CreateColumnIfNotExists<TestClass4>(t => t.InsertDate);
 
                 var date = DateTime.Now;
 
@@ -151,7 +169,7 @@ namespace DataCore.Test
 
                 database.Select(query);
 
-                database.DropTable<TestClass4>();
+                database.DropTableIfExists<TestClass4>();
 
                 connection.Close();
             }
@@ -164,9 +182,9 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClass>();
+                database.CreateTableIfNotExists<TestClass>();
 
-                database.DropColumn<TestClass>(t => t.Name);
+                database.DropColumnIfExists<TestClass>(t => t.Name);
 
                 connection.Close();
             }
@@ -179,9 +197,9 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClass>();
+                database.CreateTableIfNotExists<TestClass>();
 
-                database.CreateIndex<TestClass>(t => new { t.Id, t.Name }, true);
+                database.CreateIndexIfNotExists<TestClass>(t => new { t.Id, t.Name }, true);
 
                 connection.Close();
             }
@@ -196,10 +214,10 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClass>();
+                database.CreateTableIfNotExists<TestClass>();
 
-                database.CreateIndex<TestClass>(t => new { t.Id, t.Name }, true, indexName);
-                database.DropIndex<TestClass>(indexName);
+                database.CreateIndexIfNotExists<TestClass>(t => new { t.Id, t.Name }, true, indexName);
+                database.DropIndexIfExists<TestClass>(indexName);
 
                 connection.Close();
             }
@@ -212,10 +230,10 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClass>();
-                database.CreateTable<TestClass2>();
+                database.CreateTableIfNotExists<TestClass>();
+                database.CreateTableIfNotExists<TestClass2>();
 
-                database.CreateForeignKey<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id);
+                database.CreateForeignKeyIfNotExists<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id);
 
                 connection.Close();
             }
@@ -230,11 +248,11 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClass>();
-                database.CreateTable<TestClass2>();
+                database.CreateTableIfNotExists<TestClass>();
+                database.CreateTableIfNotExists<TestClass2>();
 
-                database.CreateForeignKey<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id, indexName);
-                database.DropForeignKey<TestClass>(indexName);
+                database.CreateForeignKeyIfNotExists<TestClass, TestClass2>(t => t.TestClass2Id, t => t.Id, indexName);
+                database.DropForeignKeyIfExists<TestClass>(indexName);
 
                 connection.Close();
             }
@@ -247,7 +265,7 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClassNoReference>();
+                database.CreateTableIfNotExists<TestClassNoReference>();
                 database.Insert(new TestClassNoReference { Id = 1 });
 
                 var result = database.SelectById<TestClassNoReference>(1);
@@ -266,7 +284,7 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestClassOnlyIdentity>();
+                database.CreateTableIfNotExists<TestClassOnlyIdentity>();
 
                 database.Insert(new TestClassOnlyIdentity());
 
@@ -281,7 +299,7 @@ namespace DataCore.Test
             {
                 var database = TestHelper.GetDatabaseFor(dbType, connection);
 
-                database.CreateTable<TestNullableProperty>();
+                database.CreateTableIfNotExists<TestNullableProperty>();
 
                 database.Insert(new TestNullableProperty { Id = 1 });
 

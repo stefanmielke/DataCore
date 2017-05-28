@@ -1,10 +1,8 @@
-﻿using DataCore.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text;
 
 namespace DataCore
@@ -90,6 +88,19 @@ namespace DataCore
             return Convert.ToDateTime(date);
         }
 
+        public virtual IEnumerable<string> GetCreateTableQuery(string tableName, IEnumerable<FieldDefinition> fields)
+        {
+            var query = new StringBuilder("CREATE TABLE ");
+            query.Append(tableName)
+                .Append(" (");
+
+            query.Append(string.Join(",", fields.Select(GetStringForColumn)));
+
+            query.Append(")");
+
+            yield return query.ToString();
+        }
+
         public virtual IEnumerable<string> GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
         {
             var query = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
@@ -103,9 +114,24 @@ namespace DataCore
             yield return query.ToString();
         }
 
+        public virtual IEnumerable<string> GetDropTableQuery(string tableName)
+        {
+            yield return string.Concat("DROP TABLE ", tableName);
+        }
+
         public virtual IEnumerable<string> GetDropTableIfExistsQuery(string tableName)
         {
             yield return string.Concat("DROP TABLE IF EXISTS ", tableName);
+        }
+
+        public virtual string GetCreateColumnQuery(string tableName, FieldDefinition field)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " ADD COLUMN ", GetStringForColumn(field));
+        }
+
+        public virtual string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " ADD COLUMN ", GetStringForColumn(field));
         }
 
         protected virtual string GetFormatFor(FieldDefinition field)
@@ -187,9 +213,14 @@ namespace DataCore
             }
         }
 
-        public virtual string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field)
+        public virtual string GetDropColumnQuery(string tableName, string memberName)
         {
-            return string.Concat("ALTER TABLE ", tableName, " ADD COLUMN ", GetStringForColumn(field));
+            return string.Concat("ALTER TABLE ", tableName, " DROP COLUMN ", memberName);
+        }
+
+        public virtual string GetDropColumnIfExistsQuery(string tableName, string memberName)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " DROP COLUMN ", memberName);
         }
 
         public string GetSelectTableName(TableDefinition table)
@@ -202,9 +233,9 @@ namespace DataCore
             return string.Concat(tableName, " WITH(NOLOCK)");
         }
 
-        public virtual string GetDropColumnIfExistsQuery(string tableName, string memberName)
+        public virtual string GetCreateIndexQuery(string indexName, string tableName, string columns, bool unique)
         {
-            return string.Concat("ALTER TABLE ", tableName, " DROP COLUMN ", memberName);
+            return string.Concat("CREATE", unique ? " UNIQUE" : "", " INDEX ", indexName, " ON ", tableName, "(", columns, ")");
         }
 
         public virtual string GetCreateIndexIfNotExistsQuery(string indexName, string tableName, string columns, bool unique)
@@ -212,9 +243,21 @@ namespace DataCore
             return string.Concat("CREATE", unique ? " UNIQUE" : "", " INDEX IF NOT EXISTS ", indexName, " ON ", tableName, "(", columns, ")");
         }
 
+        public virtual string GetDropIndexQuery(string tableName, string indexName)
+        {
+            return string.Concat("DROP INDEX ", indexName);
+        }
+
         public virtual string GetDropIndexIfExistsQuery(string tableName, string indexName)
         {
             return string.Concat("DROP INDEX IF EXISTS ", indexName);
+        }
+
+        public virtual string GetCreateForeignKeyQuery(string indexName, string tableNameFrom, string columnNameFrom, string tableNameTo,
+            string columnNameTo)
+        {
+            return string.Concat("ALTER TABLE ", tableNameFrom, " ADD CONSTRAINT ", indexName, " FOREIGN KEY (",
+                columnNameFrom, ") REFERENCES ", tableNameTo, " (", columnNameTo, ")");
         }
 
         public virtual string GetCreateForeignKeyIfNotExistsQuery(string indexName, string tableNameFrom, string columnNameFrom,
@@ -222,6 +265,11 @@ namespace DataCore
         {
             return string.Concat("ALTER TABLE ", tableNameFrom, " ADD CONSTRAINT ", indexName, " FOREIGN KEY (",
                 columnNameFrom, ") REFERENCES ", tableNameTo, " (", columnNameTo, ")");
+        }
+
+        public virtual string GetDropForeignKeyQuery(string tableName, string indexName)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " DROP CONSTRAINT ", indexName);
         }
 
         public virtual string GetDropForeignKeyIfExistsQuery(string tableName, string indexName)

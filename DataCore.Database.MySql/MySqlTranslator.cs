@@ -35,6 +35,11 @@ namespace DataCore.Database.MySql
             return "\"{0}\"";
         }
 
+        public override string GetDropIndexQuery(string tableName, string indexName)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " DROP INDEX ", indexName);
+        }
+
         public override string GetDropIndexIfExistsQuery(string tableName, string indexName)
         {
             return
@@ -54,6 +59,11 @@ namespace DataCore.Database.MySql
                     "' AND INDEX_NAME = '", indexName,
                     "') THEN CREATE", unique ? " UNIQUE" : "", " INDEX ", indexName, " ON ", tableName, "(", columns,
                     "); END IF;");
+        }
+
+        public override string GetDropForeignKeyQuery(string tableName, string indexName)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " DROP FOREIGN KEY ", indexName);
         }
 
         public override string GetDropForeignKeyIfExistsQuery(string tableName, string indexName)

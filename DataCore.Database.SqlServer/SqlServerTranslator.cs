@@ -53,9 +53,19 @@ namespace DataCore.Database.SqlServer
                 " INDEX ", indexName, " ON ", tableName, "(", columns, ")");
         }
 
+        public override string GetDropIndexQuery(string tableName, string indexName)
+        {
+            return string.Concat("DROP INDEX ", indexName, " ON ", tableName);
+        }
+
         public override string GetDropIndexIfExistsQuery(string tableName, string indexName)
         {
             return string.Concat("DROP INDEX IF EXISTS ", indexName, " ON ", tableName);
+        }
+
+        public override string GetCreateColumnQuery(string tableName, FieldDefinition field)
+        {
+            return string.Concat("ALTER TABLE ", tableName, " ADD ", GetStringForColumn(field));
         }
 
         public override string GetCreateColumnIfNotExistsQuery(string tableName, FieldDefinition field)

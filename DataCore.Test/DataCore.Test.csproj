@@ -76,6 +76,7 @@
     <Compile Include="DatabaseDeleteTest.cs" />
     <Compile Include="DatabaseInsertTest.cs" />
     <Compile Include="DatabaseSelectTest.cs" />
+    <Compile Include="DatabaseCheckedTest.cs" />
     <Compile Include="DatabaseTest.cs" />
     <Compile Include="DatabaseUpdateQuery.cs" />
     <Compile Include="DatabaseWhereTest.cs" />
