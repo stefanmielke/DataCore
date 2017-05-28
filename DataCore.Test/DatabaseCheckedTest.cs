@@ -166,6 +166,24 @@ namespace DataCore.Test
         }
 
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanDropTables(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var database = TestHelper.GetDatabaseFor(dbType, connection);
+
+                database.CreateTablesIfNotExists(typeof(TestClass), typeof(TestClass2));
+
+                database.Select(database.From<TestClass>().Where(t => t.Id == 1));
+                database.Select(database.From<TestClass2>().Where(t => t.Id == 1));
+
+                database.DropTablesIfExists(typeof(TestClass), typeof(TestClass2));
+
+                connection.Close();
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanCreateColumn(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))

@@ -20,8 +20,13 @@ namespace DataCore.Database
         int CreateTableIfNotExists(Type table, bool createReferences = false);
         int CreateTablesIfNotExists(params Type[] tables);
         int CreateTablesIfNotExists(IEnumerable<Type> tables, bool createReferences = false);
+
         int DropTable<T>();
+        int DropTable(Type table);
+        int DropTables(params Type[] tables);
         int DropTableIfExists<T>();
+        int DropTableIfExists(Type table);
+        int DropTablesIfExists(params Type[] tables);
 
         int CreateColumn<T>(Expression<Func<T, dynamic>> clause);
         int CreateColumnIfNotExists<T>(Expression<Func<T, dynamic>> clause);

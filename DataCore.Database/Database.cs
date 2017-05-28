@@ -263,7 +263,12 @@ namespace DataCore.Database
 
         public int DropTable<T>()
         {
-            var tableDefinition = GetTableDefinition(typeof(T));
+            return DropTable(typeof(T));
+        }
+
+        public int DropTable(Type table)
+        {
+            var tableDefinition = GetTableDefinition(table);
 
             var queries = Translator.GetDropTableQuery(tableDefinition.Name);
 
@@ -275,15 +280,40 @@ namespace DataCore.Database
             return 0;
         }
 
+        public int DropTables(params Type[] tables)
+        {
+            foreach (var table in tables)
+            {
+                DropTable(table);
+            }
+
+            return 0;
+        }
+
         public int DropTableIfExists<T>()
         {
-            var tableDefinition = GetTableDefinition(typeof(T));
+            return DropTableIfExists(typeof(T));
+        }
+
+        public int DropTableIfExists(Type table)
+        {
+            var tableDefinition = GetTableDefinition(table);
 
             var queries = Translator.GetDropTableIfExistsQuery(tableDefinition.Name);
 
             foreach (var query in queries)
             {
                 Execute(query);
+            }
+
+            return 0;
+        }
+
+        public int DropTablesIfExists(params Type[] tables)
+        {
+            foreach (var table in tables)
+            {
+                DropTableIfExists(table);
             }
 
             return 0;
