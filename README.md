@@ -34,17 +34,13 @@ class User
   public string Name { get; set; }
 }
 
-using (var connection = new SQLiteConnection("Data Source=:memory:"))
+using (var db = new Database.Database(new SqliteDatabase(), "Data Source=:memory:"))
 {
-    var db = new SqliteDatabase(connection);
-
     db.CreateTableIfNotExists<User>();
     
     db.Insert(new User { Id = 1, Name = "Test User" });
 
     var user = db.Select<User>(u => u.Id == 1);
-
-    connection.Close();
 }
 ```
 
