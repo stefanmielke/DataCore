@@ -205,16 +205,38 @@ db.DeleteById<User>(1, 2, 3);
 You can use the following methods to create and drop parts of your database:
 
 ```csharp
-db.CreateTableIfNotExists<User>();
-db.DropTableIfExists<User>();
+// tables
+db.CreateTable<User>();
+db.CreateTables(typeof(User), typeof(Address));
 
+db.CreateTableIfNotExists<User>();
+db.CreateTablesIfNotExists(typeof(User), typeof(Address));
+
+db.DropTable<User>();
+db.DropTables(typeof(User), typeof(Address));
+
+db.DropTableIfExists<User>();
+db.DropTablesIfExists(typeof(User), typeof(Address));
+
+// columns
+db.CreateColumn<User>(t => t.NewColumn);
 db.CreateColumnIfNotExists<User>(t => t.NewColumn);
+
+db.DropColumn<User>(t => t.NewColumn);
 db.DropColumnIfExists<User>(t => t.NewColumn);
 
+// indexes
+db.CreateIndex<User>(t => new { t.Id, t.Name }, true, "IX_User_IdName_Unique");
 db.CreateIndexIfNotExists<User>(t => new { t.Id, t.Name }, true, "IX_User_IdName_Unique");
+
+db.DropIndex<User>("IX_User_IdName_Unique");
 db.DropIndexIfExists<User>("IX_User_IdName_Unique");
 
+// foreign keys
+db.CreateForeignKey<User, Address>(u => u.Id, a => a.UserId, "FK_User_Address");
 db.CreateForeignKeyIfNotExists<User, Address>(u => u.Id, a => a.UserId, "FK_User_Address");
+
+db.DropForeignKey<User>("FK_User_Address");
 db.DropForeignKeyIfExists<User>("FK_User_Address");
 ```
 
