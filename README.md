@@ -6,7 +6,7 @@ It uses Dapper for SQL execution and creates a layer on top of it to ease the qu
 
 ## Download
 
-For now there's no Nuget version, so you can download/clone and build the current version from GitHub.
+For now there's no Nuget version, so you have to download/clone and build the current version from GitHub.
 
 ## Supported Databases
 
@@ -14,9 +14,10 @@ For now there's no Nuget version, so you can download/clone and build the curren
 * SQL Server
 * Oracle DB
 * Postgres
-* MySQL (planned for Beta)
+* MariaDB (through MySql, full support)
+* MySQL (partial - no index support - planned for full release)
 
-Each database has its own project. So you can only add what you'll use.
+Each database has its own project. You can only add what you'll use.
 
 ## Usage
 
