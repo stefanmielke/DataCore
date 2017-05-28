@@ -5,6 +5,11 @@ namespace DataCore
 {
     public interface ITranslator
     {
+        string GetCreateDatabaseQuery(string name);
+        string GetCreateDatabaseIfNotExistsQuery(string name);
+        string GetDropDatabaseQuery(string name);
+        string GetDropDatabaseIfExistsQuery(string name);
+
         void Top<T>(Query<T> query, int count);
         void Count<T>(Query<T> query);
         void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage);

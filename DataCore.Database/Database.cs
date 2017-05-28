@@ -155,6 +155,34 @@ namespace DataCore.Database
             Execute(query, parameters);
         }
 
+        public int CreateDatabase(string name)
+        {
+            var query = Translator.GetCreateDatabaseQuery(name);
+
+            return Execute(query);
+        }
+
+        public int CreateDatabaseIfNotExists(string name)
+        {
+            var query = Translator.GetCreateDatabaseIfNotExistsQuery(name);
+
+            return Execute(query);
+        }
+
+        public int DropDatabase(string name)
+        {
+            var query = Translator.GetDropDatabaseQuery(name);
+
+            return Execute(query);
+        }
+
+        public int DropDatabaseIfExists(string name)
+        {
+            var query = Translator.GetDropDatabaseIfExistsQuery(name);
+
+            return Execute(query);
+        }
+
         public int CreateTable<T>(bool createReferences = false)
         {
             return CreateTable(typeof(T), createReferences);

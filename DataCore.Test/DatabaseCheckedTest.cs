@@ -9,6 +9,20 @@ namespace DataCore.Test
     public class DatabaseCheckedTest
     {
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        public void CanCreateAndDropDatabase(TestHelper.DatabaseType dbType, string connectionString)
+        {
+            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            {
+                var db = TestHelper.GetDatabaseFor(dbType, connection);
+
+                db.DropDatabaseIfExists("test_db");
+                db.CreateDatabaseIfNotExists("test_db");
+                db.CreateDatabaseIfNotExists("test_db");
+                db.DropDatabaseIfExists("test_db");
+            }
+        }
+
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanCreateTable(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))

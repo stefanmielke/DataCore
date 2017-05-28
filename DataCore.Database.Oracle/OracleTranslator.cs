@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -8,6 +7,26 @@ namespace DataCore.Database.Oracle
 {
     public class OracleTranslator : Translator
     {
+        public override string GetCreateDatabaseQuery(string name)
+        {
+            return "SELECT 1 FROM DUAL";
+        }
+
+        public override string GetCreateDatabaseIfNotExistsQuery(string name)
+        {
+            return "SELECT 1 FROM DUAL";
+        }
+
+        public override string GetDropDatabaseQuery(string name)
+        {
+            return "SELECT 1 FROM DUAL";
+        }
+
+        public override string GetDropDatabaseIfExistsQuery(string name)
+        {
+            return "SELECT 1 FROM DUAL";
+        }
+
         public override void Top<T>(Query<T> query, int count)
         {
             query.Where("ROWNUM <= " + count);

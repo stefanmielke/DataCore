@@ -8,10 +8,14 @@ namespace DataCore.Database
     {
         ITranslator Translator { get; }
 
-        void Delete<T>(Expression<Func<T, bool>> whereClause);
-        void DeleteById<T>(object id);
-        void DeleteById<T>(params object[] ids);
-        
+        int Execute(string query);
+        IEnumerable<T> Execute<T>(string query);
+
+        int CreateDatabase(string name);
+        int CreateDatabaseIfNotExists(string name);
+        int DropDatabase(string name);
+        int DropDatabaseIfExists(string name);
+
         int CreateTable<T>(bool createReferences = false);
         int CreateTable(Type table, bool createReferences = false);
         int CreateTables(params Type[] tables);
@@ -48,20 +52,28 @@ namespace DataCore.Database
         int DropForeignKey<T>(string indexName);
         int DropForeignKeyIfExists<T>(string indexName);
 
-        int Execute(string query);
-        IEnumerable<T> Execute<T>(string query);
+        void Insert<T>(T obj);
+
+        void Update<T>(T obj, Expression<Func<T, dynamic>> whereClause);
+        void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields, Expression<Func<T, dynamic>> whereClause);
+
+        void Delete<T>(Expression<Func<T, bool>> whereClause);
+        void DeleteById<T>(object id);
+        void DeleteById<T>(params object[] ids);
+
+        Query<T> From<T>();
+
         bool Exists<T>(Query<T> query);
         bool Exists<T>(Expression<Func<T, bool>> clause);
-        Query<T> From<T>();
-        void Insert<T>(T obj);
+
         IEnumerable<T> Select<T>(Query<T> query);
         IEnumerable<TOther> Select<TOther>(IQuery query);
         IEnumerable<T> Select<T>(Expression<Func<T, bool>> clause);
+
         T SelectSingle<T>(Query<T> query);
         T SelectSingle<T>(Expression<Func<T, bool>> clause);
+
         T SelectById<T>(object id);
         IEnumerable<T> SelectById<T>(params object[] ids);
-        void Update<T>(T obj, Expression<Func<T, dynamic>> whereClause);
-        void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields, Expression<Func<T, dynamic>> whereClause);
     }
 }

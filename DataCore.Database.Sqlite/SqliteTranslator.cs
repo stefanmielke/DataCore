@@ -10,6 +10,38 @@
         /// <summary>
         /// SQLite does NOT support this method.
         /// </summary>
+        public override string GetCreateDatabaseQuery(string name)
+        {
+            return "SELECT 1";
+        }
+
+        /// <summary>
+        /// SQLite does NOT support this method.
+        /// </summary>
+        public override string GetCreateDatabaseIfNotExistsQuery(string name)
+        {
+            return "SELECT 1";
+        }
+
+        /// <summary>
+        /// SQLite does NOT support this method.
+        /// </summary>
+        public override string GetDropDatabaseQuery(string name)
+        {
+            return "SELECT 1";
+        }
+
+        /// <summary>
+        /// SQLite does NOT support this method.
+        /// </summary>
+        public override string GetDropDatabaseIfExistsQuery(string name)
+        {
+            return "SELECT 1";
+        }
+
+        /// <summary>
+        /// SQLite does NOT support this method.
+        /// </summary>
         public override string GetDropColumnQuery(string tableName, string memberName)
         {
             return "SELECT 1";

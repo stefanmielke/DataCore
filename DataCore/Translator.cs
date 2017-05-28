@@ -9,6 +9,26 @@ namespace DataCore
 {
     public class Translator : ITranslator
     {
+        public virtual string GetCreateDatabaseQuery(string name)
+        {
+            return string.Concat("CREATE DATABASE ", name);
+        }
+
+        public virtual string GetCreateDatabaseIfNotExistsQuery(string name)
+        {
+            return string.Concat("CREATE DATABASE IF NOT EXISTS ", name);
+        }
+
+        public virtual string GetDropDatabaseQuery(string name)
+        {
+            return string.Concat("DROP DATABASE ", name);
+        }
+
+        public virtual string GetDropDatabaseIfExistsQuery(string name)
+        {
+            return string.Concat("DROP DATABASE IF EXISTS ", name);
+        }
+
         public virtual void Top<T>(Query<T> query, int count)
         {
             query.SqlEnd = string.Concat("LIMIT ", count);

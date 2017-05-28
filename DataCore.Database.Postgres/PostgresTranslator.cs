@@ -4,6 +4,12 @@ namespace DataCore.Database.Postgres
 {
     public class PostgresTranslator : Translator
     {
+        public override string GetCreateDatabaseIfNotExistsQuery(string name)
+        {
+            return string.Concat("DO $do$ BEGIN IF EXISTS(SELECT 1 FROM pg_database WHERE datname = '", name,
+                "') THEN CREATE DATABASE ", name, "; END IF; END $do$ ");
+        }
+        
         public override void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage)
         {
             query.SqlEnd = string.Concat("LIMIT ", recordsPerPage, " OFFSET ", (currentPage - 1) * recordsPerPage);

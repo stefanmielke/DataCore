@@ -7,6 +7,16 @@ namespace DataCore.Database.SqlServer
 {
     public class SqlServerTranslator : Translator
     {
+        public override string GetCreateDatabaseIfNotExistsQuery(string name)
+        {
+            return string.Concat("IF NOT EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'", name, "') CREATE DATABASE ", name);
+        }
+
+        public override string GetDropDatabaseIfExistsQuery(string name)
+        {
+            return string.Concat("IF EXISTS (SELECT name FROM master.dbo.sysdatabases WHERE name = N'", name, "') DROP DATABASE ", name);
+        }
+
         public override void Top<T>(Query<T> query, int count)
         {
             query.SqlSelectFormat = string.Concat("TOP (", count, ") {0}");
