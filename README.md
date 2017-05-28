@@ -205,6 +205,13 @@ db.DeleteById<User>(1, 2, 3);
 You can use the following methods to create and drop parts of your database:
 
 ```csharp
+// databases (does not work for OracleDB and Sqlite)
+db.CreateDatabase("test_db");
+db.CreateDatabaseIfNotExists("test_db");
+
+db.DropDatabaseIfExists("test_db");
+db.DropDatabase("test_db");
+
 // tables
 db.CreateTable<User>();
 db.CreateTables(typeof(User), typeof(Address));
