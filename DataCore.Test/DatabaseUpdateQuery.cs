@@ -12,10 +12,8 @@ namespace DataCore.Test
         {
             var updatedName = "test updated";
 
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestClass>();
 
                 var testClass = new TestClass
@@ -36,8 +34,6 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
-
-                connection.Close();
             }
         }
 
@@ -47,10 +43,8 @@ namespace DataCore.Test
             var updatedName = "test updated";
             var updatedNumber = 2;
 
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestClass>();
 
                 var testClass = new TestClass
@@ -74,8 +68,6 @@ namespace DataCore.Test
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
                 Assert.AreNotEqual(updatedNumber, result.FloatNumber);
-
-                connection.Close();
             }
         }
 
@@ -85,10 +77,8 @@ namespace DataCore.Test
             var updatedName = "test updated";
             var updatedNumber = 2;
 
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestClass>();
 
                 var testClass = new TestClass
@@ -112,8 +102,6 @@ namespace DataCore.Test
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
                 Assert.AreNotEqual(updatedNumber, result.FloatNumber);
-
-                connection.Close();
             }
         }
 
@@ -122,10 +110,8 @@ namespace DataCore.Test
         {
             var updatedName = "test updated";
 
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestIgnore>();
 
                 var testClass = new TestIgnore
@@ -143,8 +129,6 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
-
-                connection.Close();
             }
         }
 
@@ -154,10 +138,8 @@ namespace DataCore.Test
             var updatedName = "test updated";
             var updatedNumber = 2;
 
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestIgnore>();
 
                 var testClass = new TestIgnore
@@ -178,8 +160,6 @@ namespace DataCore.Test
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
                 Assert.AreNotEqual(updatedNumber, result.FloatNumber);
-
-                connection.Close();
             }
         }
 
@@ -189,10 +169,8 @@ namespace DataCore.Test
             var updatedName = "test updated";
             var updatedNumber = 2;
 
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestIgnore>();
 
                 var testClass = new TestIgnore
@@ -213,8 +191,6 @@ namespace DataCore.Test
                 var result = database.SelectSingle(query);
                 Assert.AreEqual(updatedName, result.Name);
                 Assert.AreNotEqual(updatedNumber, result.FloatNumber);
-
-                connection.Close();
             }
         }
     }

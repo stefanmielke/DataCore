@@ -1,12 +1,18 @@
 ﻿using System.Data;
+using System.Data.SQLite;
 
 namespace DataCore.Database.Sqlite
 {
-    public class SqliteDatabase : Database
+    public class SqliteDatabase : IDatabaseDefinition
     {
-        public SqliteDatabase(IDbConnection connection)
-            : base(connection, new SqliteTranslator())
+        public IDbConnection GetNewDbConnection(string connectionString)
         {
+            return new SQLiteConnection(connectionString);
+        }
+
+        public ITranslator GetTranslator()
+        {
+            return new SqliteTranslator();
         }
     }
 }

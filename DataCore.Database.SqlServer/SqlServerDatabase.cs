@@ -1,12 +1,18 @@
 ﻿using System.Data;
+using System.Data.SqlClient;
 
 namespace DataCore.Database.SqlServer
 {
-    public class SqlServerDatabase : Database
+    public class SqlServerDatabase : IDatabaseDefinition
     {
-        public SqlServerDatabase(IDbConnection connection)
-            : base(connection, new SqlServerTranslator())
+        public IDbConnection GetNewDbConnection(string connectionString)
         {
+            return new SqlConnection(connectionString);
+        }
+
+        public ITranslator GetTranslator()
+        {
+            return new SqlServerTranslator();
         }
     }
 }

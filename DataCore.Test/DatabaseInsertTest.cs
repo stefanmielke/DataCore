@@ -11,10 +11,8 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanInsert(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestClass>();
 
                 database.Insert(new TestClass
@@ -31,18 +29,14 @@ namespace DataCore.Test
 
                 var results = database.Select(query);
                 Assert.IsTrue(results.Any());
-
-                connection.Close();
             }
         }
 
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CannotInsertIgnoredAttributes(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestIgnore>();
 
                 database.Insert(new TestIgnore
@@ -56,8 +50,6 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.IsNotNull(result);
-
-                connection.Close();
             }
         }
     }

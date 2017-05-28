@@ -9,10 +9,8 @@ namespace DataCore.Test
         [Test]
         public void TimedSelect()
         {
-            using (var connection = TestHelper.GetConnectionFor(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:"))
+            using (var db = TestHelper.GetDatabaseFor(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:"))
             {
-                var db = TestHelper.GetDatabaseFor(TestHelper.DatabaseType.Sqlite, connection);
-
                 db.CreateTableIfNotExists<TestClass>();
                 db.Insert(TestHelper.GetNewTestClass());
 
@@ -20,18 +18,14 @@ namespace DataCore.Test
                 {
                     db.SelectById<TestClass>(1);
                 }
-
-                connection.Close();
             }
         }
 
         [Test]
         public void TimedSelectWhere()
         {
-            using (var connection = TestHelper.GetConnectionFor(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:"))
+            using (var db = TestHelper.GetDatabaseFor(TestHelper.DatabaseType.Sqlite, "Data Source=:memory:"))
             {
-                var db = TestHelper.GetDatabaseFor(TestHelper.DatabaseType.Sqlite, connection);
-
                 db.CreateTableIfNotExists<TestClass>();
                 db.Insert(TestHelper.GetNewTestClass());
 
@@ -39,8 +33,6 @@ namespace DataCore.Test
                 {
                     db.Select<TestClass>(t => t.Id == 1);
                 }
-
-                connection.Close();
             }
         }
     }

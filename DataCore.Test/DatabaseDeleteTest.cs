@@ -7,13 +7,11 @@ namespace DataCore.Test
     [TestFixture]
     public class DatabaseDeleteTest
     {
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDeleteOne(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestClass>();
 
                 var testClass = new TestClass
@@ -33,18 +31,14 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.IsNull(result);
-
-                connection.Close();
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDeleteMany(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestClass>();
 
                 var testClass = new TestClass
@@ -68,18 +62,14 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.IsNull(result);
-
-                connection.Close();
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDeleteById(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestClass>();
                 
                 database.Insert(TestHelper.GetNewTestClass());
@@ -90,18 +80,14 @@ namespace DataCore.Test
 
                 var result = database.SelectSingle(query);
                 Assert.IsNull(result);
-
-                connection.Close();
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), "TestCases")]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDeleteByIds(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestClass>();
 
                 var test1 = TestHelper.GetNewTestClass();
@@ -117,8 +103,6 @@ namespace DataCore.Test
 
                 var result = database.Select(query);
                 Assert.IsEmpty(result);
-
-                connection.Close();
             }
         }
     }

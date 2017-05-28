@@ -1,11 +1,18 @@
 ﻿using System.Data;
+using MySql.Data.MySqlClient;
 
 namespace DataCore.Database.MySql
 {
-    public class MySqlDatabase : Database
+    public class MySqlDatabase : IDatabaseDefinition
     {
-        public MySqlDatabase(IDbConnection connection) : base(connection, new MySqlTranslator())
+        public IDbConnection GetNewDbConnection(string connectionString)
         {
+            return new MySqlConnection(connectionString);
+        }
+
+        public ITranslator GetTranslator()
+        {
+            return new MySqlTranslator();
         }
     }
 }

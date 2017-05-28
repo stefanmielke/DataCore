@@ -9,16 +9,24 @@ using DataCore.Attributes;
 
 namespace DataCore.Database
 {
-    public abstract class Database : IDatabase
+    public class Database : IDatabase
     {
-        private readonly IDbConnection _connection;
+        private readonly IDatabaseDefinition _dbDefinition;
+        private IDbConnection _connection;
 
-        public ITranslator Translator { get; private set; }
+        public ITranslator Translator { get; }
 
-        protected Database(IDbConnection connection, ITranslator translator)
+        public Database(IDatabaseDefinition dbDefinition, string connectionString)
         {
-            _connection = connection;
-            Translator = translator;
+            _dbDefinition = dbDefinition;
+            Translator = dbDefinition.GetTranslator();
+
+            OpenConnection(connectionString);
+        }
+
+        public void OpenConnection(string connectionString)
+        {
+            _connection = _dbDefinition.GetNewDbConnection(connectionString);
         }
 
         public Query<T> From<T>()
@@ -724,17 +732,38 @@ namespace DataCore.Database
 
         public int Execute(string query)
         {
+            if (_connection == null)
+                throw new ApplicationException("Call the method OpenConnection before executing a query.");
+
+            if (_connection.State == ConnectionState.Closed)
+                _connection.Open();
+
             return _connection.Execute(query);
         }
 
         public int Execute(string query, Parameters parameters)
         {
+            if (_connection == null)
+                throw new ApplicationException("Call the method OpenConnection before executing a query.");
+
+            if (_connection.State == ConnectionState.Closed)
+                _connection.Open();
+
             return _connection.Execute(query, parameters.GetValues());
         }
 
         private TableDefinition GetTableDefinition(Type type)
         {
             return new TableDefinition(type);
+        }
+
+        public void Dispose()
+        {
+            if (_connection != null)
+            {
+                _connection.Close();
+                _connection.Dispose();
+            }
         }
     }
 }

@@ -4,8 +4,10 @@ using System.Linq.Expressions;
 
 namespace DataCore.Database
 {
-    public interface IDatabase
+    public interface IDatabase : IDisposable
     {
+        void OpenConnection(string connectionString);
+
         ITranslator Translator { get; }
 
         int Execute(string query);

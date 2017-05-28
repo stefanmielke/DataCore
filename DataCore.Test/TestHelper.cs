@@ -47,62 +47,43 @@ namespace DataCore.Test
 
     public static class TestHelper
     {
-        public static IDbConnection GetConnectionFor(DatabaseType dbType, string connectionString)
+        public static IDatabase GetDatabaseFor(DatabaseType dbType, string connectionString)
         {
-            var connection = GetConnectionForInternal(dbType, connectionString);
-            connection.Open();
-
-            var database = GetDatabaseFor(dbType, connection);
-
-            database.DropTableIfExists<TestClass>();
-            database.DropTableIfExists<TestClass2>();
-            database.DropTableIfExists<TestClass3>();
-            database.DropTableIfExists<TestClass4>();
-            database.DropTableIfExists<TestIgnore>();
-            database.DropTableIfExists<TestOverride>();
-            database.DropTableIfExists<TestClassRef2>();
-            database.DropTableIfExists<TestClassRef1>();
-            database.DropTableIfExists<TestClassNoReference>();
-            database.DropTableIfExists<TestClassOnlyIdentity>();
-            database.DropTableIfExists<TestNullableProperty>();
-            
-            return connection;
-        }
-
-        private static IDbConnection GetConnectionForInternal(DatabaseType dbType, string connectionString)
-        {
+            IDatabaseDefinition dbDefinition;
             switch (dbType)
             {
                 case DatabaseType.Sqlite:
-                    return new SQLiteConnection(connectionString);
+                    dbDefinition = new SqliteDatabase();
+                    break;
                 case DatabaseType.Oracle:
-                    return new OracleConnection(connectionString);
+                    dbDefinition = new OracleDatabase();
+                    break;
                 case DatabaseType.Postgres:
-                    return new NpgsqlConnection(connectionString);
+                    dbDefinition = new PostgresDatabase();
+                    break;
                 case DatabaseType.MariaDb:
                 case DatabaseType.MySql:
-                    return new MySqlConnection(connectionString);
+                    dbDefinition = new MySqlDatabase();
+                    break;
                 default:
-                    return new SqlConnection(connectionString);
+                    dbDefinition = new SqlServerDatabase();
+                    break;
             }
-        }
 
-        public static IDatabase GetDatabaseFor(DatabaseType dbType, IDbConnection connection)
-        {
-            switch (dbType)
-            {
-                case DatabaseType.Sqlite:
-                    return new SqliteDatabase(connection);
-                case DatabaseType.Oracle:
-                    return new OracleDatabase(connection);
-                case DatabaseType.Postgres:
-                    return new PostgresDatabase(connection);
-                case DatabaseType.MariaDb:
-                case DatabaseType.MySql:
-                    return new MySqlDatabase(connection);
-                default:
-                    return new SqlServerDatabase(connection);
-            }
+            var db = new Database.Database(dbDefinition, connectionString);
+            db.DropTableIfExists<TestClass>();
+            db.DropTableIfExists<TestClass2>();
+            db.DropTableIfExists<TestClass3>();
+            db.DropTableIfExists<TestClass4>();
+            db.DropTableIfExists<TestIgnore>();
+            db.DropTableIfExists<TestOverride>();
+            db.DropTableIfExists<TestClassRef2>();
+            db.DropTableIfExists<TestClassRef1>();
+            db.DropTableIfExists<TestClassNoReference>();
+            db.DropTableIfExists<TestClassOnlyIdentity>();
+            db.DropTableIfExists<TestNullableProperty>();
+
+            return db;
         }
 
         public static TestClass GetNewTestClass(int id = 1, int number = 1, string name = "test", bool done = true, int testClass2Id = 1)

@@ -1,11 +1,18 @@
 ﻿using System.Data;
+using Npgsql;
 
 namespace DataCore.Database.Postgres
 {
-    public class PostgresDatabase : Database
+    public class PostgresDatabase : IDatabaseDefinition
     {
-        public PostgresDatabase(IDbConnection connection) : base(connection, new PostgresTranslator())
+        public IDbConnection GetNewDbConnection(string connectionString)
         {
+            return new NpgsqlConnection(connectionString);
+        }
+
+        public ITranslator GetTranslator()
+        {
+            return new PostgresTranslator();
         }
     }
 }

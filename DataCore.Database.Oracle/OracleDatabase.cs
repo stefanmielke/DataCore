@@ -1,12 +1,18 @@
 ﻿using System.Data;
+using Oracle.ManagedDataAccess.Client;
 
 namespace DataCore.Database.Oracle
 {
-    public class OracleDatabase : Database
+    public class OracleDatabase : IDatabaseDefinition
     {
-        public OracleDatabase(IDbConnection connection)
-            : base(connection, new OracleTranslator())
+        public IDbConnection GetNewDbConnection(string connectionString)
         {
+            return new OracleConnection(connectionString);
+        }
+
+        public ITranslator GetTranslator()
+        {
+            return new OracleTranslator();
         }
     }
 }

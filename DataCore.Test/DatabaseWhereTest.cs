@@ -10,36 +10,28 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanUseSelectSingleWhereOnDatabase(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestClass>();
                 database.Insert(TestHelper.GetNewTestClass());
 
                 var obj = database.SelectSingle<TestClass>(t => t.Id == 1);
 
                 Assert.IsNotNull(obj);
-
-                connection.Close();
             }
         }
 
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanUseSelectWhereOnDatabase(TestHelper.DatabaseType dbType, string connectionString)
         {
-            using (var connection = TestHelper.GetConnectionFor(dbType, connectionString))
+            using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
-                var database = TestHelper.GetDatabaseFor(dbType, connection);
-
                 database.CreateTableIfNotExists<TestClass>();
                 database.Insert(TestHelper.GetNewTestClass());
 
                 var objs = database.Select<TestClass>(t => t.Id == 1);
 
                 Assert.That(objs.Count(), Is.GreaterThan(0));
-
-                connection.Close();
             }
         }
     }
