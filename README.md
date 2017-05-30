@@ -205,7 +205,7 @@ You can use the following methods to create and drop parts of your database:
 db.CreateDatabase("test_db");
 db.CreateDatabaseIfNotExists("test_db");
 
-db.DatabaseExists(); // returns true
+db.DatabaseExists("test_db"); // returns true
 
 db.DropDatabaseIfExists("test_db");
 db.DropDatabase("test_db");
