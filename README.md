@@ -34,7 +34,7 @@ class User
   public string Name { get; set; }
 }
 
-using (var db = new Database.Database(new SqliteDatabase(), "Data Source=:memory:"))
+using (var db = new DataCoreDatabase(new SqliteDatabase(), "Data Source=:memory:"))
 {
     db.CreateTable<User>();
     
