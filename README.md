@@ -14,7 +14,7 @@ For now there's no Nuget version, so you have to download/clone and build the cu
 * SQL Server
 * Oracle DB
 * Postgres
-* MariaDB (through MySql, full support)
+* MariaDB (through MySQL, full support)
 * MySQL (partial - no index support - planned for full release)
 
 Each database has its own project. You can only add what you'll use.
@@ -36,7 +36,7 @@ class User
 
 using (var db = new Database.Database(new SqliteDatabase(), "Data Source=:memory:"))
 {
-    db.CreateTableIfNotExists<User>();
+    db.CreateTable<User>();
     
     db.Insert(new User { Id = 1, Name = "Test User" });
 
@@ -249,23 +249,28 @@ db.DropForeignKeyIfExists<User>("FK_User_Address");
 For automatic generation and Id usage, the following attributes can be used to decorate your properties.
 
 ```csharp
-[Table("USER")]
+[Table("USER")] // explicit table name
 class User
 {
+  // set as primary key, with the column name, and with AutoIncrement
   [Column(isPrimaryKey: true, columnName: "User_ID"), Identity]
   public int Id { get; set; }
   
+  // create an index when creating the table
   [Index]
   public string Login { get; set; }
   
   public string Name { get; set; }
 
+  // set as nullable
   [Column(isRequired: false)]
   public DateTime InsertDate { get; set; }
   
+  // ignore the field for db
   [Ignore]
   public float Number { get; set; }
   
+  // create a foreign key to Address with the name provided
   [Reference(typeof(Address), "FK_User_Address")]
   public int AddressId { get; set; }
 }
