@@ -8,14 +8,14 @@ using System;
 
 namespace DataCore.Database
 {
-    public class Database : IDatabase
+    public class DataCoreDatabase : IDatabase
     {
         private readonly IDatabaseDefinition _dbDefinition;
         private IDbConnection _connection;
 
         public ITranslator Translator { get; }
 
-        public Database(IDatabaseDefinition dbDefinition, string connectionString)
+        public DataCoreDatabase(IDatabaseDefinition dbDefinition, string connectionString)
         {
             _dbDefinition = dbDefinition;
             Translator = dbDefinition.GetTranslator();

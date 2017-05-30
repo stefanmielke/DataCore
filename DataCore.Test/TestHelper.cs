@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Data;
-using System.Data.SqlClient;
-using System.Data.SQLite;
 using DataCore.Database;
 using DataCore.Database.MySql;
 using DataCore.Database.Oracle;
@@ -10,10 +7,7 @@ using DataCore.Database.Postgres;
 using DataCore.Database.Sqlite;
 using DataCore.Database.SqlServer;
 using DataCore.Test.Models;
-using MySql.Data.MySqlClient;
-using Npgsql;
 using NUnit.Framework;
-using Oracle.ManagedDataAccess.Client;
 
 namespace DataCore.Test
 {
@@ -93,7 +87,7 @@ namespace DataCore.Test
                     break;
             }
 
-            var db = new Database.Database(dbDefinition, connectionString);
+            var db = new Database.DataCoreDatabase(dbDefinition, connectionString);
             db.DropTableIfExists<TestClass>();
             db.DropTableIfExists<TestClass2>();
             db.DropTableIfExists<TestClass3>();
