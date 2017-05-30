@@ -4,6 +4,34 @@ namespace DataCore.Database.MySql
 {
     public class MySqlTranslator : Translator
     {
+        public override string GetDatabaseExistsQuery(string name)
+        {
+            return string.Concat("SELECT COUNT(1) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='", name, "'");
+        }
+
+        public override string GetTableExistsQuery(string tableName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM information_schema.tables WHERE table_name='", tableName, "'");
+        }
+
+        public override string GetColumnExistsQuery(string tableName, string columnName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM information_schema.COLUMNS WHERE table_name='", tableName,
+                "' AND COLUMN_NAME='", columnName, "'");
+        }
+
+        public override string GetIndexExistsQuery(string indexName, string tableName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM information_schema.statistics WHERE INDEX_NAME='", indexName,
+                "' AND TABLE_NAME='", tableName, "'");
+        }
+
+        public override string GetForeignKeyExistsQuery(string indexName, string tableName)
+        {
+            return string.Concat(
+                "SELECT COUNT(*) FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_NAME = '", indexName, "'");
+        }
+
         protected override string GetStringForColumn(FieldDefinition field)
         {
             var nullable = field.Nullable ? "NULL" : "NOT NULL";

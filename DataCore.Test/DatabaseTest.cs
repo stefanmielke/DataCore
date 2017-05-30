@@ -89,7 +89,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCasesNoSqlite))]
         public void CanCreateTableWithReferences(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
@@ -166,7 +166,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCasesNoSqlite))]
         public void CanDropColumn(TestHelper.DatabaseType dbType, string connectionString)
         {
             using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
@@ -214,7 +214,7 @@ namespace DataCore.Test
             }
         }
 
-        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
+        [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCasesNoSqlite))]
         public void CanDropForeignKey(TestHelper.DatabaseType dbType, string connectionString)
         {
             string indexName = "FK_TestClass_Id";

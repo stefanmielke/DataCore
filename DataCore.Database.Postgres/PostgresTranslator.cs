@@ -4,12 +4,38 @@ namespace DataCore.Database.Postgres
 {
     public class PostgresTranslator : Translator
     {
+        public override string GetDatabaseExistsQuery(string name)
+        {
+            return string.Concat("SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = '", name, "')");
+        }
+
+        public override string GetTableExistsQuery(string tableName)
+        {
+            return string.Concat("SELECT COUNT(*) FROM pg_class WHERE relname='", tableName.ToLower(), "'");
+        }
+
+        public override string GetColumnExistsQuery(string tableName, string columnName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM information_schema.columns WHERE table_name='", tableName.ToLower(), "' and column_name='", columnName.ToLower(), "'");
+        }
+
+        public override string GetIndexExistsQuery(string indexName, string tableName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM pg_indexes WHERE indexname='", indexName.ToLower(),
+                "' AND tablename='", tableName.ToLower(), "'");
+        }
+
+        public override string GetForeignKeyExistsQuery(string indexName, string tableName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM pg_constraint WHERE conname='", indexName.ToLower(), "'");
+        }
+
         public override string GetCreateDatabaseIfNotExistsQuery(string name)
         {
             return string.Concat("DO $do$ BEGIN IF EXISTS(SELECT 1 FROM pg_database WHERE datname = '", name,
-                "') THEN CREATE DATABASE ", name, "; END IF; END $do$ ");
+                "') THEN CREATE DATABASE ", name, "; END IF; END $do$");
         }
-        
+
         public override void Paginate<T>(Query<T> query, int recordsPerPage, int currentPage)
         {
             query.SqlEnd = string.Concat("LIMIT ", recordsPerPage, " OFFSET ", (currentPage - 1) * recordsPerPage);

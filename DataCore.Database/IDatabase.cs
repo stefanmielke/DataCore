@@ -13,11 +13,13 @@ namespace DataCore.Database
         int Execute(string query);
         IEnumerable<T> Execute<T>(string query);
 
+        bool DatabaseExists(string name);
         int CreateDatabase(string name);
         int CreateDatabaseIfNotExists(string name);
         int DropDatabase(string name);
         int DropDatabaseIfExists(string name);
 
+        bool TableExists<T>();
         int CreateTable<T>(bool createReferences = false);
         int CreateTable(Type table, bool createReferences = false);
         int CreateTables(params Type[] tables);
@@ -39,16 +41,22 @@ namespace DataCore.Database
         int DropAndCreateTables(params Type[] tables);
         int DropAndCreateTables(IEnumerable<Type> tables, bool createReferences = false);
 
+        bool ColumnExists<T>(string columnName);
+        bool ColumnExists<T>(Expression<Func<T, dynamic>> clause);
         int CreateColumn<T>(Expression<Func<T, dynamic>> clause);
         int CreateColumnIfNotExists<T>(Expression<Func<T, dynamic>> clause);
         int DropColumn<T>(Expression<Func<T, dynamic>> clause);
         int DropColumnIfExists<T>(Expression<Func<T, dynamic>> clause);
 
+        bool IndexExists<T>(string indexName);
+        bool IndexExists<T>(Expression<Func<T, dynamic>> clause);
         int CreateIndex<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null);
         int CreateIndexIfNotExists<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null);
         int DropIndex<T>(string indexName);
         int DropIndexIfExists<T>(string indexName);
 
+        bool ForeignKeyExists<TFrom>(string indexName);
+        bool ForeignKeyExists<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo);
         int CreateForeignKey<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo, string indexName = null);
         int CreateForeignKeyIfNotExists<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo, string indexName = null);
         int DropForeignKey<T>(string indexName);

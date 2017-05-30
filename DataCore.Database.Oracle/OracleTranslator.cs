@@ -7,21 +7,62 @@ namespace DataCore.Database.Oracle
 {
     public class OracleTranslator : Translator
     {
+        /// <summary>
+        /// OracleDB does NOT support this method.
+        /// </summary>
+        public override string GetDatabaseExistsQuery(string name)
+        {
+            return "SELECT 1";
+        }
+
+        public override string GetTableExistsQuery(string tableName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM all_tables WHERE table_name='", tableName.ToUpper(), "'");
+        }
+
+        public override string GetColumnExistsQuery(string tableName, string columnName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM all_tab_columns WHERE table_name='", tableName.ToUpper(),
+                "' AND column_name='", columnName.ToUpper(), "'");
+        }
+
+        public override string GetIndexExistsQuery(string indexName, string tableName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM user_indexes WHERE index_name='", indexName.ToUpper(), "'");
+        }
+
+        public override string GetForeignKeyExistsQuery(string indexName, string tableName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME='", indexName.ToUpper(), "' AND CONSTRAINT_TYPE='R'");
+        }
+
+        /// <summary>
+        /// OracleDB does NOT support this method.
+        /// </summary>
         public override string GetCreateDatabaseQuery(string name)
         {
             return "SELECT 1 FROM DUAL";
         }
 
+        /// <summary>
+        /// OracleDB does NOT support this method.
+        /// </summary>
         public override string GetCreateDatabaseIfNotExistsQuery(string name)
         {
             return "SELECT 1 FROM DUAL";
         }
+        /// <summary>
+        /// OracleDB does NOT support this method.
+        /// </summary>
 
         public override string GetDropDatabaseQuery(string name)
         {
             return "SELECT 1 FROM DUAL";
         }
 
+        /// <summary>
+        /// OracleDB does NOT support this method.
+        /// </summary>
         public override string GetDropDatabaseIfExistsQuery(string name)
         {
             return "SELECT 1 FROM DUAL";

@@ -43,6 +43,29 @@ namespace DataCore.Test
                 yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=localhost;User Id=sa; Password=YourStrong!Passw0rd;");
             }
         }
+
+        public static IEnumerable TestCasesNoSqlite
+        {
+            get
+            {
+                yield return new TestCaseData(TestHelper.DatabaseType.Oracle, @"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=xe)));User Id=system;Password=oracle;");
+                yield return new TestCaseData(TestHelper.DatabaseType.Postgres, @"Server=localhost;User Id=postgres; Password=postgres;");
+                yield return new TestCaseData(TestHelper.DatabaseType.MariaDb, @"Server=localhost;Database=db;Uid=root;Pwd=mariadb;");
+                //yield return new TestCaseData(TestHelper.DatabaseType.MySql, @"Server=localhost;Port=3307;Uid=root;Pwd=mysql;Database:db;");
+                yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=localhost;User Id=sa; Password=YourStrong!Passw0rd;");
+            }
+        }
+
+        public static IEnumerable TestCasesNoSqliteAndOracle
+        {
+            get
+            {
+                yield return new TestCaseData(TestHelper.DatabaseType.Postgres, @"Server=localhost;User Id=postgres; Password=postgres;");
+                yield return new TestCaseData(TestHelper.DatabaseType.MariaDb, @"Server=localhost;Database=db;Uid=root;Pwd=mariadb;");
+                //yield return new TestCaseData(TestHelper.DatabaseType.MySql, @"Server=localhost;Port=3307;Uid=root;Pwd=mysql;Database:db;");
+                yield return new TestCaseData(TestHelper.DatabaseType.SqlServer, @"Server=localhost;User Id=sa; Password=YourStrong!Passw0rd;");
+            }
+        }
     }
 
     public static class TestHelper

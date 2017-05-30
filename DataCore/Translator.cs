@@ -9,6 +9,11 @@ namespace DataCore
 {
     public class Translator : ITranslator
     {
+        public virtual string GetDatabaseExistsQuery(string name)
+        {
+            return string.Concat("SELECT CASE WHEN DB_ID('", name, "') IS NOT NULL THEN 1 ELSE 0 END");
+        }
+
         public virtual string GetCreateDatabaseQuery(string name)
         {
             return string.Concat("CREATE DATABASE ", name);
@@ -108,6 +113,11 @@ namespace DataCore
             return Convert.ToDateTime(date);
         }
 
+        public virtual string GetTableExistsQuery(string tableName)
+        {
+            return string.Concat("SELECT CASE WHEN OBJECT_ID('", tableName, "', 'U') IS NOT NULL THEN 1 ELSE 0 END");
+        }
+
         public virtual IEnumerable<string> GetCreateTableQuery(string tableName, IEnumerable<FieldDefinition> fields)
         {
             var query = new StringBuilder("CREATE TABLE ");
@@ -142,6 +152,12 @@ namespace DataCore
         public virtual IEnumerable<string> GetDropTableIfExistsQuery(string tableName)
         {
             yield return string.Concat("DROP TABLE IF EXISTS ", tableName);
+        }
+
+        public virtual string GetColumnExistsQuery(string tableName, string columnName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM sys.columns WHERE Name = N'", columnName,
+                "' AND Object_ID = Object_ID(N'", tableName, "')");
         }
 
         public virtual string GetCreateColumnQuery(string tableName, FieldDefinition field)
@@ -243,6 +259,11 @@ namespace DataCore
             return string.Concat("ALTER TABLE ", tableName, " DROP COLUMN ", memberName);
         }
 
+        public virtual string GetIndexExistsQuery(string indexName, string tableName)
+        {
+            return string.Concat("SELECT COUNT(1) FROM sys.indexes WHERE name='",indexName,"' AND object_id=OBJECT_ID('",tableName,"')");
+        }
+
         public string GetSelectTableName(TableDefinition table)
         {
             return GetSelectTableName(table.Name);
@@ -271,6 +292,11 @@ namespace DataCore
         public virtual string GetDropIndexIfExistsQuery(string tableName, string indexName)
         {
             return string.Concat("DROP INDEX IF EXISTS ", indexName);
+        }
+
+        public virtual string GetForeignKeyExistsQuery(string indexName, string tableName)
+        {
+            return string.Concat("SELECT CASE WHEN OBJECT_ID('", indexName, "', 'F') IS NOT NULL THEN 1 ELSE 0 END");
         }
 
         public virtual string GetCreateForeignKeyQuery(string indexName, string tableNameFrom, string columnNameFrom, string tableNameTo,
