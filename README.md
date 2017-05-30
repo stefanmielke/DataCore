@@ -201,9 +201,11 @@ db.DeleteById<User>(1, 2, 3);
 You can use the following methods to create and drop parts of your database:
 
 ```csharp
-// databases (does not work for OracleDB and Sqlite)
+// databases (does not work for OracleDB)
 db.CreateDatabase("test_db");
 db.CreateDatabaseIfNotExists("test_db");
+
+db.DatabaseExists(); // returns true
 
 db.DropDatabaseIfExists("test_db");
 db.DropDatabase("test_db");
@@ -214,6 +216,8 @@ db.CreateTables(typeof(User), typeof(Address));
 
 db.CreateTableIfNotExists<User>();
 db.CreateTablesIfNotExists(typeof(User), typeof(Address));
+
+db.TableExists<User>(); // returns true
 
 db.DropTable<User>();
 db.DropTables(typeof(User), typeof(Address));
@@ -228,6 +232,9 @@ db.DropAndCreateTables(typeof(User), typeof(Address));
 db.CreateColumn<User>(t => t.NewColumn);
 db.CreateColumnIfNotExists<User>(t => t.NewColumn);
 
+db.ColumnExists<User>("NewColumn"); // returns true
+db.ColumnExists<User>(t => t.NewColumn); // returns true
+
 db.DropColumn<User>(t => t.NewColumn);
 db.DropColumnIfExists<User>(t => t.NewColumn);
 
@@ -235,12 +242,18 @@ db.DropColumnIfExists<User>(t => t.NewColumn);
 db.CreateIndex<User>(t => new { t.Id, t.Name }, true, "IX_User_IdName_Unique");
 db.CreateIndexIfNotExists<User>(t => new { t.Id, t.Name }, true, "IX_User_IdName_Unique");
 
+db.IndexExists<User>("IX_User_IdName_Unique"); // returns true
+db.IndexExists<User>(t => new { t.Id, t.Name }); // returns true
+
 db.DropIndex<User>("IX_User_IdName_Unique");
 db.DropIndexIfExists<User>("IX_User_IdName_Unique");
 
 // foreign keys
 db.CreateForeignKey<User, Address>(u => u.Id, a => a.UserId, "FK_User_Address");
 db.CreateForeignKeyIfNotExists<User, Address>(u => u.Id, a => a.UserId, "FK_User_Address");
+
+db.ForeignKeyExists<User>("FK_User_Address"); // returns true
+db.ForeignKeyExists<User, Address>(u => u.Id, a => a.UserId); // returns true
 
 db.DropForeignKey<User>("FK_User_Address");
 db.DropForeignKeyIfExists<User>("FK_User_Address");
