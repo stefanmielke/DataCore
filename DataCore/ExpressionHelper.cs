@@ -271,6 +271,12 @@ namespace DataCore
                 return true;
             }
 
+            if (methodExpression.Method.Name == "Count" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
+            {
+                concat = string.Concat("COUNT(", GetStringForExpression(translator, methodExpression.Arguments[0], parameters), ")");
+                return true;
+            }
+
             if (methodExpression.Method.Name == "As" && methodExpression.Method.ReflectedType.Name == "SqlExtensions")
             {
                 var aliasFormat = translator.GetAliasFormat();

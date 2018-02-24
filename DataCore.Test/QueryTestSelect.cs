@@ -206,6 +206,25 @@ namespace DataCore.Test
         }
 
         [Test]
+        public void CanGenerateSelectWithCount()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Select(t => t.Id.Count());
+
+            Assert.That(query.SqlColumns, Is.EqualTo("COUNT(TestClass.Id)"));
+        }
+
+        [Test]
+        public void CanGenerateHavingWithCount()
+        {
+            var query = new Query<TestClass>(new Translator());
+            query.Having(t => t.Id.Count() > 0);
+
+            Assert.That(query.SqlHaving, Is.EqualTo("(COUNT(TestClass.Id) > @p0)"));
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+        }
+
+        [Test]
         public void CanGenerateSelectWithAlias()
         {
             var query = new Query<TestClass>(new Translator());

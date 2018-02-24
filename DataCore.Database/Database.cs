@@ -423,7 +423,7 @@ namespace DataCore.Database
                                 tableDefinition.Name,
                                 tableDefinition.Fields
                                     .First(fld => fld.PropertyInfo.Name ==
-                                                  ((PropertyInfo) ((MemberExpression) f).Member).Name).Name
+                                                  ((PropertyInfo)((MemberExpression)f).Member).Name).Name
                             )
                     ).FirstOrDefault();
 
@@ -511,7 +511,7 @@ namespace DataCore.Database
                         f =>
                             Translator.GetDropColumnIfExistsQuery(tableDefinition.Name,
                                 tableDefinition.Fields.First(
-                                        fld => fld.PropertyInfo.Name == ((PropertyInfo) ((MemberExpression) f).Member).Name).Name)
+                                        fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name).Name)
                     )
                 );
 
@@ -773,6 +773,14 @@ namespace DataCore.Database
                 query.Build();
 
             return Execute<T>(query.SqlCommand.ToString(), query.Parameters).FirstOrDefault();
+        }
+
+        public TOther SelectSingle<TOther>(IQuery query)
+        {
+            if (!query.Built)
+                query.Build();
+
+            return Execute<TOther>(query.SqlCommand.ToString(), query.Parameters).FirstOrDefault();
         }
 
         public T SelectSingle<T>(Expression<Func<T, bool>> clause)

@@ -21,6 +21,11 @@
             return property;
         }
 
+        public static T Count<T>(this T property)
+        {
+            return property;
+        }
+
         public static T As<T>(this T property, string alias)
         {
             return property;

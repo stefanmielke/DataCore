@@ -81,6 +81,7 @@ namespace DataCore.Database
         IEnumerable<T> Select<T>(Expression<Func<T, bool>> clause);
 
         T SelectSingle<T>(Query<T> query);
+        TOther SelectSingle<TOther>(IQuery query);
         T SelectSingle<T>(Expression<Func<T, bool>> clause);
 
         T SelectById<T>(object id);

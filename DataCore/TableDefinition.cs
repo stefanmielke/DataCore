@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace DataCore
 {
     public sealed class TableDefinition
     {
-        private static readonly Dictionary<Type, TableDefinition> Definitions = new Dictionary<Type, TableDefinition>();
+        private static readonly ConcurrentDictionary<Type, TableDefinition> Definitions = new ConcurrentDictionary<Type, TableDefinition>();
 
         public string Name { get; }
         public FieldDefinition IdField { get; }
@@ -31,7 +32,7 @@ namespace DataCore
             IdField = GetIdFieldForType(type);
             Fields = GetPropertiesForType(type).Select(GetFieldForProperty).ToList();
 
-            Definitions.Add(type, this);
+            Definitions.TryAdd(type, this);
         }
 
         private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
