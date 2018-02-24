@@ -159,6 +159,25 @@ var query = db.From<User>().GroupBy(u => u.Age.IsNull(0)).Select(u => new { u.Ag
 var result = db.Select(query);
 ```
 
+#### All available extensions
+```
+Sum()
+Min()
+Max()
+Average()
+Count()
+Between(start, end)
+In(value1, value2, ...)
+Like(string)
+TrimSql()
+Length()
+Upper()
+Lower()
+IsNull(otherValue)
+Cast<To>()
+As(alias)
+```
+
 ### Record Maintenance
 
 #### Insert
