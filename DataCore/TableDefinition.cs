@@ -35,17 +35,17 @@ namespace DataCore
             Definitions.TryAdd(type, this);
         }
 
-        private IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
+        private static IEnumerable<PropertyInfo> GetPropertiesForType(Type type)
         {
             return type.GetProperties().Where(p => CanUseType(p.PropertyType) && p.GetCustomAttributes(typeof(IgnoreAttribute), true).Length == 0);
         }
 
-        private bool CanUseType(Type propertyType)
+        private static bool CanUseType(Type propertyType)
         {
             return !propertyType.IsClass || propertyType == typeof(string);
         }
 
-        private PropertyInfo GetIdPropertyForType(Type type)
+        private static PropertyInfo GetIdPropertyForType(Type type)
         {
             return type.GetProperties()
                 .FirstOrDefault(p =>
@@ -57,21 +57,19 @@ namespace DataCore
                 );
         }
 
-        private FieldDefinition GetIdFieldForType(Type type)
+        private static FieldDefinition GetIdFieldForType(Type type)
         {
             return GetFieldForProperty(GetIdPropertyForType(type));
         }
 
-        private string GetTableName(Type type)
+        private static string GetTableName(Type type)
         {
             var tableAttributes = type.GetCustomAttributes(typeof(TableAttribute), true);
-            if (tableAttributes.Length > 0)
-            {
-                var tableAttribute = (TableAttribute)tableAttributes[0];
-                return tableAttribute.TableName;
-            }
-
-            return type.Name;
+            if (tableAttributes.Length <= 0) 
+                return type.Name;
+            
+            var tableAttribute = (TableAttribute)tableAttributes[0];
+            return tableAttribute.TableName;
         }
 
         private static FieldDefinition GetFieldForProperty(PropertyInfo p)
@@ -126,13 +124,13 @@ namespace DataCore
             }
 
             var indexAttributes = p.GetCustomAttributes(typeof(IndexAttribute), true);
-            if (indexAttributes.Length > 0)
-            {
-                var indexAttribute = (IndexAttribute)indexAttributes[0];
-                field.HasIndex = true;
-                field.IndexName = indexAttribute.Name;
-                field.IndexUnique = indexAttribute.Unique;
-            }
+            if (indexAttributes.Length <= 0) 
+                return field;
+            
+            var indexAttribute = (IndexAttribute)indexAttributes[0];
+            field.HasIndex = true;
+            field.IndexName = indexAttribute.Name;
+            field.IndexUnique = indexAttribute.Unique;
 
             return field;
         }

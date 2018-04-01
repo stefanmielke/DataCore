@@ -14,7 +14,7 @@ namespace DataCore.Test
                 db.CreateTableIfNotExists<TestClass>();
                 db.Insert(TestHelper.GetNewTestClass());
 
-                for (int i = 0; i < 100000; i++)
+                for (var i = 0; i < 100000; i++)
                 {
                     db.SelectById<TestClass>(1);
                 }
@@ -29,7 +29,7 @@ namespace DataCore.Test
                 db.CreateTableIfNotExists<TestClass>();
                 db.Insert(TestHelper.GetNewTestClass());
 
-                for (int i = 0; i < 100000; i++)
+                for (var i = 0; i < 100000; i++)
                 {
                     db.Select<TestClass>(t => t.Id == 1);
                 }

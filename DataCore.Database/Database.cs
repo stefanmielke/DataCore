@@ -47,7 +47,8 @@ namespace DataCore.Database
             var values = string.Join(", ",
                 properties.Select(p =>
                 {
-                    var value = ExpressionHelper.GetValueFrom(Translator, p.PropertyInfo.PropertyType, p.PropertyInfo.GetValue(obj, null));
+                    var value = ExpressionHelper.GetValueFrom(Translator, p.PropertyInfo.PropertyType,
+                        p.PropertyInfo.GetValue(obj, null));
                     return parameters.Add(Translator, value);
                 })
             );
@@ -70,7 +71,9 @@ namespace DataCore.Database
             var parameters = new Parameters();
             foreach (var prop in properties)
             {
-                var key = parameters.Add(Translator, ExpressionHelper.GetValueFrom(Translator, prop.PropertyInfo.PropertyType, prop.PropertyInfo.GetValue(obj, null)));
+                var key = parameters.Add(Translator,
+                    ExpressionHelper.GetValueFrom(Translator, prop.PropertyInfo.PropertyType,
+                        prop.PropertyInfo.GetValue(obj, null)));
                 nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
             }
 
@@ -83,7 +86,8 @@ namespace DataCore.Database
             Execute(query, parameters);
         }
 
-        public void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields, Expression<Func<T, dynamic>> whereClause)
+        public void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields,
+            Expression<Func<T, dynamic>> whereClause)
         {
             var type = typeof(T);
 
@@ -98,7 +102,9 @@ namespace DataCore.Database
             var parameters = new Parameters();
             foreach (var prop in properties.Where(p => fields.Contains(p.Name)))
             {
-                var key = parameters.Add(Translator, ExpressionHelper.GetValueFrom(Translator, prop.PropertyInfo.PropertyType, prop.PropertyInfo.GetValue(obj, null)));
+                var key = parameters.Add(Translator,
+                    ExpressionHelper.GetValueFrom(Translator, prop.PropertyInfo.PropertyType,
+                        prop.PropertyInfo.GetValue(obj, null)));
                 nameValues.Add(new KeyValuePair<string, string>(prop.Name, key));
             }
 
@@ -153,6 +159,7 @@ namespace DataCore.Database
             {
                 parameters.Add(Translator, id);
             }
+
             var inParams = string.Join(",", parameters.GetValues().Select(kv => kv.Key));
 
             var whereQuery = string.Concat(tableDefinition.IdField.Name, " IN (", inParams, ")");
@@ -230,15 +237,16 @@ namespace DataCore.Database
                 CreateIndex(field.IndexUnique, field.IndexName, tableDefinition.Name, field.Name);
             }
 
-            if (createReferences)
-            {
-                foreach (var field in fields.Where(f => f.IsReference))
-                {
-                    var referencedTable = GetTableDefinition(type);
-                    var idColumnTo = referencedTable.IdField;
+            if (!createReferences)
+                return 0;
 
-                    CreateForeignKey(field.ReferenceName, tableDefinition.Name, referencedTable.Name, field.Name, idColumnTo.Name);
-                }
+            foreach (var field in fields.Where(f => f.IsReference))
+            {
+                var referencedTable = GetTableDefinition(type);
+                var idColumnTo = referencedTable.IdField;
+
+                CreateForeignKey(field.ReferenceName, tableDefinition.Name, referencedTable.Name, field.Name,
+                    idColumnTo.Name);
             }
 
             return 0;
@@ -283,15 +291,16 @@ namespace DataCore.Database
                 CreateIndexIfNotExists(field.IndexUnique, field.IndexName, tableDefinition.Name, field.Name);
             }
 
-            if (createReferences)
-            {
-                foreach (var field in fields.Where(f => f.IsReference))
-                {
-                    var referencedTable = GetTableDefinition(type);
-                    var idColumnTo = referencedTable.IdField;
+            if (!createReferences)
+                return 0;
 
-                    CreateForeignKeyIfNotExists(field.ReferenceName, tableDefinition.Name, referencedTable.Name, field.Name, idColumnTo.Name);
-                }
+            foreach (var field in fields.Where(f => f.IsReference))
+            {
+                var referencedTable = GetTableDefinition(type);
+                var idColumnTo = referencedTable.IdField;
+
+                CreateForeignKeyIfNotExists(field.ReferenceName, tableDefinition.Name, referencedTable.Name,
+                    field.Name, idColumnTo.Name);
             }
 
             return 0;
@@ -412,113 +421,106 @@ namespace DataCore.Database
         public bool ColumnExists<T>(Expression<Func<T, dynamic>> clause)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
-            if (arguments != null && arguments.Length > 0)
-            {
-                var tableDefinition = GetTableDefinition(typeof(T));
+            if (arguments == null || arguments.Length <= 0)
+                return false;
 
-                var query =
-                    arguments.Select(
-                        f =>
-                            Translator.GetColumnExistsQuery(
-                                tableDefinition.Name,
-                                tableDefinition.Fields
-                                    .First(fld => fld.PropertyInfo.Name ==
-                                                  ((PropertyInfo)((MemberExpression)f).Member).Name).Name
-                            )
-                    ).FirstOrDefault();
+            var tableDefinition = GetTableDefinition(typeof(T));
+            var query =
+                arguments.Select(
+                    f =>
+                        Translator.GetColumnExistsQuery(
+                            tableDefinition.Name,
+                            tableDefinition.Fields
+                                .First(fld => fld.PropertyInfo.Name ==
+                                              ((PropertyInfo) ((MemberExpression) f).Member).Name).Name
+                        )
+                ).FirstOrDefault();
 
-                return ExecuteScalar(query) > 0;
-            }
-
-            return false;
+            return ExecuteScalar(query) > 0;
         }
 
         public int CreateColumn<T>(Expression<Func<T, dynamic>> clause)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
-            if (arguments != null && arguments.Length > 0)
-            {
-                var tableDefinition = GetTableDefinition(typeof(T));
+            if (arguments == null || arguments.Length <= 0)
+                return 0;
 
-                var query = string.Join(";",
-                    arguments.Select(
-                        f =>
-                            Translator.GetCreateColumnQuery(
-                                tableDefinition.Name, tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)
-                            )
-                    )
-                );
+            var tableDefinition = GetTableDefinition(typeof(T));
+            var query = string.Join(";",
+                arguments.Select(
+                    f =>
+                        Translator.GetCreateColumnQuery(
+                            tableDefinition.Name,
+                            tableDefinition.Fields.First(fld =>
+                                fld.PropertyInfo.Name == ((PropertyInfo) ((MemberExpression) f).Member).Name)
+                        )
+                )
+            );
 
-                return Execute(query);
-            }
-
-            return 0;
+            return Execute(query);
         }
 
         public int CreateColumnIfNotExists<T>(Expression<Func<T, dynamic>> clause)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
-            if (arguments != null && arguments.Length > 0)
-            {
-                var tableDefinition = GetTableDefinition(typeof(T));
+            if (arguments == null || arguments.Length <= 0)
+                return 0;
 
-                var query = string.Join(";",
-                    arguments.Select(
-                        f =>
-                            Translator.GetCreateColumnIfNotExistsQuery(
-                                tableDefinition.Name, tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)
-                            )
-                    )
-                );
+            var tableDefinition = GetTableDefinition(typeof(T));
+            var query = string.Join(";",
+                arguments.Select(
+                    f =>
+                        Translator.GetCreateColumnIfNotExistsQuery(
+                            tableDefinition.Name,
+                            tableDefinition.Fields.First(fld =>
+                                fld.PropertyInfo.Name == ((PropertyInfo) ((MemberExpression) f).Member).Name)
+                        )
+                )
+            );
 
-                return Execute(query);
-            }
-
-            return 0;
+            return Execute(query);
         }
 
         public int DropColumn<T>(Expression<Func<T, dynamic>> clause)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
-            if (arguments != null && arguments.Length > 0)
-            {
-                var tableDefinition = GetTableDefinition(typeof(T));
+            if (arguments == null || arguments.Length <= 0)
+                return 0;
 
-                var query = string.Join(";",
-                    arguments.Select(
-                        f =>
-                            Translator.GetDropColumnQuery(tableDefinition.Name,
-                                tableDefinition.Fields.First(
-                                    fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name).Name)
-                    )
-                );
+            var tableDefinition = GetTableDefinition(typeof(T));
+            var query = string.Join(";",
+                arguments.Select(
+                    f =>
+                        Translator.GetDropColumnQuery(tableDefinition.Name,
+                            tableDefinition.Fields.First(
+                                    fld => fld.PropertyInfo.Name ==
+                                           ((PropertyInfo) ((MemberExpression) f).Member).Name)
+                                .Name)
+                )
+            );
 
-                return Execute(query);
-            }
-
-            return 0;
+            return Execute(query);
         }
 
         public int DropColumnIfExists<T>(Expression<Func<T, dynamic>> clause)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
-            if (arguments != null && arguments.Length > 0)
-            {
-                var tableDefinition = GetTableDefinition(typeof(T));
+            if (arguments == null || arguments.Length <= 0)
+                return 0;
 
-                var query = string.Join(";",
-                    arguments.Select(
-                        f =>
-                            Translator.GetDropColumnIfExistsQuery(tableDefinition.Name,
-                                tableDefinition.Fields.First(
-                                        fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name).Name)
-                    )
-                );
+            var tableDefinition = GetTableDefinition(typeof(T));
+            var query = string.Join(";",
+                arguments.Select(
+                    f =>
+                        Translator.GetDropColumnIfExistsQuery(tableDefinition.Name,
+                            tableDefinition.Fields.First(
+                                    fld => fld.PropertyInfo.Name ==
+                                           ((PropertyInfo) ((MemberExpression) f).Member).Name)
+                                .Name)
+                )
+            );
 
-                return Execute(query);
-            }
-
-            return 0;
+            return Execute(query);
         }
 
         public bool IndexExists<T>(string indexName)
@@ -533,33 +535,31 @@ namespace DataCore.Database
         public bool IndexExists<T>(Expression<Func<T, dynamic>> clause)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
-            if (arguments != null && arguments.Length > 0)
-            {
-                var tableDefinition = GetTableDefinition(typeof(T));
+            if (arguments == null || arguments.Length <= 0)
+                return false;
 
-                var columns = string.Join(", ", arguments.Select(f => tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)));
+            var tableDefinition = GetTableDefinition(typeof(T));
+            var columns = string.Join(", ",
+                arguments.Select(f => tableDefinition.Fields.First(fld =>
+                    fld.PropertyInfo.Name == ((PropertyInfo) ((MemberExpression) f).Member).Name)));
 
-                var indexName = string.Concat("IX_", tableDefinition.Name, "_", columns.Replace(", ", "_"));
+            var indexName = string.Concat("IX_", tableDefinition.Name, "_", columns.Replace(", ", "_"));
 
-                return IndexExists<T>(indexName);
-            }
-
-            return false;
+            return IndexExists<T>(indexName);
         }
 
         public int CreateIndex<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
-            if (arguments != null && arguments.Length > 0)
-            {
-                var tableDefinition = GetTableDefinition(typeof(T));
+            if (arguments == null || arguments.Length <= 0)
+                return 0;
 
-                var columns = string.Join(", ", arguments.Select(f => tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)));
+            var tableDefinition = GetTableDefinition(typeof(T));
+            var columns = string.Join(", ",
+                arguments.Select(f => tableDefinition.Fields.First(fld =>
+                    fld.PropertyInfo.Name == ((PropertyInfo) ((MemberExpression) f).Member).Name)));
 
-                return CreateIndex(unique, indexName, tableDefinition.Name, columns);
-            }
-
-            return 0;
+            return CreateIndex(unique, indexName, tableDefinition.Name, columns);
         }
 
         private int CreateIndex(bool unique, string indexName, string tableName, string columns)
@@ -572,19 +572,19 @@ namespace DataCore.Database
             return Execute(query);
         }
 
-        public int CreateIndexIfNotExists<T>(Expression<Func<T, dynamic>> clause, bool unique = false, string indexName = null)
+        public int CreateIndexIfNotExists<T>(Expression<Func<T, dynamic>> clause, bool unique = false,
+            string indexName = null)
         {
             var arguments = ExpressionHelper.GetExpressionsFromDynamic(clause);
-            if (arguments != null && arguments.Length > 0)
-            {
-                var tableDefinition = GetTableDefinition(typeof(T));
+            if (arguments == null || arguments.Length <= 0)
+                return 0;
 
-                var columns = string.Join(", ", arguments.Select(f => tableDefinition.Fields.First(fld => fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)f).Member).Name)));
+            var tableDefinition = GetTableDefinition(typeof(T));
+            var columns = string.Join(", ",
+                arguments.Select(f => tableDefinition.Fields.First(fld =>
+                    fld.PropertyInfo.Name == ((PropertyInfo) ((MemberExpression) f).Member).Name)));
 
-                return CreateIndexIfNotExists(unique, indexName, tableDefinition.Name, columns);
-            }
-
-            return 0;
+            return CreateIndexIfNotExists(unique, indexName, tableDefinition.Name, columns);
         }
 
         private int CreateIndexIfNotExists(bool unique, string indexName, string tableName, string columns)
@@ -624,104 +624,113 @@ namespace DataCore.Database
             return ExecuteScalar(query) > 0;
         }
 
-        public bool ForeignKeyExists<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo)
+        public bool ForeignKeyExists<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom,
+            Expression<Func<TTo, dynamic>> columnTo)
         {
             var argumentsFrom = ExpressionHelper.GetExpressionsFromDynamic(columnFrom);
             var argumentsTo = ExpressionHelper.GetExpressionsFromDynamic(columnTo);
 
-            if (argumentsFrom != null && argumentsFrom.Length > 0
-                && argumentsTo != null && argumentsTo.Length > 0)
-            {
-                var tableFrom = GetTableDefinition(typeof(TFrom));
-                var tableTo = GetTableDefinition(typeof(TTo));
+            if (argumentsFrom == null || argumentsFrom.Length <= 0 || argumentsTo == null || argumentsTo.Length <= 0)
+                return false;
 
-                var columnNameFrom = tableFrom.Fields.First(
+            var tableFrom = GetTableDefinition(typeof(TFrom));
+            var tableTo = GetTableDefinition(typeof(TTo));
+
+            var columnNameFrom = tableFrom.Fields.First(
+                fld =>
+                    fld.PropertyInfo.Name ==
+                    ((PropertyInfo) ((MemberExpression) argumentsFrom.First()).Member).Name).Name;
+
+            var columnNameTo = tableTo.Fields.First(
                     fld =>
-                        fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)argumentsFrom.First()).Member).Name).Name;
+                        fld.PropertyInfo.Name ==
+                        ((PropertyInfo) ((MemberExpression) argumentsTo.First()).Member).Name)
+                .Name;
 
-                var columnNameTo = tableTo.Fields.First(
-                    fld =>
-                        fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)argumentsTo.First()).Member).Name).Name;
+            var indexName = string.Concat("FK_", tableFrom.Name, "_", columnNameFrom, "_", tableTo.Name, "_",
+                columnNameTo);
+            indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
 
-                var indexName = string.Concat("FK_", tableFrom.Name, "_", columnNameFrom, "_", tableTo.Name, "_", columnNameTo);
-                indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
-
-                return ForeignKeyExists<TFrom>(indexName);
-            }
-
-            return false;
+            return ForeignKeyExists<TFrom>(indexName);
         }
 
-        public int CreateForeignKey<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo, string indexName = null)
+        public int CreateForeignKey<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom,
+            Expression<Func<TTo, dynamic>> columnTo, string indexName = null)
         {
             var argumentsFrom = ExpressionHelper.GetExpressionsFromDynamic(columnFrom);
             var argumentsTo = ExpressionHelper.GetExpressionsFromDynamic(columnTo);
 
-            if (argumentsFrom != null && argumentsFrom.Length > 0
-                && argumentsTo != null && argumentsTo.Length > 0)
-            {
-                var tableFrom = GetTableDefinition(typeof(TFrom));
-                var tableTo = GetTableDefinition(typeof(TTo));
+            if (argumentsFrom == null || argumentsFrom.Length <= 0 || argumentsTo == null || argumentsTo.Length <= 0)
+                return 0;
+            var tableFrom = GetTableDefinition(typeof(TFrom));
+            var tableTo = GetTableDefinition(typeof(TTo));
 
-                var columnNameFrom = tableFrom.Fields.First(
+            var columnNameFrom = tableFrom.Fields.First(
+                fld =>
+                    fld.PropertyInfo.Name ==
+                    ((PropertyInfo) ((MemberExpression) argumentsFrom.First()).Member).Name).Name;
+
+            var columnNameTo = tableTo.Fields.First(
                     fld =>
-                        fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)argumentsFrom.First()).Member).Name).Name;
+                        fld.PropertyInfo.Name ==
+                        ((PropertyInfo) ((MemberExpression) argumentsTo.First()).Member).Name)
+                .Name;
 
-                var columnNameTo = tableTo.Fields.First(
-                    fld =>
-                        fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)argumentsTo.First()).Member).Name).Name;
-
-                return CreateForeignKey(indexName, tableFrom.Name, tableTo.Name, columnNameFrom, columnNameTo);
-            }
-
-            return 0;
+            return CreateForeignKey(indexName, tableFrom.Name, tableTo.Name, columnNameFrom, columnNameTo);
         }
 
-        private int CreateForeignKey(string indexName, string tableNameFrom, string tableNameTo, string columnNameFrom, string columnNameTo)
+        private int CreateForeignKey(string indexName, string tableNameFrom, string tableNameTo, string columnNameFrom,
+            string columnNameTo)
         {
             if (string.IsNullOrEmpty(indexName))
-                indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
+                indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_",
+                    columnNameTo);
 
             indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
 
-            var query = Translator.GetCreateForeignKeyQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
+            var query = Translator.GetCreateForeignKeyQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo,
+                columnNameTo);
 
             return Execute(query);
         }
 
-        public int CreateForeignKeyIfNotExists<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom, Expression<Func<TTo, dynamic>> columnTo, string indexName = null)
+        public int CreateForeignKeyIfNotExists<TFrom, TTo>(Expression<Func<TFrom, dynamic>> columnFrom,
+            Expression<Func<TTo, dynamic>> columnTo, string indexName = null)
         {
             var argumentsFrom = ExpressionHelper.GetExpressionsFromDynamic(columnFrom);
             var argumentsTo = ExpressionHelper.GetExpressionsFromDynamic(columnTo);
 
-            if (argumentsFrom != null && argumentsFrom.Length > 0
-               && argumentsTo != null && argumentsTo.Length > 0)
-            {
-                var tableFrom = GetTableDefinition(typeof(TFrom));
-                var tableTo = GetTableDefinition(typeof(TTo));
+            if (argumentsFrom == null || argumentsFrom.Length <= 0 || argumentsTo == null || argumentsTo.Length <= 0)
+                return 0;
 
-                var columnNameFrom = tableFrom.Fields.First(
+            var tableFrom = GetTableDefinition(typeof(TFrom));
+            var tableTo = GetTableDefinition(typeof(TTo));
+
+            var columnNameFrom = tableFrom.Fields.First(
+                fld =>
+                    fld.PropertyInfo.Name ==
+                    ((PropertyInfo) ((MemberExpression) argumentsFrom.First()).Member).Name).Name;
+
+            var columnNameTo = tableTo.Fields.First(
                     fld =>
-                        fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)argumentsFrom.First()).Member).Name).Name;
+                        fld.PropertyInfo.Name ==
+                        ((PropertyInfo) ((MemberExpression) argumentsTo.First()).Member).Name)
+                .Name;
 
-                var columnNameTo = tableTo.Fields.First(
-                    fld =>
-                        fld.PropertyInfo.Name == ((PropertyInfo)((MemberExpression)argumentsTo.First()).Member).Name).Name;
-
-                return CreateForeignKeyIfNotExists(indexName, tableFrom.Name, tableTo.Name, columnNameFrom, columnNameTo);
-            }
-
-            return 0;
+            return CreateForeignKeyIfNotExists(indexName, tableFrom.Name, tableTo.Name, columnNameFrom, columnNameTo);
         }
 
-        private int CreateForeignKeyIfNotExists(string indexName, string tableNameFrom, string tableNameTo, string columnNameFrom, string columnNameTo)
+        private int CreateForeignKeyIfNotExists(string indexName, string tableNameFrom, string tableNameTo,
+            string columnNameFrom, string columnNameTo)
         {
             if (string.IsNullOrEmpty(indexName))
-                indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_", columnNameTo);
+                indexName = string.Concat("FK_", tableNameFrom, "_", columnNameFrom, "_", tableNameTo, "_",
+                    columnNameTo);
 
             indexName = indexName.Substring(0, Math.Min(20, indexName.Length));
 
-            var query = Translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom, tableNameTo, columnNameTo);
+            var query = Translator.GetCreateForeignKeyIfNotExistsQuery(indexName, tableNameFrom, columnNameFrom,
+                tableNameTo, columnNameTo);
 
             return Execute(query);
         }
@@ -813,6 +822,7 @@ namespace DataCore.Database
             {
                 parameters.Add(Translator, id);
             }
+
             var inParams = string.Join(",", parameters.GetValues().Select(kv => kv.Key));
 
             var query = From<T>().Where(idProperty.Name + " IN (" + inParams + ")").Build();
@@ -893,18 +903,18 @@ namespace DataCore.Database
             return _connection.Query<int>(query, parameters.GetValues()).First();
         }
 
-        private TableDefinition GetTableDefinition(Type type)
+        private static TableDefinition GetTableDefinition(Type type)
         {
             return new TableDefinition(type);
         }
 
         public void Dispose()
         {
-            if (_connection != null)
-            {
-                _connection.Close();
-                _connection.Dispose();
-            }
+            if (_connection == null)
+                return;
+
+            _connection.Close();
+            _connection.Dispose();
         }
     }
 }

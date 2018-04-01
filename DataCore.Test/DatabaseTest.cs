@@ -191,7 +191,7 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanDropIndex(TestHelper.DatabaseType dbType, string connectionString)
         {
-            string indexName = "IX_TestClass_Id_Name";
+            const string indexName = "IX_TestClass_Id_Name";
 
             using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
@@ -217,7 +217,7 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCasesNoSqlite))]
         public void CanDropForeignKey(TestHelper.DatabaseType dbType, string connectionString)
         {
-            string indexName = "FK_TestClass_Id";
+            const string indexName = "FK_TestClass_Id";
 
             using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {

@@ -121,26 +121,26 @@ namespace DataCore.Database.Oracle
             yield return query.ToString();
 
             var identity = fieldList.FirstOrDefault(f => f.IsIdentity);
-            if (identity != null)
-            {
-                var sequenceName = tableName + "_sequence";
-                var triggerName = tableName + "_on_insert";
+            if (identity == null)
+                yield break;
+            
+            var sequenceName = tableName + "_sequence";
+            var triggerName = tableName + "_on_insert";
 
-                yield return string.Concat("CREATE SEQUENCE ", sequenceName);
+            yield return string.Concat("CREATE SEQUENCE ", sequenceName);
 
-                query.Clear();
-                query.Append("CREATE OR REPLACE TRIGGER ");
-                query.Append(triggerName);
-                query.Append(" BEFORE INSERT ON ");
-                query.Append(tableName);
-                query.Append(" FOR EACH ROW BEGIN SELECT ");
-                query.Append(sequenceName);
-                query.Append(".nextval INTO :new.");
-                query.Append(identity.Name);
-                query.Append(" FROM dual; END;");
+            query.Clear();
+            query.Append("CREATE OR REPLACE TRIGGER ");
+            query.Append(triggerName);
+            query.Append(" BEFORE INSERT ON ");
+            query.Append(tableName);
+            query.Append(" FOR EACH ROW BEGIN SELECT ");
+            query.Append(sequenceName);
+            query.Append(".nextval INTO :new.");
+            query.Append(identity.Name);
+            query.Append(" FROM dual; END;");
 
-                yield return query.ToString();
-            }
+            yield return query.ToString();
         }
 
         public override IEnumerable<string> GetCreateTableIfNotExistsQuery(string tableName, IEnumerable<FieldDefinition> fields)
@@ -157,26 +157,26 @@ namespace DataCore.Database.Oracle
             yield return CatchException(query.ToString(), -955);
 
             var identity = fieldList.FirstOrDefault(f => f.IsIdentity);
-            if (identity != null)
-            {
-                var sequenceName = tableName + "_sequence";
-                var triggerName = tableName + "_on_insert";
+            if (identity == null)
+                yield break;
+            
+            var sequenceName = tableName + "_sequence";
+            var triggerName = tableName + "_on_insert";
 
-                yield return CatchException(string.Concat("CREATE SEQUENCE ", sequenceName));
+            yield return CatchException(string.Concat("CREATE SEQUENCE ", sequenceName));
 
-                query.Clear();
-                query.Append("CREATE OR REPLACE TRIGGER ");
-                query.Append(triggerName);
-                query.Append(" BEFORE INSERT ON ");
-                query.Append(tableName);
-                query.Append(" FOR EACH ROW BEGIN SELECT ");
-                query.Append(sequenceName);
-                query.Append(".nextval INTO :new.");
-                query.Append(identity.Name);
-                query.Append(" FROM dual; END;");
+            query.Clear();
+            query.Append("CREATE OR REPLACE TRIGGER ");
+            query.Append(triggerName);
+            query.Append(" BEFORE INSERT ON ");
+            query.Append(tableName);
+            query.Append(" FOR EACH ROW BEGIN SELECT ");
+            query.Append(sequenceName);
+            query.Append(".nextval INTO :new.");
+            query.Append(identity.Name);
+            query.Append(" FROM dual; END;");
 
-                yield return CatchException(query.ToString());
-            }
+            yield return CatchException(query.ToString());
         }
 
         public override string GetCreateColumnQuery(string tableName, FieldDefinition field)
@@ -329,13 +329,13 @@ namespace DataCore.Database.Oracle
             return "\"{0}\"";
         }
 
-        private string CatchException(string sql, int exceptionCode)
+        private static string CatchException(string sql, int exceptionCode)
         {
             return string.Concat("BEGIN EXECUTE IMMEDIATE '", sql, "' ; EXCEPTION WHEN OTHERS THEN IF SQLCODE != ",
                 exceptionCode, " THEN RAISE; END IF; END;");
         }
 
-        private string CatchException(string sql)
+        private static string CatchException(string sql)
         {
             return string.Concat("BEGIN EXECUTE IMMEDIATE '", sql, "' ; EXCEPTION WHEN OTHERS THEN NULL; END;");
         }

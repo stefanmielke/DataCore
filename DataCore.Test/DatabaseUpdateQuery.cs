@@ -10,7 +10,7 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanUpdate(TestHelper.DatabaseType dbType, string connectionString)
         {
-            var updatedName = "test updated";
+            const string updatedName = "test updated";
 
             using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
@@ -40,8 +40,8 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanUpdateOnlyOneField(TestHelper.DatabaseType dbType, string connectionString)
         {
-            var updatedName = "test updated";
-            var updatedNumber = 2;
+            const string updatedName = "test updated";
+            const int updatedNumber = 2;
 
             using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
@@ -74,8 +74,8 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanUpdateOnlyManyFields(TestHelper.DatabaseType dbType, string connectionString)
         {
-            var updatedName = "test updated";
-            var updatedNumber = 2;
+            const string updatedName = "test updated";
+            const int updatedNumber = 2;
 
             using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
@@ -108,7 +108,7 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanUpdateWithoutIgnoredField(TestHelper.DatabaseType dbType, string connectionString)
         {
-            var updatedName = "test updated";
+            const string updatedName = "test updated";
 
             using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
@@ -135,8 +135,8 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanUpdateOnlyOneFieldWithoutIgnoredField(TestHelper.DatabaseType dbType, string connectionString)
         {
-            var updatedName = "test updated";
-            var updatedNumber = 2;
+            const string updatedName = "test updated";
+            const int updatedNumber = 2;
 
             using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {
@@ -166,8 +166,8 @@ namespace DataCore.Test
         [Test, TestCaseSource(typeof(SqlTestDataFactory), nameof(SqlTestDataFactory.TestCases))]
         public void CanUpdateOnlyManyFieldsWithoutIgnoredField(TestHelper.DatabaseType dbType, string connectionString)
         {
-            var updatedName = "test updated";
-            var updatedNumber = 2;
+            const string updatedName = "test updated";
+            const int updatedNumber = 2;
 
             using (var database = TestHelper.GetDatabaseFor(dbType, connectionString))
             {

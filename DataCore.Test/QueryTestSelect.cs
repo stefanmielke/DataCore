@@ -74,16 +74,16 @@ namespace DataCore.Test
                     .Top(103)
                     .Build();
 
-            var expected = "SELECT TestClass.Id, TestClass.Name"
-                            + " FROM TestClass WITH(NOLOCK)"
-                            + " INNER JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id)"
-                            + " LEFT JOIN TestClass2 WITH(NOLOCK) ON ((TestClass.Id = TestClass2.Id) AND (TestClass2.Id = @p0))"
-                            + " RIGHT JOIN TestClass3 WITH(NOLOCK) ON ((TestClass2.Id = TestClass3.Id) AND (TestClass3.Id > @p1))"
-                            + " WHERE (TestClass.FloatNumber > @p2)"
-                            + " GROUP BY TestClass.Id, TestClass.Name"
-                            + " HAVING (TestClass.Id > @p3)"
-                            + " ORDER BY TestClass.Id"
-                            + " LIMIT 103";
+            const string expected = "SELECT TestClass.Id, TestClass.Name"
+                                    + " FROM TestClass WITH(NOLOCK)"
+                                    + " INNER JOIN TestClass2 WITH(NOLOCK) ON (TestClass.Id = TestClass2.Id)"
+                                    + " LEFT JOIN TestClass2 WITH(NOLOCK) ON ((TestClass.Id = TestClass2.Id) AND (TestClass2.Id = @p0))"
+                                    + " RIGHT JOIN TestClass3 WITH(NOLOCK) ON ((TestClass2.Id = TestClass3.Id) AND (TestClass3.Id > @p1))"
+                                    + " WHERE (TestClass.FloatNumber > @p2)"
+                                    + " GROUP BY TestClass.Id, TestClass.Name"
+                                    + " HAVING (TestClass.Id > @p3)"
+                                    + " ORDER BY TestClass.Id"
+                                    + " LIMIT 103";
 
             Assert.AreEqual(expected, query.SqlCommand.ToString());
             Assert.AreEqual(1, query.Parameters.GetValues()["@p0"]);

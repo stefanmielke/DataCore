@@ -16,8 +16,7 @@ namespace DataCore
         protected override Expression VisitMember(MemberExpression memberExpression)
         {
             var expression = Visit(memberExpression.Expression);
-            var constantExpression = expression as ConstantExpression;
-            if (constantExpression != null)
+            if (expression is ConstantExpression constantExpression)
             {
                 var container = constantExpression.Value;
                 var member = memberExpression.Member;
@@ -50,23 +49,21 @@ namespace DataCore
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            string constantValue;
-            if (ExpressionHelper.GetSqlExtensionMethodCallConstant(new Translator(), node, Parameters, out constantValue))
+            if (ExpressionHelper.GetSqlExtensionMethodCallConstant(new Translator(), node, Parameters, out _))
                 return node;
 
-            var obj = node.Object == null ? null : ((ConstantExpression)node.Object).Value;
+            var obj = ((ConstantExpression) node.Object)?.Value;
             var args = node.Arguments.Select(
                 a =>
                 {
                     ConstantExpression constExpr;
 
-                    var memberExpr = a as MemberExpression;
-                    if (memberExpr != null)
+                    if (a is MemberExpression memberExpr)
                         constExpr = VisitMember(memberExpr) as ConstantExpression;
                     else
                         constExpr = a as ConstantExpression;
-                    
-                    return constExpr.Value;
+
+                    return constExpr?.Value;
                 }
             ).ToArray();
 

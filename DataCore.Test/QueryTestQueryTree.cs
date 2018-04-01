@@ -35,7 +35,7 @@ namespace DataCore.Test
         {
             var query = new Query<TestClass>(new Translator());
 
-            query.Where(t => (t.Id == 0 && t.FloatNumber == 1) && t.Id == 1);
+            query.Where(t => t.Id == 0 && t.FloatNumber == 1 && t.Id == 1);
 
             Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.FloatNumber = @p1)) AND (TestClass.Id = @p2))", query.SqlWhere);
             Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
@@ -48,7 +48,7 @@ namespace DataCore.Test
         {
             var query = new Query<TestClass>(new Translator());
 
-            query.Where(t => (t.Id == 0 && t.FloatNumber == 1) || (t.Id == 1 && t.FloatNumber == 0));
+            query.Where(t => t.Id == 0 && t.FloatNumber == 1 || t.Id == 1 && t.FloatNumber == 0);
 
             Assert.AreEqual("(((TestClass.Id = @p0) AND (TestClass.FloatNumber = @p1)) OR ((TestClass.Id = @p2) AND (TestClass.FloatNumber = @p3)))", query.SqlWhere);
             Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);

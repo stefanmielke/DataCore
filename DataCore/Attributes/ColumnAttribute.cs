@@ -4,11 +4,11 @@ namespace DataCore.Attributes
 {
     public class ColumnAttribute : Attribute
     {
-        public string ColumnName { get; private set; }
-        public bool IsPrimaryKey { get; private set; }
-        public bool IsRequired { get; private set; }
-        public int Length { get; private set; }
-        public int Precision { get; private set; }
+        public string ColumnName { get; }
+        public bool IsPrimaryKey { get; }
+        public bool IsRequired { get; }
+        public int Length { get; }
+        public int Precision { get; }
 
         public ColumnAttribute(string columnName = null, bool isPrimaryKey = false, bool isRequired = true, int length = 255, int precision = 3)
         {

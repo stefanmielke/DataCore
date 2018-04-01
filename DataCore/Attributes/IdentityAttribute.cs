@@ -4,8 +4,8 @@ namespace DataCore.Attributes
 {
     public class IdentityAttribute : Attribute
     {
-        public int Start { get; set; }
-        public int Increment { get; set; }
+        public int Start { get; }
+        public int Increment { get; }
 
         public IdentityAttribute(int start = 1, int increment = 1)
         {

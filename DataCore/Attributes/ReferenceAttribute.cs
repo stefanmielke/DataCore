@@ -4,8 +4,8 @@ namespace DataCore.Attributes
 {
     public class ReferenceAttribute : Attribute
     {
-        public Type Table { get; private set; }
-        public string FkName { get; private set; }
+        public Type Table { get; }
+        public string FkName { get; }
 
         public ReferenceAttribute(Type table, string fkName = null)
         {

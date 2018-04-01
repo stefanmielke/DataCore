@@ -87,7 +87,7 @@ namespace DataCore.Test
                     break;
             }
 
-            var db = new Database.DataCoreDatabase(dbDefinition, connectionString);
+            var db = new DataCoreDatabase(dbDefinition, connectionString);
             db.DropTableIfExists<TestClass>();
             db.DropTableIfExists<TestClass2>();
             db.DropTableIfExists<TestClass3>();

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -18,31 +17,30 @@ namespace DataCore
     public class Query<T> : IQuery
     {
         private readonly ITranslator _translator;
-        private TableDefinition _tableDefinition;
 
         public bool Built { get; private set; }
 
         public string SqlSelectFormat { get; set; }
-        public string SqlColumns { get; set; }
-        public string SqlFrom { get; set; }
-        public string SqlWhere { get; set; }
-        public string SqlOrderBy { get; set; }
-        public string SqlHaving { get; set; }
-        public string SqlGroupBy { get; set; }
+        public string SqlColumns { get; private set; }
+        public string SqlFrom { get; private set; }
+        public string SqlWhere { get; private set; }
+        public string SqlOrderBy { get; private set; }
+        public string SqlHaving { get; private set; }
+        public string SqlGroupBy { get; private set; }
         public string SqlEnd { get; set; }
-        public StringBuilder SqlCommand { get; private set; }
+        public StringBuilder SqlCommand { get; }
 
         private readonly List<IQuery> _unionQueries;
         private readonly List<IQuery> _unionAllQueries;
 
-        public Parameters Parameters { get; private set; }
+        public Parameters Parameters { get; }
 
         public Query(ITranslator translator)
         {
             Built = false;
             
             _translator = translator;
-            _tableDefinition = new TableDefinition(typeof(T));
+            var tableDefinition = new TableDefinition(typeof(T));
 
             SqlSelectFormat = "{0}";
             SqlWhere = string.Empty;
@@ -51,7 +49,7 @@ namespace DataCore
             SqlGroupBy = "";
             SqlOrderBy = "";
             SqlEnd = "";
-            SqlFrom = _translator.GetSelectTableName(_tableDefinition);
+            SqlFrom = _translator.GetSelectTableName(tableDefinition);
 
             Parameters = new Parameters();
 

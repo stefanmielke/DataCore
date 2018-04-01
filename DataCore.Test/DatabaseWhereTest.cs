@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using DataCore.Test.Models;
+﻿using DataCore.Test.Models;
 using NUnit.Framework;
 
 namespace DataCore.Test
