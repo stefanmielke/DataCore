@@ -350,6 +350,22 @@ namespace DataCore
             return this;
         }
 
+        public Query<T> Having<TJoined>(Expression<Func<TJoined, bool>> clause)
+        {
+            var query = GetQueryFromClause(clause);
+
+            SqlHaving = string.IsNullOrEmpty(SqlHaving) ? query : string.Concat("(", SqlHaving, ") AND (", query, ")");
+
+            return this;
+        }
+
+        public Query<T> GroupBy<TJoined>(Expression<Func<TJoined, dynamic>> clause)
+        {
+            SqlGroupBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlGroupBy, Parameters);
+
+            return this;
+        }
+
         public Query<T> GroupBy(Expression<Func<T, dynamic>> clause)
         {
             SqlGroupBy = ExpressionHelper.FormatStringFromArguments(_translator, clause, SqlGroupBy, Parameters);

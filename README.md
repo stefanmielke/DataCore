@@ -112,6 +112,16 @@ var result = db.Select(query);
 var query = db.From<User>().GroupBy(u => u.Name).Having(u => u.Age.Sum() > 100).Count();
 var result = db.Select(query);
 ```
+```csharp
+var query = db.From<User>()
+              .LeftJoin<Address>((u, a) => u.Id == a.UserId)
+              .GroupBy(u => u.Name)
+              .GroupBy<Address>(a => a.Street)
+              .Having(u => u.Age.Sum() > 100)
+              .Having<Address>(a => a.Sum.Number.Count() > 2)
+              .Count();
+var result = db.Select(query);
+```
 
 ### Select Columns
 
