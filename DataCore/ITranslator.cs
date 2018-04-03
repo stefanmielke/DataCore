@@ -17,6 +17,7 @@ namespace DataCore
 
         string GetInsertQuery(TableDefinition table, string names, string values);
         string GetUpdateQuery(string tableName, IEnumerable<KeyValuePair<string, string>> nameValues, string where, Parameters parameters);
+        string GetDeleteQuery(string tableName);
         string GetDeleteQuery(string tableName, string whereQuery, Parameters parameters);
 
         string GetParameterTag();

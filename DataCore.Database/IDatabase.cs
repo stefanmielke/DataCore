@@ -70,6 +70,7 @@ namespace DataCore.Database
         void Delete<T>(Expression<Func<T, bool>> whereClause);
         void DeleteById<T>(object id);
         void DeleteById<T>(params object[] ids);
+        void DeleteAll<T>();
 
         Query<T> From<T>();
 

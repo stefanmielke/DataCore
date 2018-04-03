@@ -53,5 +53,41 @@ namespace DataCore.Test
             Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
             Assert.AreEqual("test", query.Parameters.GetValues()["@p1"]);
         }
+        
+        [Test]
+        public void CanGenerateHavingWithAddition()
+        {
+            var query = new Query<TestClass>(new Translator()).Having(t => t.Id + t.Id > 0);
+
+            Assert.AreEqual("((TestClass.Id + TestClass.Id) > @p0)", query.SqlHaving);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+        }
+        
+        [Test]
+        public void CanGenerateHavingWithSubtraction()
+        {
+            var query = new Query<TestClass>(new Translator()).Having(t => t.Id - t.Id > 0);
+
+            Assert.AreEqual("((TestClass.Id - TestClass.Id) > @p0)", query.SqlHaving);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+        }
+        
+        [Test]
+        public void CanGenerateHavingWithMultiply()
+        {
+            var query = new Query<TestClass>(new Translator()).Having(t => t.Id * t.Id > 0);
+
+            Assert.AreEqual("((TestClass.Id * TestClass.Id) > @p0)", query.SqlHaving);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+        }
+        
+        [Test]
+        public void CanGenerateHavingWithModulo()
+        {
+            var query = new Query<TestClass>(new Translator()).Having(t => t.Id % t.Id > 0);
+
+            Assert.AreEqual("((TestClass.Id % TestClass.Id) > @p0)", query.SqlHaving);
+            Assert.AreEqual(0, query.Parameters.GetValues()["@p0"]);
+        }
     }
 }

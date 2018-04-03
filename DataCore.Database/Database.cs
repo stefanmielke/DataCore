@@ -169,6 +169,17 @@ namespace DataCore.Database
             Execute(query, parameters);
         }
 
+        public void DeleteAll<T>()
+        {
+            var type = typeof(T);
+
+            var tableDefinition = GetTableDefinition(type);
+
+            var query = Translator.GetDeleteQuery(tableDefinition.Name);
+
+            Execute(query);
+        }
+
         public bool DatabaseExists(string name)
         {
             var query = Translator.GetDatabaseExistsQuery(name);

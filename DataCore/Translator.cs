@@ -68,6 +68,11 @@ namespace DataCore
             return query;
         }
 
+        public string GetDeleteQuery(string tableName)
+        {
+            return string.Concat("DELETE FROM ", tableName);
+        }
+
         public string GetDeleteQuery(string tableName, string whereQuery, Parameters parameters)
         {
             return string.Concat("DELETE FROM ", tableName, " WHERE ", whereQuery);
@@ -93,6 +98,16 @@ namespace DataCore
                     return "({0} AND {1})";
                 case ExpressionType.OrElse:
                     return "({0} OR {1})";
+                case ExpressionType.Add:
+                    return "({0} + {1})";
+                case ExpressionType.Subtract:
+                    return "({0} - {1})";
+                case ExpressionType.Multiply:
+                    return "({0} * {1})";
+                case ExpressionType.Divide:
+                    return "({0} / {1})";
+                case ExpressionType.Modulo:
+                    return "({0} % {1})";
                 default:
                     return "({0} {1})";
             }
