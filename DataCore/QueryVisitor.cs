@@ -1,16 +1,15 @@
-﻿using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
 
 namespace DataCore
 {
     public class QueryVisitor : ExpressionVisitor
     {
-        public Parameters Parameters { get; }
+        private readonly Parameters _parameters;
 
         public QueryVisitor(Parameters parameters)
         {
-            Parameters = parameters;
+            _parameters = parameters;
         }
 
         protected override Expression VisitMember(MemberExpression memberExpression)
@@ -40,8 +39,12 @@ namespace DataCore
 
         protected override Expression VisitNew(NewExpression node)
         {
-            var args = node.Arguments.Select(a => ((ConstantExpression)a).Value).ToArray();
-
+            var args = new object[node.Arguments.Count];
+            for (var i = 0; i < args.Length; i++)
+            {
+                args[i] = ((ConstantExpression)node.Arguments[i]).Value;
+            }
+            
             var newObject = node.Constructor.Invoke(args);
 
             return Expression.Constant(newObject);
@@ -49,23 +52,23 @@ namespace DataCore
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (ExpressionHelper.GetSqlExtensionMethodCallConstant(new Translator(), node, Parameters, out _))
+            if (ExpressionHelper.GetSqlExtensionMethodCallConstant(new Translator(), node, _parameters, out _))
                 return node;
 
             var obj = ((ConstantExpression) node.Object)?.Value;
-            var args = node.Arguments.Select(
-                a =>
-                {
-                    ConstantExpression constExpr;
+            
+            var args = new object[node.Arguments.Count];
+            for (var i = 0; i < args.Length; i++)
+            {
+                ConstantExpression constExpr;
 
-                    if (a is MemberExpression memberExpr)
-                        constExpr = VisitMember(memberExpr) as ConstantExpression;
-                    else
-                        constExpr = a as ConstantExpression;
+                if (node.Arguments[i] is MemberExpression memberExpr)
+                    constExpr = VisitMember(memberExpr) as ConstantExpression;
+                else
+                    constExpr = node.Arguments[i] as ConstantExpression;
 
-                    return constExpr?.Value;
-                }
-            ).ToArray();
+                args[i] = constExpr?.Value;
+            }
 
             var newObject = node.Method.Invoke(obj, args);
 
