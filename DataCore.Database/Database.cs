@@ -58,7 +58,7 @@ namespace DataCore.Database
             Execute(query, parameters);
         }
 
-        public void Update<T>(T obj, Expression<Func<T, dynamic>> whereClause)
+        public void Update<T>(T obj, Expression<Func<T, bool>> whereClause)
         {
             var type = typeof(T);
 
@@ -87,7 +87,7 @@ namespace DataCore.Database
         }
 
         public void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields,
-            Expression<Func<T, dynamic>> whereClause)
+            Expression<Func<T, bool>> whereClause)
         {
             var type = typeof(T);
 

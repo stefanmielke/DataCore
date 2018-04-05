@@ -64,8 +64,8 @@ namespace DataCore.Database
 
         void Insert<T>(T obj);
 
-        void Update<T>(T obj, Expression<Func<T, dynamic>> whereClause);
-        void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields, Expression<Func<T, dynamic>> whereClause);
+        void Update<T>(T obj, Expression<Func<T, bool>> whereClause);
+        void UpdateOnly<T>(T obj, Expression<Func<T, dynamic>> onlyFields, Expression<Func<T, bool>> whereClause);
 
         void Delete<T>(Expression<Func<T, bool>> whereClause);
         void DeleteById<T>(object id);
